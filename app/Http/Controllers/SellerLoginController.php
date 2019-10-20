@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-// use App\CustomerLogin;
+// use App\SellerLogin;
 
-use App\Model\CustomerDetail as customer_details;
-use App\Model\CustomerLogin as customer_logins;
-use App\Model\CustomerLoginLog as customer_login_logs;
+use App\Model\SellerDetail as seller_details;
+use App\Model\SellerLogin as seller_logins;
+use App\Model\SellerLoginLog as seller_login_logs;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
-class CustomerLoginController extends Controller
+class SellerLoginController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -43,8 +43,8 @@ class CustomerLoginController extends Controller
 
         $username_input = $request->username;
         $password_input = $request->password;
-        $customerLogin  = customer_details::where('customerUsername', $username_input);
-        if (!$customerLogin->exists()) {
+        $sellerLogin  = seller_details::where('sellerUsername', $username_input);
+        if (!$sellerLogin->exists()) {
             // Redirect to login page again
             $response = [
                 'status' => 403,
@@ -52,20 +52,20 @@ class CustomerLoginController extends Controller
             ];
             return response()->json($response, 403);
         }
-        $customerLogin = customer_logins::where('customerUsername', $username_input)->first();
+        $sellerLogin = seller_logins::where('sellerUsername', $username_input)->first();
         $loginInfo = [
-            'customerId' => $customerLogin->customerId,
-            'customerUsername' => $customerLogin->customerUsername,
+            'sellerId' => $sellerLogin->sellerId,
+            'sellerUsername' => $sellerLogin->sellerUsername,
             'created_at' => date_format(now(), 'Y-m-d H:i:s'),
             'updated_at' => date_format(now(), 'Y-m-d H:i:s')
         ];
-        if (Hash::check($password_input, $customerLogin->customerPassword)) {
+        if (Hash::check($password_input, $sellerLogin->sellerPassword)) {
             $loginInfo['loginSuccess'] = 1;
-            customer_login_logs::insert($loginInfo);
+            seller_login_logs::insert($loginInfo);
             // Redirect to home or last pagez
             $response = [
                 'status' => 200,
-                'customerToken' => $customerLogin->customerToken
+                'sellerToken' => $sellerLogin->sellerToken
             ];
             return response()->json($response, 200);
         }
@@ -75,17 +75,17 @@ class CustomerLoginController extends Controller
             'message' => 'Login Failed'
         ];
         $loginInfo['loginSuccess'] = 0;
-        customer_login_logs::insert($loginInfo);
+        seller_login_logs::insert($loginInfo);
         return response()->json($response, 403);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\CustomerLogin  $customerLogin
+     * @param  \App\SellerLogin  $sellerLogin
      * @return \Illuminate\Http\Response
      */
-    public function show(CustomerLogin $customerLogin)
+    public function show(SellerLogin $sellerLogin)
     {
         //
     }
@@ -93,10 +93,10 @@ class CustomerLoginController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\CustomerLogin  $customerLogin
+     * @param  \App\SellerLogin  $sellerLogin
      * @return \Illuminate\Http\Response
      */
-    public function edit(CustomerLogin $customerLogin)
+    public function edit(SellerLogin $sellerLogin)
     {
         //
     }
@@ -105,10 +105,10 @@ class CustomerLoginController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\CustomerLogin  $customerLogin
+     * @param  \App\SellerLogin  $sellerLogin
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, CustomerLogin $customerLogin)
+    public function update(Request $request, SellerLogin $sellerLogin)
     {
         //
     }
@@ -116,10 +116,10 @@ class CustomerLoginController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\CustomerLogin  $customerLogin
+     * @param  \App\SellerLogin  $sellerLogin
      * @return \Illuminate\Http\Response
      */
-    public function destroy(CustomerLogin $customerLogin)
+    public function destroy(SellerLogin $sellerLogin)
     {
         //
     }

@@ -1,11 +1,11 @@
 <?php
 
-namespace App;
+namespace App\Model;
 
 use Illuminate\Database\Eloquent\Model;
 
-class customerLoginLogs extends Model
+class CustomerLoginLog extends Model
 {
     protected $connection = 'dbmarketcustomers';
-    protected $table = 'customerLoginLogs';
+    protected $table = 'CustomerLoginLogs';
 }
