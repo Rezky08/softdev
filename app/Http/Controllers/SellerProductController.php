@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Model\SellerProduct;
+use App\Model\SellerLogin as seller_logins;
+use App\Model\SellerProduct as seller_products;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class SellerProductController extends Controller
 {
@@ -25,13 +27,48 @@ class SellerProductController extends Controller
      */
     public function store(Request $request)
     {
+        // Authorization
+        $sellerData = seller_logins::where('sellerToken', $request->input('token'));
+        if (!$sellerData->exists()) {
+            $response = [
+                'status' => 401,
+                'message' => "You're not Authorized"
+            ];
+            return response()->json($response, 401);
+        }
+        $sellerData = $sellerData->first();
+
+
         $productDetail = [
+            'sellerId' => $sellerData->sellerId,
             'sellerProductName' => $request->input('productName'),
             'sellerProductPrice' => $request->input('productPrice'),
             'sellerProductStock' => $request->input('productStock'),
             'created_at' => date_format(now(), 'Y-m-d H:i:s'),
             'updated_at' => date_format(now(), 'Y-m-d H:i:s')
         ];
+
+        $productImage = $request->file('productImage');
+        if ($productImage != null) {
+            // check image size
+            $imageMaxSize = 102400;
+            if ($productImage->getClientSize() > $imageMaxSize) {
+                $response = [
+                    'status' => 400,
+                    'message' => "File size is " . $productImage->getClientSize() . " Max 100KB"
+                ];
+                return response()->json($response, 400);
+            }
+            $productImagePath = Storage::url($productImage->store('public/image/sellers/' . $sellerData->sellerUsername));
+            $productDetail['sellerProductImage'] = $productImagePath;
+        }
+        $status = seller_products::insert($productDetail);
+
+        $response = [
+            'status' => 200,
+            'message' => 'Add product successfully'
+        ];
+        return response()->json($response, 200);
     }
 
     /**
@@ -40,9 +77,29 @@ class SellerProductController extends Controller
      * @param  \App\SellerProduct  $sellerProduct
      * @return \Illuminate\Http\Response
      */
-    public function show(SellerProduct $sellerProduct)
+    public function show($sellerId, $productId = null)
     {
-        //
+        $showProductData = [];
+        $sellerProductData = seller_products::where('sellerId', $sellerId);
+        if ($productId) {
+            $sellerProductData = $sellerProductData->where('id', $productId)->first();
+        } else {
+            $sellerProductData = $sellerProductData->get();
+        }
+        foreach ($sellerProductData as $productCount => $productData) {
+            $showProductData[] = [
+                'sellerId' => $productData->sellerId,
+                'productName' => $productData->sellerProductName,
+                'productPrice' => $productData->sellerProductPrice,
+                'productImage' => $productData->sellerProductImage ?: Storage::url('public/image/default/ImageCrash.png')
+            ];
+        }
+        $response = [
+            'status' => 200,
+            'product' => $showProductData
+        ];
+
+        return response()->json($response, 200);
     }
 
     /**

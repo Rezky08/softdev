@@ -22,6 +22,10 @@ Route::post('/customer/register', 'CustomerRegisterController@store');
 
 Route::post('/seller/login', 'SellerLoginController@store');
 Route::post('/seller/register', 'SellerRegisterController@store');
+Route::post('/seller/product', 'SellerProductController@store');
+Route::get('/seller/product/{sellerId}/{productId?}', 'SellerProductController@show');
+
 
 Route::get('/apitest', 'TesterController@index');
+Route::get('/paramtest/{param1}/{param2}', 'TesterController@paramTest');
 Route::post('/apitest', 'TesterController@readFile');

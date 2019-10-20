@@ -65,7 +65,7 @@ class CustomerLoginController extends Controller
             // Redirect to home or last pagez
             $response = [
                 'status' => 200,
-                'customerToken' => $customerLogin->customerToken
+                'token' => $customerLogin->customerToken
             ];
             return response()->json($response, 200);
         }

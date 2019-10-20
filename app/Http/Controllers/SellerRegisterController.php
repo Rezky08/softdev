@@ -73,7 +73,7 @@ class SellerRegisterController extends Controller
             $response = [
                 'status' => 200,
                 'sellerUsername' => $sellerLogin['sellerUsername'],
-                'sellerToken' => $sellerLogin['sellerToken']
+                'token' => $sellerLogin['sellerToken']
             ];
             return response()->json($response, 200);
         }

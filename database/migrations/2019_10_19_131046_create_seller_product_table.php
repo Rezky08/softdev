@@ -19,7 +19,7 @@ class CreateSellerProductTable extends Migration
             $table->string('sellerProductName', 100);
             $table->integer('sellerProductPrice')->default(12);
             $table->integer('sellerProductStock');
-            $table->string('sellerProductImage', 100)->comment('get value from path with id');
+            $table->text('sellerProductImage')->nullable()->comment('path Image');
             $table->timestamps();
         });
     }

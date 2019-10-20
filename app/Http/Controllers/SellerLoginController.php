@@ -65,7 +65,7 @@ class SellerLoginController extends Controller
             // Redirect to home or last pagez
             $response = [
                 'status' => 200,
-                'sellerToken' => $sellerLogin->sellerToken
+                'token' => $sellerLogin->sellerToken
             ];
             return response()->json($response, 200);
         }

@@ -73,7 +73,7 @@ class CustomerRegisterController extends Controller
             $response = [
                 'status' => 200,
                 'customerUsername' => $customerLogin['customerUsername'],
-                'customerToken' => $customerLogin['customerToken']
+                'token' => $customerLogin['customerToken']
             ];
             return response()->json($response, 200);
         }
