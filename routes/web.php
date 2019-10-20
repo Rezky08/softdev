@@ -11,6 +11,11 @@
 |
 */
 
+
 Route::get('/', function () {
     return view('welcome');
+});
+Route::post('/login', 'CustomerLoginController@index');
+Route::get('/login', function () {
+    dd('test');
 });
