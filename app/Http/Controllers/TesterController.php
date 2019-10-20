@@ -7,13 +7,15 @@ use Illuminate\Session\Store;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use SebastianBergmann\CodeCoverage\Report\Html\File;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class TesterController extends Controller
 {
     public function index()
     {
         $response = [
-            'message' => Str::random(60)
+            'message' => Str::random(60),
+            'JWT' => JWTAuth::attempt(['a'])
         ];
         return response()->json($response, 200);
     }

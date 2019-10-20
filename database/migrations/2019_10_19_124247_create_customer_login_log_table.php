@@ -13,7 +13,7 @@ class CreateCustomerLoginLogTable extends Migration
      */
     public function up()
     {
-        Schema::connection('dbmarketcustomers')->create('CustomerLoginLogs', function (Blueprint $table) {
+        Schema::connection('dbmarketcustomers')->create('customerLoginLogs', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('customerId', 100);
             $table->string('customerUsername', 100);

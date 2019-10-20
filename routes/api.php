@@ -26,7 +26,8 @@ Route::post('/seller/product', 'SellerProductController@store');
 Route::get('/seller/product/{sellerId}/{productId?}', 'SellerProductController@show');
 Route::get('/seller/product', 'SellerProductController@index');
 
-
+// Route::group(['middleware' => ['AuthAPI']], function () {
 Route::get('/apitest', 'TesterController@index');
+// });
 Route::get('/paramtest/{param1}/{param2}', 'TesterController@paramTest');
 Route::post('/apitest', 'TesterController@readFile');
