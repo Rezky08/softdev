@@ -15,6 +15,7 @@ class CreateSellerSecuirtyTable extends Migration
     {
         Schema::connection('dbmarketsellers')->create('sellerSecuritys', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->string('sellerId', 100);
             $table->string('sellerUsername', 100)->unique();
             $table->string('sellerQuestion1', 100);
             $table->string('sellerAnswer1', 100);

@@ -15,6 +15,7 @@ class CreateCustomerTransactionTable extends Migration
     {
         Schema::connection('dbmarketcustomers')->create('customerTransactions', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->string('customerId', 100);
             $table->integer('CustomerTotalPrice')->default(12)->comment('customer price pay');
             $table->timestamps();
         });

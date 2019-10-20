@@ -15,6 +15,7 @@ class CreateCustomerLoginTable extends Migration
     {
         Schema::connection('dbmarketcustomers')->create('customerLogins', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->string('customerId', 100);
             $table->string('customerUsername', 100)->unique();
             $table->text('customerPassword');
             $table->tinyInteger('customerStatus')->default(0);

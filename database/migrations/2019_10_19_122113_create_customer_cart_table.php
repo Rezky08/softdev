@@ -15,6 +15,7 @@ class CreateCustomerCartTable extends Migration
     {
         Schema::connection('dbmarketcustomers')->create('customerCarts', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->string('customerId', 100);
             $table->string('customerIdShop', 100);
             $table->string('customerIdProduct', 100);
             $table->string('customerProductName', 100);

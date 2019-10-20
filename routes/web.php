@@ -15,7 +15,5 @@
 Route::get('/', function () {
     return view('welcome');
 });
-Route::post('/login', 'CustomerLoginController@index');
-Route::get('/login', function () {
-    dd('test');
-});
+Route::get('/register', 'CustomerRegisterController@index');
+Route::get('/login', 'CustomerLoginController@index');

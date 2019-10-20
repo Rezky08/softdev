@@ -3,13 +3,11 @@
 namespace App\Http\Controllers;
 
 // use App\CustomerLogin;
+
+use App\customerLoginLogs as customer_login_logs;
+use App\Model\CustomerDetail as customer_details;
+use App\Model\CustomerLogin as customer_logins;
 use Illuminate\Http\Request;
-use App\Model\CustomerLogin as customer_login;
-use App\Model\CustomerRegister as customer_register;
-use App\Model\CustomerSecurity as customer_security;
-use DateTime;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class CustomerLoginController extends Controller
@@ -19,31 +17,9 @@ class CustomerLoginController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
-        $username_input = $request->input('username');
-        $password_input = $request->input('password');
-        $username_input = 'Rezky.setiawan85';
-        $password_input = 'Test123#';
-        $customerLogin  = customer_register::where('customerUsername', $username_input);
-        if ($customerLogin->exists()) {
-            $customerLogin = $customerLogin->first();
-            $password = customer_security::where('username', $username_input)->first()->password;
-            $password = Hash::make($password);
-            if (Hash::check($password_input, $password)) {
-                $loginInfo = [
-                    'username' => $customerLogin->customerUsername,
-                    'LoginTime' => date_format(now(), 'Y-m-d H:i:s')
-                ];
-                $request->session()->put($loginInfo);
-                // Redirect to home or last page
-                return redirect('/');
-            }
-            // Redirect to login page again
-            return redirect('/');
-        }
-        // Redirect to login page again
-        return redirect('/');
+        return view('login');
     }
 
     /**
@@ -64,7 +40,43 @@ class CustomerLoginController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
+        $username_input = $request->username;
+        $password_input = $request->password;
+        $customerLogin  = customer_details::where('customerUsername', $username_input);
+        if (!$customerLogin->exists()) {
+            // Redirect to login page again
+            $response = [
+                'status' => 403,
+                'message' => 'Login Failed'
+            ];
+            return response()->json($response, 403);
+        }
+        $customerLogin = customer_logins::where('customerUsername', $username_input)->first();
+        $loginInfo = [
+            'customerId' => $customerLogin->customerId,
+            'customerUsername' => $customerLogin->customerUsername,
+            'created_at' => date_format(now(), 'Y-m-d H:i:s'),
+            'updated_at' => date_format(now(), 'Y-m-d H:i:s')
+        ];
+        if (Hash::check($password_input, $customerLogin->customerPassword)) {
+            $loginInfo['loginSuccess'] = 1;
+            customer_login_logs::insert($loginInfo);
+            // Redirect to home or last pagez
+            $response = [
+                'status' => 200,
+                'customerToken' => $customerLogin->customerToken
+            ];
+            return response()->json($response, 200);
+        }
+        // Redirect to login page again
+        $response = [
+            'status' => 403,
+            'message' => 'Login Failed'
+        ];
+        $loginInfo['loginSuccess'] = 0;
+        customer_login_logs::insert($loginInfo);
+        return response()->json($response, 403);
     }
 
     /**
