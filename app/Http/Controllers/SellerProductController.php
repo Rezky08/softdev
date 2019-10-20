@@ -16,7 +16,22 @@ class SellerProductController extends Controller
      */
     public function index()
     {
-        //
+        $showProductData = [];
+        $sellerProductData = seller_products::all();
+        foreach ($sellerProductData as $productCount => $productData) {
+            $showProductData[] = [
+                'sellerId' => $productData->sellerId,
+                'productName' => $productData->sellerProductName,
+                'productPrice' => $productData->sellerProductPrice,
+                'productImage' => $productData->sellerProductImage ?: Storage::url('public/image/default/ImageCrash.png')
+            ];
+        }
+        $response = [
+            'status' => 200,
+            'product' => $showProductData
+        ];
+
+        return response()->json($response, 200);
     }
 
     /**
