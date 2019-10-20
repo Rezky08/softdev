@@ -62,10 +62,23 @@ class SellerLoginController extends Controller
         if (Hash::check($password_input, $sellerLogin->sellerPassword)) {
             $loginInfo['loginSuccess'] = 1;
             seller_login_logs::insert($loginInfo);
-            // Redirect to home or last pagez
+            $sellerData = seller_details::where('id', $loginInfo['sellerId'])->first();
+            unset($loginInfo['created_at'], $loginInfo['updated_at']);
+            $loginData = [
+                'id' => $sellerData->id,
+                'username' => $sellerData->sellerUsername,
+                'fullname' => $sellerData->sellerFullname,
+                'DOB' => $sellerData->sellerDOB,
+                'address' => $sellerData->sellerAddress,
+                'sex' => $sellerData->sellerSex,
+                'email' => $sellerData->sellerEmail,
+                'phone' => $sellerData->sellerPhone,
+                'loginTime' => date_format(now(), 'Y-m-d H:i:s')
+            ];
             $response = [
                 'status' => 200,
-                'token' => $sellerLogin->sellerToken
+                'token' => $sellerLogin->sellerToken,
+                'data' => $loginData
             ];
             return response()->json($response, 200);
         }

@@ -48,7 +48,7 @@ class SellerRegisterController extends Controller
             return response()->json($response, 401);
         }
         $sellerDetail = [
-            'sellerFullname' => $request->input('fullname'),
+            'sellerFullname' => $request->input('fullname') ?: $request->input('username'),
             'sellerDOB' => $request->input('DOB'),
             'sellerAddress' => $request->input('address'),
             'sellerSex' => $request->input('sex'),

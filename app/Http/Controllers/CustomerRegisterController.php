@@ -48,7 +48,7 @@ class CustomerRegisterController extends Controller
             return response()->json($response, 401);
         }
         $customerDetail = [
-            'customerFullname' => $request->input('fullname'),
+            'customerFullname' => $request->input('fullname') ?: $request->input('username'),
             'customerDOB' => $request->input('DOB'),
             'customerAddress' => $request->input('address'),
             'customerSex' => $request->input('sex'),

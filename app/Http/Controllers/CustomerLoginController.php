@@ -62,10 +62,23 @@ class CustomerLoginController extends Controller
         if (Hash::check($password_input, $customerLogin->customerPassword)) {
             $loginInfo['loginSuccess'] = 1;
             customer_login_logs::insert($loginInfo);
-            // Redirect to home or last pagez
+            $customerData = customer_details::where('id', $loginInfo['customerId'])->first();
+            unset($loginInfo['created_at'], $loginInfo['updated_at']);
+            $loginData = [
+                'id' => $customerData->id,
+                'username' => $customerData->customerUsername,
+                'fullname' => $customerData->customerFullname,
+                'DOB' => $customerData->customerDOB,
+                'address' => $customerData->customerAddress,
+                'sex' => $customerData->customerSex,
+                'email' => $customerData->customerEmail,
+                'phone' => $customerData->customerPhone,
+                'loginTime' => date_format(now(), 'Y-m-d H:i:s')
+            ];
             $response = [
                 'status' => 200,
-                'token' => $customerLogin->customerToken
+                'token' => $customerLogin->customerToken,
+                'data' => $loginData
             ];
             return response()->json($response, 200);
         }

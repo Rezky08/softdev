@@ -16,11 +16,11 @@ class CreateSellersTable extends Migration
         Schema::connection('dbmarketsellers')->create('sellerDetails', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('sellerFullname', 100);
-            $table->date('sellerDOB');
+            $table->date('sellerDOB')->nullable();
             $table->text('sellerAddress')->nullable();
             $table->tinyInteger('sellerSex')->default(0);
             $table->string('sellerEmail', 100);
-            $table->string('sellerPhone', 20);
+            $table->string('sellerPhone', 20)->nullable();
             $table->string('sellerUsername', 100)->unique();
             $table->timestamps();
         });

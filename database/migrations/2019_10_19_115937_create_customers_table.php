@@ -16,11 +16,11 @@ class CreateCustomersTable extends Migration
         Schema::connection('dbmarketcustomers')->create('customerDetails', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('customerFullname', 100);
-            $table->date('customerDOB');
+            $table->date('customerDOB')->nullable();
             $table->text('customerAddress')->nullable();
             $table->tinyInteger('customerSex')->default(0);
             $table->string('customerEmail', 100);
-            $table->string('customerPhone', 20);
+            $table->string('customerPhone', 20)->nullable();
             $table->string('customerUsername', 100)->unique();
             $table->timestamps();
         });
