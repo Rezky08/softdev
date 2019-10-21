@@ -77,7 +77,7 @@ class CustomerCartController extends Controller
         if ($productDetails->sellerProductStock < $request->qty) {
             $response = [
                 'status' => 400,
-                'Message' => $productDetails->sellerProductName . $productDetails->sellerProductQty . "  Left"
+                'Message' => $productDetails->sellerProductName . " " . $productDetails->sellerProductStock . "  Left"
             ];
             return response()->json($response, 400);
         }
@@ -92,6 +92,32 @@ class CustomerCartController extends Controller
             'created_at' => date_format(now(), 'Y-m-d H:i:s'),
             'updated_at' => date_format(now(), 'Y-m-d H:i:s')
         ];
+        $whereCond = [
+            'customerId' => $productAddtoCart['customerId'],
+            'customerIdProduct' => $productAddtoCart['customerIdProduct'],
+            'customerStatus' => 0,
+        ];
+        $status = customer_cart::where($whereCond);
+        if ($status->exists()) {
+            $cartData = $status->first();
+            $updateCart = [
+                'customerProductQty' => $cartData->customerProductQty + $request->qty,
+                'updated_at' => date_format(now(), 'Y-m-d H:i:s')
+            ];
+            $status = $status->update($updateCart);
+            if (!$status) {
+                $response = [
+                    'status' => 500,
+                    'Message' => 'Internal Server Error'
+                ];
+                return response()->json($response, 500);
+            }
+            $response = [
+                'status' => 201,
+                'Message' => 'Success add ' . $productDetails->sellerProductName . ' to Cart'
+            ];
+            return response()->json($response, 201);
+        }
         $status = customer_cart::insert($productAddtoCart);
         if (!$status) {
             $response = [

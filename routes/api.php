@@ -28,7 +28,7 @@ Route::get('/customer/{customerId}/cart/{cartId}', 'CustomerCartController@show'
 
 Route::post('/seller/login', 'SellerLoginController@store');
 Route::post('/seller/register', 'SellerRegisterController@store');
-Route::post('/seller/product', 'SellerProductController@store');
+Route::post('/seller/{sellerId}/product', 'SellerProductController@store');
 Route::get('/seller/{sellerId}/product/{productId?}', 'SellerProductController@show');
 Route::get('/seller/product', 'SellerProductController@index');
 Route::get('/seller/profile', 'SellerRegisterController@index');
