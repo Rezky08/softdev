@@ -15,7 +15,7 @@ use JWTFactory;
 
 class TesterController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $customerGuard = Auth::guard('customer');
         $credentials = [

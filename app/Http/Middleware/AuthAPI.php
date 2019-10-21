@@ -35,6 +35,5 @@ class AuthAPI
                 return response()->json($response, 401);
             }
         }
-        $request->headers->remove('Authorization');
     }
 }
