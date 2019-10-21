@@ -56,7 +56,7 @@ class CustomerCartController extends Controller
     {
         // Authorization
         $customerData = customer_logins::where('customerToken', $request->header('Authorization'));
-        if (!$customerCartData->exists()) {
+        if (!$customerData->exists()) {
             $response = [
                 'status' => 401,
                 'Message' => "You're Not Authorized"
