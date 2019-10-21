@@ -74,7 +74,7 @@ class CustomerCartController extends Controller
             return response()->json($response, 404);
         }
         $productDetails = $productDetails->first();
-        if ($productDetails->sellerProductQty < $request->qty) {
+        if ($productDetails->sellerProductStock < $request->qty) {
             $response = [
                 'status' => 400,
                 'Message' => $productDetails->sellerProductName . $productDetails->sellerProductQty . "  Left"
