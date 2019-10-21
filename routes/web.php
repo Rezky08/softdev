@@ -15,5 +15,3 @@
 Route::get('/', function () {
     return view('welcome');
 });
-Route::get('/register', 'CustomerRegisterController@index');
-Route::get('/login', 'CustomerLoginController@index');
