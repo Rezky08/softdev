@@ -17,8 +17,7 @@ class AuthAPI
      */
     public function handle($request, Closure $next)
     {
-        $token = $request->token;
-        var_dump($token);
+        $token = $request->header('Authorization');
         // search in customer
         $tokenExsist = customer_login::where('customerToken', $token)->exists();
         if ($tokenExsist) {
@@ -36,6 +35,6 @@ class AuthAPI
                 return response()->json($response, 401);
             }
         }
-        return var_dump('test');
+        $request->headers->remove('Authorization');
     }
 }

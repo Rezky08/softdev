@@ -44,14 +44,7 @@ class SellerProductController extends Controller
     public function store(Request $request)
     {
         // Authorization
-        $sellerData = seller_logins::where('sellerToken', $request->input('token'));
-        if (!$sellerData->exists()) {
-            $response = [
-                'status' => 401,
-                'message' => "You're not Authorized"
-            ];
-            return response()->json($response, 401);
-        }
+        $sellerData = seller_logins::where('sellerToken', $request->header('Authorization'));
         $sellerData = $sellerData->first();
 
         $productDetail = [

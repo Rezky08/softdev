@@ -55,14 +55,7 @@ class CustomerCartController extends Controller
     public function store(Request $request)
     {
         // Authorization
-        $customerData = customer_login::where('customerToken', $request->input('token'));
-        if (!$customerData->exists()) {
-            $response = [
-                'status' => 401,
-                'message' => "You're not Authorized"
-            ];
-            return response()->json($response, 401);
-        }
+        $customerData = customer_login::where('customerToken', $request->header('Authorization'));
         $customerData = $customerData->first();
 
         $productDetails = seller_product::where('id', $request->idProduct);
@@ -74,13 +67,7 @@ class CustomerCartController extends Controller
             return response()->json($response, 404);
         }
         $productDetails = $productDetails->first();
-        if ($productDetails->sellerProductStock < $request->qty) {
-            $response = [
-                'status' => 400,
-                'Message' => $productDetails->sellerProductName . " " . $productDetails->sellerProductStock . "  Left"
-            ];
-            return response()->json($response, 400);
-        }
+
         $productAddtoCart = [
             'customerId' => $customerData->id,
             'customerSellerIdShop' => $productDetails->sellerId,
@@ -98,8 +85,15 @@ class CustomerCartController extends Controller
             'customerStatus' => 0,
         ];
         $status = customer_cart::where($whereCond);
+        $cartData = $status->first();
+        if ($productDetails->sellerProductStock < $request->qty + $cartData->customerProductQty) {
+            $response = [
+                'status' => 400,
+                'Message' => $productDetails->sellerProductName . " " . $productDetails->sellerProductStock . "  Left"
+            ];
+            return response()->json($response, 400);
+        }
         if ($status->exists()) {
-            $cartData = $status->first();
             $updateCart = [
                 'customerProductQty' => $cartData->customerProductQty + $request->qty,
                 'updated_at' => date_format(now(), 'Y-m-d H:i:s')

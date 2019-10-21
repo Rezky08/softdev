@@ -21,16 +21,19 @@ Route::post('/customer/login', 'CustomerLoginController@store');
 Route::post('/customer/register', 'CustomerRegisterController@store');
 Route::get('/customer/profile', 'CustomerRegisterController@index');
 Route::get('/customer/{customerId}/profile/', 'CustomerRegisterController@show');
-Route::get('/customer/{customerId}/cart/', 'CustomerCartController@index');
-Route::post('/customer/{customerId}/cart/', 'CustomerCartController@store');
-Route::get('/customer/{customerId}/cart/{cartId}', 'CustomerCartController@show');
 
+Route::group(['middleware' => ['AuthAPI']], function () {
+    Route::get('/customer/{customerId}/cart/', 'CustomerCartController@index');
+    Route::get('/customer/{customerId}/cart/{cartId}', 'CustomerCartController@show');
+    Route::post('/customer/{customerId}/cart/', 'CustomerCartController@store');
 
+    Route::post('/seller/{sellerId}/product', 'SellerProductController@store');
+});
+
+Route::get('/seller/product', 'SellerProductController@index');
 Route::post('/seller/login', 'SellerLoginController@store');
 Route::post('/seller/register', 'SellerRegisterController@store');
-Route::post('/seller/{sellerId}/product', 'SellerProductController@store');
 Route::get('/seller/{sellerId}/product/{productId?}', 'SellerProductController@show');
-Route::get('/seller/product', 'SellerProductController@index');
 Route::get('/seller/profile', 'SellerRegisterController@index');
 Route::get('/seller/{id}/profile/', 'SellerRegisterController@show');
 
