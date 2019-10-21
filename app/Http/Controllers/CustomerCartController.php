@@ -115,10 +115,10 @@ class CustomerCartController extends Controller
                 return response()->json($response, 500);
             }
             $response = [
-                'status' => 201,
+                'status' => 200,
                 'Message' => 'Success add ' . $productDetails->sellerProductName . ' to Cart'
             ];
-            return response()->json($response, 201);
+            return response()->json($response, 200);
         }
         $status = customer_cart::insert($productAddtoCart);
         if (!$status) {
@@ -129,10 +129,10 @@ class CustomerCartController extends Controller
             return response()->json($response, 405);
         }
         $response = [
-            'status' => 201,
+            'status' => 200,
             'Message' => 'Success add ' . $productDetails->sellerProductName . ' to Cart'
         ];
-        return response()->json($response, 201);
+        return response()->json($response, 200);
     }
 
     /**

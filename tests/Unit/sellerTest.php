@@ -4,10 +4,12 @@ namespace Tests\Unit;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
+use PhpParser\Node\Expr\Cast\Int_;
 use Tests\TestCase;
 
-class customerTest extends TestCase
+class sellerTest extends TestCase
 {
     /**
      * A basic unit test example.
@@ -15,7 +17,7 @@ class customerTest extends TestCase
      * @return void
      */
     /** @test */
-    public function customerCanRegister()
+    public function sellerCanRegister()
     {
         $input = [
             'username' => 'iniusername' . Str::random(3),
@@ -24,30 +26,32 @@ class customerTest extends TestCase
             'password' => 'P@sswr0d!',
             'sex' => 0
         ];
-        $response = $this->post('/api/customer/register', $input);
+        $response = $this->post('/api/seller/register', $input);
         $response->assertStatus(200);
     }
 
     /** @test */
-    public function customerCanLogin()
+    public function sellerCanLogin()
     {
         $input = [
-            'username' => 'rezky221197',
+            'username' => 'rezky2211977',
             'password' => 'Test123#'
         ];
-        $response = $this->post('/api/customer/login', $input);
+        $response = $this->post('/api/seller/login', $input);
         $response->assertStatus(200);
     }
 
     /** @test */
-    public function customerCanAddToCart()
+    public function sellerCanAddTheirProduct()
     {
-        $this->withHeaders(['Authorization' => 'CJAJewRn70ksnRV7kpWfe17NWVOggwmN3LYGJ1tV83lzUqXGuViziQFDRcOV']);
+        $this->withHeaders(['Authorization' => 'aHhy7AIAvzPBdQdpB0YbaRH6N9Zw0rbhWCjenCOLhMZKSjq9tvenCidF8Y05']);
         $input = [
-            'idProduct' => rand(1, 10),
-            'qty' => 2,
+            'productName' => Str::random(20),
+            'productPrice' => rand(1, 99999),
+            'productStock' =>  rand(1, 100),
+            'productImage' => UploadedFile::fake()->image('fakerImage.jpg')->size(100)
         ];
-        $response = $this->post('/api/customer/2/cart', $input);
+        $response = $this->post('/api/seller/1/product', $input);
         $response->assertStatus(200);
     }
 }
