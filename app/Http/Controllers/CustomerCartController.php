@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Model\CustomerCart as customer_cart;
 use App\Model\CustomerDetail as customer_detail;
+use App\Model\CustomerLogin as customer_login;
 use App\Model\SellerProduct as seller_product;
 use App\Model\SellerShop as seller_shop;
 use Illuminate\Http\Request;
@@ -54,7 +55,7 @@ class CustomerCartController extends Controller
     public function store(Request $request)
     {
         // Authorization
-        $customerData = customer_cart::where('customerToken', $request->input('token'));
+        $customerData = customer_login::where('customerToken', $request->input('token'));
         if (!$customerData->exists()) {
             $response = [
                 'status' => 401,
