@@ -18,7 +18,26 @@ class CustomerRegisterController extends Controller
      */
     public function index()
     {
-        return view('register');
+        $customerData = [];
+        $customerDetails = customer_details::all();
+        foreach ($customerDetails as $customer => $detail) {
+            $customerData[] = [
+                'id' => $detail->id,
+                'username' => $detail->customerUsername,
+                'fullname' => $detail->customerFullname,
+                'DOB' => $detail->customerDOB,
+                'address' => $detail->customerAddress,
+                'sex' => $detail->customerSex == 0 ? 'Male' : 'Female',
+                'email' => $detail->customerEmail,
+                'phone' => $detail->customerPhone,
+                'joinDate' => date_format($detail->created_at, 'Y-m-d H:i:s')
+            ];
+        }
+        $response = [
+            'status' => 200,
+            'data' => $customerData
+        ];
+        return response()->json($response, 200);
     }
 
     /**
@@ -85,9 +104,33 @@ class CustomerRegisterController extends Controller
      * @param  \App\CustomerRegister  $customerRegister
      * @return \Illuminate\Http\Response
      */
-    public function show(CustomerRegister $customerRegister)
+    public function show($customerID)
     {
-        //
+        $customerDetails = customer_details::where('id', $customerID);
+        if (!$customerDetails->exists()) {
+            $response = [
+                'status' => 404,
+                'message' => 'Data not found'
+            ];
+            return response()->json($response, 404);
+        }
+        $customerDetails = $customerDetails->first();
+        $customerDetails = [
+            'id' => $customerDetails->id,
+            'username' => $customerDetails->customerUsername,
+            'fullname' => $customerDetails->customerFullname,
+            'DOB' => $customerDetails->customerDOB,
+            'address' => $customerDetails->customerAddress,
+            'sex' => $customerDetails->customerSex == 0 ? 'Male' : 'Female',
+            'email' => $customerDetails->customerEmail,
+            'phone' => $customerDetails->customerPhone,
+            'joinDate' => date_format($customerDetails->created_at, 'Y-m-d H:i:s')
+        ];
+        $response = [
+            'status' => 200,
+            'data' => $customerDetails
+        ];
+        return response()->json($response, 200);
     }
 
     /**

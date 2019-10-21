@@ -70,7 +70,7 @@ class CustomerLoginController extends Controller
                 'fullname' => $customerData->customerFullname,
                 'DOB' => $customerData->customerDOB,
                 'address' => $customerData->customerAddress,
-                'sex' => $customerData->customerSex,
+                'sex' => $customerData->customerSex == 0 ? 'Male' : 'Female',
                 'email' => $customerData->customerEmail,
                 'phone' => $customerData->customerPhone,
                 'loginTime' => date_format(now(), 'Y-m-d H:i:s')

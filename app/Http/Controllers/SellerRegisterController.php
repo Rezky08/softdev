@@ -18,7 +18,26 @@ class SellerRegisterController extends Controller
      */
     public function index()
     {
-        return view('register');
+        $sellerData = [];
+        $sellerDetails = seller_details::all();
+        foreach ($sellerDetails as $seller => $detail) {
+            $sellerData[] = [
+                'id' => $detail->id,
+                'username' => $detail->sellerUsername,
+                'fullname' => $detail->sellerFullname,
+                'DOB' => $detail->sellerDOB,
+                'address' => $detail->sellerAddress,
+                'sex' => $detail->sellerSex == 0 ? 'Male' : 'Female',
+                'email' => $detail->sellerEmail,
+                'phone' => $detail->sellerPhone,
+                'joinDate' => date_format($detail->created_at, 'Y-m-d H:i:s')
+            ];
+        }
+        $response = [
+            'status' => 200,
+            'data' => $sellerData
+        ];
+        return response()->json($response, 200);
     }
 
     /**
@@ -85,9 +104,33 @@ class SellerRegisterController extends Controller
      * @param  \App\SellerRegister  $sellerRegister
      * @return \Illuminate\Http\Response
      */
-    public function show(SellerRegister $sellerRegister)
+    public function show($sellerID)
     {
-        //
+        $sellerDetails = seller_details::where('id', $sellerID);
+        if (!$sellerDetails->exists()) {
+            $response = [
+                'status' => 404,
+                'message' => 'Data not found'
+            ];
+            return response()->json($response, 404);
+        }
+        $sellerDetails = $sellerDetails->first();
+        $sellerDetails = [
+            'id' => $sellerDetails->id,
+            'username' => $sellerDetails->sellerUsername,
+            'fullname' => $sellerDetails->sellerFullname,
+            'DOB' => $sellerDetails->sellerDOB,
+            'address' => $sellerDetails->sellerAddress,
+            'sex' => $sellerDetails->sellerSex == 0 ? 'Male' : 'Female',
+            'email' => $sellerDetails->sellerEmail,
+            'phone' => $sellerDetails->sellerPhone,
+            'joinDate' => date_format($sellerDetails->created_at, 'Y-m-d H:i:s')
+        ];
+        $response = [
+            'status' => 200,
+            'data' => $sellerDetails
+        ];
+        return response()->json($response, 200);
     }
 
     /**

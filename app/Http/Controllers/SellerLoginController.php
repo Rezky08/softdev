@@ -70,7 +70,7 @@ class SellerLoginController extends Controller
                 'fullname' => $sellerData->sellerFullname,
                 'DOB' => $sellerData->sellerDOB,
                 'address' => $sellerData->sellerAddress,
-                'sex' => $sellerData->sellerSex,
+                'sex' => $sellerData->sellerSex == 0 ? 'Male' : 'Female',
                 'email' => $sellerData->sellerEmail,
                 'phone' => $sellerData->sellerPhone,
                 'loginTime' => date_format(now(), 'Y-m-d H:i:s')
