@@ -20,6 +20,7 @@ class SellerProductController extends Controller
         $sellerProductData = seller_products::all();
         foreach ($sellerProductData as $productCount => $productData) {
             $showProductData[] = [
+                'id' => $productData->id,
                 'sellerId' => $productData->sellerId,
                 'productName' => $productData->sellerProductName,
                 'productPrice' => $productData->sellerProductPrice,
@@ -52,7 +53,6 @@ class SellerProductController extends Controller
             return response()->json($response, 401);
         }
         $sellerData = $sellerData->first();
-
 
         $productDetail = [
             'sellerId' => $sellerData->sellerId,
@@ -103,6 +103,7 @@ class SellerProductController extends Controller
         }
         foreach ($sellerProductData as $productCount => $productData) {
             $showProductData[] = [
+                'id' => $productData->id,
                 'sellerId' => $productData->sellerId,
                 'productName' => $productData->sellerProductName,
                 'productPrice' => $productData->sellerProductPrice,
