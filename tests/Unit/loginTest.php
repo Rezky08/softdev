@@ -17,9 +17,8 @@ class loginTest extends TestCase
     public function userCanLoginTest()
     {
         // $response = $this->get('/login');
-        $input = ['username' => 'Rezky.setiawan85', 'password' => 'Test123#'];
-        $response = $this->post('/login', $input);
+        $input = ['username' => 'rezky221197', 'password' => 'Test123#'];
+        $response = $this->post('/api/login', $input);
         $response->assertStatus(200);
-        $response->assertExactJson()('username');
     }
 }

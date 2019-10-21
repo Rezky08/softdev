@@ -27,6 +27,7 @@ class CustomerCartController extends Controller
             ];
             return response()->json($response, 400);
         }
+        $customerCart = $customerCart->get();
         foreach ($customerCart as $cartId => $cartData) {
             $productImage = seller_product::where('id', $cartData->customerIdProduct)->first();
             $customerCartData[] = [
