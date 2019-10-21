@@ -93,14 +93,14 @@ class CustomerCartController extends Controller
         ];
         $status = customer_cart::where($whereCond);
         $cartData = $status->first();
-        if ($productDetails->sellerProductStock < $request->qty + $cartData->customerProductQty) {
-            $response = [
-                'status' => 400,
-                'Message' => $productDetails->sellerProductName . " " . $productDetails->sellerProductStock . "  Left"
-            ];
-            return response()->json($response, 400);
-        }
         if ($status->exists()) {
+            if ($productDetails->sellerProductStock < $request->qty + $cartData->customerProductQty) {
+                $response = [
+                    'status' => 400,
+                    'Message' => $productDetails->sellerProductName . " " . $productDetails->sellerProductStock . "  Left"
+                ];
+                return response()->json($response, 400);
+            }
             $updateCart = [
                 'customerProductQty' => $cartData->customerProductQty + $request->qty,
                 'updated_at' => date_format(now(), 'Y-m-d H:i:s')
