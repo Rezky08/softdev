@@ -54,7 +54,9 @@ class MigrateAllCommand extends Command
             schema::enableForeignKeyConstraints();
             // $this->info('install migrate table in' . $schema);
         }
-        Artisan::call('migrate');
+        Artisan::call('migrate:fresh');
+        $this->info(Artisan::output());
+        Artisan::call('passport:install --force');
         $this->info(Artisan::output());
     }
 }

@@ -157,8 +157,20 @@ class SellerLoginController extends Controller
      * @param  \App\SellerLogin  $sellerLogin
      * @return \Illuminate\Http\Response
      */
-    public function destroy(SellerLogin $sellerLogin)
+    public function destroy(Request $request)
     {
-        //
+        $sellerData = $request->sellerData;
+        if ($sellerData->token()->revoke()) {
+            $response = [
+                'status' => 200,
+                'message' => 'You Have Logged Out'
+            ];
+            return response()->json($response);
+        }
+        $response = [
+            'status' => 401,
+            'Message' => "You're Not Authorized"
+        ];
+        return response()->json($response, 401);
     }
 }

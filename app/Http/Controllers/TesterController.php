@@ -17,10 +17,11 @@ class TesterController extends Controller
 
     public function index(Request $request)
     {
-        $customer = Auth::guard('customer')->user();
+        $customer = Auth::guard('seller')->user();
         $response = [
             'message' => Str::random(60),
-            'data' => $customer
+            'data' => $customer,
+            'scopes' => $customer->tokenCan('seller')
 
         ];
         return response()->json($response, 200);

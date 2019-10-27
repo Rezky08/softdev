@@ -158,8 +158,20 @@ class CustomerLoginController extends Controller
      * @param  \App\CustomerLogin  $customerLogin
      * @return \Illuminate\Http\Response
      */
-    public function destroy(CustomerLogin $customerLogin)
+    public function destroy(Request $request)
     {
-        //
+        $customerData = $request->customerData;
+        if ($customerData->token()->revoke()) {
+            $response = [
+                'status' => 200,
+                'message' => 'You Have Logged Out'
+            ];
+            return response()->json($response);
+        }
+        $response = [
+            'status' => 401,
+            'Message' => "You're Not Authorized"
+        ];
+        return response()->json($response, 401);
     }
 }

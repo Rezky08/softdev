@@ -14,7 +14,7 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'customer',
+        'guard' => 'web',
         'passwords' => 'users',
     ],
 
@@ -42,7 +42,7 @@ return [
         ],
 
         'api' => [
-            'driver' => 'token',
+            'driver' => 'passport',
             'provider' => 'users',
             'hash' => false,
         ],
@@ -56,6 +56,7 @@ return [
             'provider' => 'sellers',
             'hash' => false,
         ],
+
     ],
 
     /*
@@ -84,11 +85,10 @@ return [
             'driver' => 'eloquent',
             'model' => App\Model\CustomerDetail::class,
         ],
-        'seller' => [
+        'sellers' => [
             'driver' => 'eloquent',
             'model' => App\Model\SellerDetail::class,
         ],
-
 
         // 'users' => [
         //     'driver' => 'database',
@@ -116,8 +116,8 @@ return [
             'provider' => 'users',
             'table' => 'password_resets',
             'expire' => 60,
+            'throttle' => 60,
         ],
-
     ],
 
     /*

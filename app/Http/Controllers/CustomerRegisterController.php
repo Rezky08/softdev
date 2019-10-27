@@ -59,6 +59,7 @@ class CustomerRegisterController extends Controller
      */
     public function store(Request $request)
     {
+        // return dd($request->all());
         // input validation
         $validation = Validator::make($request->all(), [
             'username' => ['required', 'unique:dbmarketsellers.sellerLogins,sellerUsername', 'unique:dbmarketcustomers.customerLogins,customerUsername'],
