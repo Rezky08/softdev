@@ -47,8 +47,13 @@ return [
             'hash' => false,
         ],
         'customer' => [
-            'driver' => 'jwt',
+            'driver' => 'passport',
             'provider' => 'customers',
+            'hash' => false,
+        ],
+        'seller' => [
+            'driver' => 'passport',
+            'provider' => 'sellers',
             'hash' => false,
         ],
     ],
@@ -77,7 +82,11 @@ return [
         ],
         'customers' => [
             'driver' => 'eloquent',
-            'model' => App\Model\CustomerLogin::class,
+            'model' => App\Model\CustomerDetail::class,
+        ],
+        'seller' => [
+            'driver' => 'eloquent',
+            'model' => App\Model\SellerDetail::class,
         ],
 
 

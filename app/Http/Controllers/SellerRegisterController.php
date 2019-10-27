@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\SellerRegister;
 use App\Model\SellerDetail as seller_details;
 use App\Model\SellerLogin as seller_logins;
+use App\Model\SellerShop as seller_shops;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Validator;
 
 class SellerRegisterController extends Controller
 {
@@ -58,14 +60,20 @@ class SellerRegisterController extends Controller
      */
     public function store(Request $request)
     {
-        $accountExist = seller_details::where('sellerUsername', $request->input('username'))->exists();
-        if ($accountExist) {
+        // input validation
+        $validation = Validator::make($request->all(), [
+            'username' => ['required', 'unique:dbmarketsellers.sellerLogins,sellerUsername', 'unique:dbmarketcustomers.customerLogins,customerUsername'],
+            'password' => ['required', 'min:8', 'max:12', 'regex:/^(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*[\d]).{8,12}$/'],
+            'email' => ['required', 'email', 'unique:dbmarketsellers.sellerDetails,sellerEmail', 'unique:dbmarketcustomers.customerDetails,customerEmail']
+        ]);
+        if ($validation->fails()) {
             $response = [
                 'status' => 401,
-                'message' => 'Account was exists'
+                'message' => $validation->errors()
             ];
             return response()->json($response, 401);
         }
+
         $sellerDetail = [
             'sellerFullname' => $request->input('fullname') ?: $request->input('username'),
             'sellerDOB' => $request->input('DOB'),
@@ -81,7 +89,6 @@ class SellerRegisterController extends Controller
         $sellerLogin = [
             'sellerUsername' => $request->input('username'),
             'sellerPassword' => Hash::make($request->input('password')),
-            'sellerToken' => Str::random(60),
             'sellerStatus' => 1,
             'sellerId' => $sellerID,
             'created_at' => date_format(now(), 'Y-m-d H:i:s'),
@@ -89,13 +96,32 @@ class SellerRegisterController extends Controller
         ];
         $status = seller_logins::insert($sellerLogin);
         if ($status) {
-            $response = [
-                'status' => 200,
-                'sellerUsername' => $sellerLogin['sellerUsername'],
-                'token' => $sellerLogin['sellerToken']
+            $sellerShop = [
+                'sellerId' => $sellerID,
+                'sellerShopName' => $request->input('username'),
+                'sellerShopOwnerName' => $request->input('fullname') ?: $request->input('username'),
+                'sellerShopPhone' => $request->input('phone'),
+                'sellerShopCertificate' => $request->input('shopCertificate'),
+                'created_at' => date_format(now(), 'Y-m-d H:i:s'),
+                'updated_at' => date_format(now(), 'Y-m-d H:i:s')
             ];
-            return response()->json($response, 200);
+            $status = seller_shops::insert($sellerShop);
+            if ($status) {
+                $response = [
+                    'status' => 200,
+                    'sellerUsername' => $sellerLogin['sellerUsername'],
+                    'token' => seller_details::find($sellerID)->createToken('regiterToken', ['seller'])->accessToken
+                ];
+                return response()->json($response, 200);
+            }
         }
+        // Fail Register
+        $destroyAccount = seller_details::where('id', $sellerID)->delete();
+        $response = [
+            'status' => 400,
+            'message' => 'Sorry, unable create account'
+        ];
+        return response()->json($response, 400);
     }
 
     /**

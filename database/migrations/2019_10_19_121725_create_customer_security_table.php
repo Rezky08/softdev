@@ -15,7 +15,7 @@ class CreateCustomerSecurityTable extends Migration
     {
         Schema::connection('dbmarketcustomers')->create('customerSecuritys', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('customerId', 100);
+            $table->bigInteger('customerId')->unsigned();
             $table->string('customerUsername', 100)->unique();
             $table->string('customerQuestion1', 100);
             $table->string('customerAnswer1', 100);

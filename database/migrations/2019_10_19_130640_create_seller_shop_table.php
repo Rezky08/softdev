@@ -15,11 +15,11 @@ class CreateSellerShopTable extends Migration
     {
         Schema::connection('dbmarketsellers')->create('sellerShops', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('sellerId', 100);
+            $table->bigInteger('sellerId')->unsigned();
             $table->string('sellerShopName', 100);
             $table->string('sellerShopOwnerName', 100);
-            $table->string('sellerShopPhone', 20);
-            $table->string('sellerShopCertificate', 100);
+            $table->string('sellerShopPhone', 20)->nullable();
+            $table->string('sellerShopCertificate', 100)->nullable();
             $table->timestamps();
         });
     }

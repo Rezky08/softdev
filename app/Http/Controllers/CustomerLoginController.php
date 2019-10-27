@@ -8,7 +8,9 @@ use App\Model\CustomerDetail as customer_details;
 use App\Model\CustomerLogin as customer_logins;
 use App\Model\CustomerLoginLog as customer_login_logs;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Validator;
 
 class CustomerLoginController extends Controller
 {
@@ -19,7 +21,19 @@ class CustomerLoginController extends Controller
      */
     public function index()
     {
-        return view('login');
+        $customerData = Auth::guard('customer')->user();
+        if (!$customerData) {
+            $response = [
+                'status' => 401,
+                'Message' => "You're Not Authorized"
+            ];
+            return response()->json($response, 401);
+        }
+        $response = [
+            'status' => 200,
+            'data' => $customerData
+        ];
+        return response()->json($response, 200);
     }
 
     /**
@@ -40,6 +54,18 @@ class CustomerLoginController extends Controller
      */
     public function store(Request $request)
     {
+        // input Validation
+        $validation = Validator::make($request->all(), [
+            'username' => ['required'],
+            'password' => ['required', 'min:8', 'max:12']
+        ]);
+        if ($validation->fails()) {
+            $response = [
+                'status' => 400,
+                'message' => $validation->errors()
+            ];
+            return response()->json($response, 403);
+        }
 
         $username_input = $request->username;
         $password_input = $request->password;
@@ -63,22 +89,22 @@ class CustomerLoginController extends Controller
             $loginInfo['loginSuccess'] = 1;
             customer_login_logs::insert($loginInfo);
             $customerData = customer_details::where('id', $loginInfo['customerId'])->first();
-            unset($loginInfo['created_at'], $loginInfo['updated_at']);
-            $loginData = [
-                'id' => $customerData->id,
-                'username' => $customerData->customerUsername,
-                'fullname' => $customerData->customerFullname,
-                'DOB' => $customerData->customerDOB,
-                'address' => $customerData->customerAddress,
-                'sex' => $customerData->customerSex == 0 ? 'Male' : 'Female',
-                'email' => $customerData->customerEmail,
-                'phone' => $customerData->customerPhone,
-                'loginTime' => date_format(now(), 'Y-m-d H:i:s')
-            ];
+            // unset($loginInfo['created_at'], $loginInfo['updated_at']);
+            // $loginData = [
+            //     'id' => $customerData->id,
+            //     'username' => $customerData->customerUsername,
+            //     'fullname' => $customerData->customerFullname,
+            //     'DOB' => $customerData->customerDOB,
+            //     'address' => $customerData->customerAddress,
+            //     'sex' => $customerData->customerSex == 0 ? 'Male' : 'Female',
+            //     'email' => $customerData->customerEmail,
+            //     'phone' => $customerData->customerPhone,
+            //     'loginTime' => date_format(now(), 'Y-m-d H:i:s')
+            // ];
             $response = [
                 'status' => 200,
-                'token' => $customerLogin->customerToken,
-                'data' => $loginData
+                // 'data' => $loginData,
+                'token' => $customerData->createToken('loginToken', ['customer'])->accessToken,
             ];
             return response()->json($response, 200);
         }

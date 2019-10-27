@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Model\SellerLogin as seller_logins;
 use App\Model\SellerProduct as seller_products;
+use App\Model\SellerShop as seller_shops;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -21,7 +22,7 @@ class SellerProductController extends Controller
         foreach ($sellerProductData as $productCount => $productData) {
             $showProductData[] = [
                 'id' => $productData->id,
-                'sellerId' => $productData->sellerId,
+                'shopId' => $productData->sellerId,
                 'productName' => $productData->sellerProductName,
                 'productPrice' => $productData->sellerProductPrice,
                 'productImage' => $productData->sellerProductImage ?: Storage::url('public/image/default/ImageCrash.png')
@@ -43,19 +44,10 @@ class SellerProductController extends Controller
      */
     public function store(Request $request)
     {
-        // Authorization
-        $sellerData = seller_logins::where('sellerToken', $request->header('Authorization'));
-        if (!$sellerData->exists()) {
-            $response = [
-                'status' => 401,
-                'Message' => "You're Not Authorized"
-            ];
-            return response()->json($response, 401);
-        }
-        $sellerData = $sellerData->first();
-
+        $sellerData = $request->sellerData;
+        $sellerShopId = seller_shops::where('sellerId', $sellerData->id)->first();
         $productDetail = [
-            'sellerId' => $sellerData->sellerId,
+            'sellerShopId' => $sellerShopId->id,
             'sellerProductName' => $request->input('productName'),
             'sellerProductPrice' => $request->input('productPrice'),
             'sellerProductStock' => $request->input('productStock'),
@@ -92,10 +84,10 @@ class SellerProductController extends Controller
      * @param  \App\SellerProduct  $sellerProduct
      * @return \Illuminate\Http\Response
      */
-    public function show($sellerId, $productId = null)
+    public function show($sellerShopId, $productId = null)
     {
         $showProductData = [];
-        $sellerProductData = seller_products::where('sellerId', $sellerId);
+        $sellerProductData = seller_products::where('sellerShopId', $sellerShopId);
         if ($productId) {
             $sellerProductData = $sellerProductData->where('id', $productId)->first();
         } else {
@@ -104,7 +96,7 @@ class SellerProductController extends Controller
         foreach ($sellerProductData as $productCount => $productData) {
             $showProductData[] = [
                 'id' => $productData->id,
-                'sellerId' => $productData->sellerId,
+                'sellerShopId' => $productData->sellerShopId,
                 'productName' => $productData->sellerProductName,
                 'productPrice' => $productData->sellerProductPrice,
                 'productImage' => $productData->sellerProductImage ?: Storage::url('public/image/default/ImageCrash.png')

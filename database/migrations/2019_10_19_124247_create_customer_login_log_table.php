@@ -15,7 +15,7 @@ class CreateCustomerLoginLogTable extends Migration
     {
         Schema::connection('dbmarketcustomers')->create('customerLoginLogs', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('customerId', 100);
+            $table->bigInteger('customerId')->unsigned();
             $table->string('customerUsername', 100);
             $table->tinyInteger('loginSuccess')->default(0);
             $table->timestamps();

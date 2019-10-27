@@ -15,7 +15,7 @@ class CreateSellerLoginLogTable extends Migration
     {
         Schema::connection('dbmarketsellers')->create('sellerLoginLogs', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('sellerId', 100);
+            $table->bigInteger('sellerId')->unsigned();
             $table->string('sellerUsername', 100);
             $table->tinyInteger('loginSuccess')->default(0);
             $table->timestamps();

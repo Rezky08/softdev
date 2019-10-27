@@ -15,10 +15,10 @@ class CreateCustomerCartTable extends Migration
     {
         Schema::connection('dbmarketcustomers')->create('customerCarts', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('customerId', 100);
-            $table->string('customerSellerIdShop', 100);
-            $table->string('customerIdProduct', 100);
-            $table->string('customerProductName', 100);
+            $table->bigInteger('customerId')->unsigned();
+            $table->bigInteger('customerSellerShopId')->unsigned();
+            $table->bigInteger('customerSellerProductId')->unsigned();
+            $table->string('customerProductName');
             $table->integer('customerProductPrice')->default(12);
             $table->integer('customerProductQty')->default(12);
             $table->tinyInteger('customerStatus')->default(0);

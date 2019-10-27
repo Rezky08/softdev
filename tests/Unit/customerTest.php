@@ -44,7 +44,7 @@ class customerTest extends TestCase
     {
         $this->withHeaders(['Authorization' => 'CJAJewRn70ksnRV7kpWfe17NWVOggwmN3LYGJ1tV83lzUqXGuViziQFDRcOV']);
         $input = [
-            'idProduct' => rand(1, 10),
+            'productId' => rand(1, 10),
             'qty' => 2,
         ];
         $response = $this->post('/api/customer/2/cart', $input);

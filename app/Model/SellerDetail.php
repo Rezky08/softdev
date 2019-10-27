@@ -3,9 +3,13 @@
 namespace App\Model;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Passport\HasApiTokens;
+use Illuminate\Foundation\Auth\User as Authenticable;
 
-class SellerDetail extends Model
+class SellerDetail extends Authenticable
 {
+    use Notifiable, HasApiTokens;
     protected $connection = 'dbmarketsellers';
     protected $table = 'sellerDetails';
     public function getTableColumns()

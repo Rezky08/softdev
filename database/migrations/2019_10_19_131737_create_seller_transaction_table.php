@@ -15,8 +15,8 @@ class CreateSellerTransactionTable extends Migration
     {
         Schema::connection('dbmarketsellers')->create('sellerTransactions', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('sellerId', 100);
-            $table->string('customerId', 100);
+            $table->bigInteger('sellerShopId')->unsigned();
+            $table->bigInteger('customerId')->unsigned();
             $table->integer('sellerTotalPrice')->default(12)->comment('seller price received');
             $table->timestamps();
         });

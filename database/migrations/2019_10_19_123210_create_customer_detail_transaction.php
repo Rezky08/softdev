@@ -14,9 +14,10 @@ class CreateCustomerDetailTransaction extends Migration
     public function up()
     {
         Schema::connection('dbmarketcustomers')->create('customerDetailTransactions', function (Blueprint $table) {
-            $table->string('customerIdTransaction', 100);
-            $table->string('customerIdShop', 100);
-            $table->string('customerIdProduct', 100);
+            $table->bigIncrements('id');
+            $table->bigInteger('customerTransactionId')->unsigned();
+            $table->bigInteger('customerSellerShopId')->unsigned();
+            $table->bigInteger('customerSellerProductId')->unsigned();
             $table->string('customerProductName', 100);
             $table->integer('customerProductPrice')->default(12);
             $table->integer('customerProductQty')->default(12);

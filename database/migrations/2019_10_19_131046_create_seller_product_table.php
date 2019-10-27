@@ -15,7 +15,7 @@ class CreateSellerProductTable extends Migration
     {
         Schema::connection('dbmarketsellers')->create('sellerProducts', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('sellerId', 100);
+            $table->bigInteger('sellerShopId')->unsigned();
             $table->string('sellerProductName', 100);
             $table->integer('sellerProductPrice')->default(12);
             $table->integer('sellerProductStock');

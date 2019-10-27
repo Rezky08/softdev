@@ -15,7 +15,7 @@ class CreateSellerLoginTable extends Migration
     {
         Schema::connection('dbmarketsellers')->create('sellerLogins', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('sellerId', 100);
+            $table->bigInteger('sellerId')->unsigned();
             $table->string('sellerUsername', 100)->unique();
             $table->text('sellerPassword');
             $table->tinyInteger('sellerStatus')->default(0);

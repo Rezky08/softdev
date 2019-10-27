@@ -8,6 +8,7 @@ use App\Model\CustomerLogin as customer_logins;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Validator;
 
 class CustomerRegisterController extends Controller
 {
@@ -58,14 +59,20 @@ class CustomerRegisterController extends Controller
      */
     public function store(Request $request)
     {
-        $accountExist = customer_details::where('customerUsername', $request->input('username'))->exists();
-        if ($accountExist) {
+        // input validation
+        $validation = Validator::make($request->all(), [
+            'username' => ['required', 'unique:dbmarketsellers.sellerLogins,sellerUsername', 'unique:dbmarketcustomers.customerLogins,customerUsername'],
+            'password' => ['required', 'min:8', 'max:12', 'regex:/^(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*[\d]).{8,12}$/'],
+            'email' => ['required', 'email', 'unique:dbmarketsellers.sellerDetails,sellerEmail', 'unique:dbmarketcustomers.customerDetails,customerEmail']
+        ]);
+        if ($validation->fails()) {
             $response = [
                 'status' => 401,
-                'message' => 'Account was exists'
+                'message' => $validation->errors()
             ];
             return response()->json($response, 401);
         }
+
         $customerDetail = [
             'customerFullname' => $request->input('fullname') ?: $request->input('username'),
             'customerDOB' => $request->input('DOB'),
@@ -81,7 +88,6 @@ class CustomerRegisterController extends Controller
         $customerLogin = [
             'customerUsername' => $request->input('username'),
             'customerPassword' => Hash::make($request->input('password')),
-            'customerToken' => Str::random(60),
             'customerStatus' => 1,
             'customerId' => $customerID,
             'created_at' => date_format(now(), 'Y-m-d H:i:s'),
@@ -92,7 +98,7 @@ class CustomerRegisterController extends Controller
             $response = [
                 'status' => 200,
                 'customerUsername' => $customerLogin['customerUsername'],
-                'token' => $customerLogin['customerToken']
+                'token' => customer_details::find($customerID)->createToken('registerToken', ['customer'])->accessToken
             ];
             return response()->json($response, 200);
         }

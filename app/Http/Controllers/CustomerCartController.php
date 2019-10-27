@@ -8,6 +8,7 @@ use App\Model\CustomerLogin as customer_logins;
 use App\Model\SellerProduct as seller_product;
 use App\Model\SellerShop as seller_shop;
 use Illuminate\Http\Request;
+use Validator;
 
 class CustomerCartController extends Controller
 {
@@ -29,11 +30,11 @@ class CustomerCartController extends Controller
         }
         $customerCart = $customerCart->get();
         foreach ($customerCart as $cartId => $cartData) {
-            $productImage = seller_product::where('id', $cartData->customerIdProduct)->first();
+            $productImage = seller_product::where('id', $cartData->customerSellerProductId)->first();
             $customerCartData[] = [
                 'id' => $cartData->id,
-                'idShop' => $cartData->customerSellerIdShop,
-                'idProduct' => $cartData->customerIdProduct,
+                'idShop' => $cartData->customerSellerShopId,
+                'productId' => $cartData->customerSellerProductId,
                 'productImage' => $productImage->sellerProductImage,
                 'productName' => $cartData->customerProductName,
                 'productPrice' => $cartData->customerProductPrice,
@@ -55,18 +56,8 @@ class CustomerCartController extends Controller
      */
     public function store(Request $request)
     {
-        // Authorization
-        $customerData = customer_logins::where('customerToken', $request->header('Authorization'));
-        if (!$customerData->exists()) {
-            $response = [
-                'status' => 401,
-                'Message' => "You're Not Authorized"
-            ];
-            return response()->json($response, 401);
-        }
-        $customerData = $customerData->first();
-
-        $productDetails = seller_product::where('id', $request->idProduct);
+        $customerData = $request->customerData;
+        $productDetails = seller_product::where('id', $request->productId);
         if (!$productDetails->exists()) {
             $response = [
                 'status' => 404,
@@ -78,8 +69,8 @@ class CustomerCartController extends Controller
 
         $productAddtoCart = [
             'customerId' => $customerData->id,
-            'customerSellerIdShop' => $productDetails->sellerId,
-            'customerIdProduct' => $request->idProduct,
+            'customerSellerShopId' => $productDetails->sellerShopId,
+            'customerSellerProductId' => $request->productId,
             'customerProductName' => $productDetails->sellerProductName,
             'customerProductPrice' => $productDetails->sellerProductPrice,
             'customerProductQty' => $request->qty,
@@ -89,7 +80,7 @@ class CustomerCartController extends Controller
         ];
         $whereCond = [
             'customerId' => $productAddtoCart['customerId'],
-            'customerIdProduct' => $productAddtoCart['customerIdProduct'],
+            'customerSellerProductId' => $productAddtoCart['customerSellerProductId'],
             'customerStatus' => 0,
         ];
         $status = customer_cart::where($whereCond);
@@ -114,9 +105,21 @@ class CustomerCartController extends Controller
                 ];
                 return response()->json($response, 500);
             }
+            $cartData = customer_cart::find($cartData->id);
+            $customerCartData = [];
+            $productImage = seller_product::where('id', $cartData->customerSellerProductId)->first();
+            $customerCartData[] = [
+                'id' => $cartData->id,
+                'idShop' => $cartData->customerSellerShopId,
+                'productId' => $cartData->customerSellerProductId,
+                'productImage' => $productImage->sellerProductImage,
+                'productName' => $cartData->customerProductName,
+                'productPrice' => $cartData->customerProductPrice,
+                'productQty' => $cartData->customerProductQty,
+            ];
             $response = [
                 'status' => 200,
-                'Message' => 'Success add ' . $productDetails->sellerProductName . ' to Cart'
+                'data' => $customerCartData
             ];
             return response()->json($response, 200);
         }
@@ -153,11 +156,11 @@ class CustomerCartController extends Controller
             return response()->json($response, 400);
         }
         $customerCartData = $customerCartData->first();
-        $productImage = seller_product::where('id', $customerCartData->customerIdProduct)->first();
+        $productImage = seller_product::where('id', $customerCartData->customerSellerProductId)->first();
         $customerCartData = [
             'id' => $customerCartData->id,
-            'idShop' => $customerCartData->customerSellerIdShop,
-            'idProduct' => $customerCartData->customerIdProduct,
+            'idShop' => $customerCartData->customerSellerShopId,
+            'productId' => $customerCartData->customerSellerProductId,
             'productImage' => $productImage->sellerProductImage,
             'productName' => $customerCartData->customerProductName,
             'productPrice' => $customerCartData->customerProductPrice,
@@ -177,9 +180,67 @@ class CustomerCartController extends Controller
      * @param  \App\Model\CustomerCart  $CustomerCart
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, CustomerCart $CustomerCart)
+    public function update(Request $request)
     {
-        //
+        $validation = Validator::make($request->all(), [
+            'id' => ['required', 'regex:/[\d]/'],
+            'qty' => ['required', 'regex:/[\d]/']
+        ]);
+        if ($validation->fails()) {
+            $response = [
+                'status' => 400,
+                'message' => $validation->errors()
+            ];
+            return response()->json($response, 400);
+        }
+        $customerData = $request->customerData;
+        $whereCond = [
+            'id' => $request->id,
+            'customerId' => $customerData->id,
+            ['customerStatus', '!=', '99']
+        ];
+        $cartData = customer_cart::where($whereCond);
+        if (!$cartData->exists()) {
+            $response = [
+                'status' => 404,
+                'message' => 'Cart Not Found!'
+            ];
+            return response()->json($response, 404);
+        }
+        if ($request->qty <= 0) {
+            // cancel product
+            $cartUpdate = $cartData->update([
+                'customerProductQty' => $request->qty,
+                'customerStatus' => 99,
+            ]);
+            $cartData = $cartData->first();
+            $response = [
+                'status ' => 200,
+                'message' => $cartData->customerProductName . " has been removed from the cart"
+            ];
+            return response()->json($response);
+        } else {
+            $cartUpdate = $cartData->update([
+                'customerProductQty' => $request->qty
+            ]);
+        }
+        $cartData = customer_cart::where($whereCond)->first();
+        $customerCartData = [];
+        $productImage = seller_product::where('id', $cartData->customerSellerProductId)->first();
+        $customerCartData[] = [
+            'id' => $cartData->id,
+            'idShop' => $cartData->customerSellerShopId,
+            'productId' => $cartData->customerSellerProductId,
+            'productImage' => $productImage->sellerProductImage,
+            'productName' => $cartData->customerProductName,
+            'productPrice' => $cartData->customerProductPrice,
+            'productQty' => $cartData->customerProductQty,
+        ];
+        $response = [
+            'status' => 200,
+            'data' => $customerCartData
+        ];
+        return response()->json($response, 200);
     }
 
     /**
@@ -188,8 +249,42 @@ class CustomerCartController extends Controller
      * @param  \App\Model\CustomerCart  $CustomerCart
      * @return \Illuminate\Http\Response
      */
-    public function destroy(CustomerCart $CustomerCart)
+    public function destroy(Request $request)
     {
-        //
+        $validation = Validator::make($request->all(), [
+            'id' => ['required', 'regex:/[\d]/'],
+        ]);
+        if ($validation->fails()) {
+            $response = [
+                'status' => 400,
+                'message' => $validation->errors()
+            ];
+            return response()->json($response, 400);
+        }
+        $customerData = $request->customerData;
+        $whereCond = [
+            'id' => $request->id,
+            'customerId' => $customerData->id,
+            ['customerStatus', '!=', '99']
+        ];
+        $cartData = customer_cart::where($whereCond);
+        if (!$cartData->exists()) {
+            $response = [
+                'status' => 404,
+                'message' => 'Cart Not Found!'
+            ];
+            return response()->json($response, 404);
+        }
+
+        // cancel product
+        $cartUpdate = $cartData->update([
+            'customerStatus' => 99
+        ]);
+        $cartData = customer_cart::where('id', $request->id)->first();
+        $response = [
+            'status ' => 200,
+            'message' => $cartData->customerProductName . " has been removed from the cart"
+        ];
+        return response()->json($response);
     }
 }

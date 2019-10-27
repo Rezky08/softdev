@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Model\CustomerDetail as customer_details;
 use App\Model\CustomerLogin as customer_logins;
 use Illuminate\Http\Request;
 use Illuminate\Session\Store;
@@ -10,26 +11,31 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use SebastianBergmann\CodeCoverage\Report\Html\File;
-use JWTAuth;
-use JWTFactory;
 
 class TesterController extends Controller
 {
+
     public function index(Request $request)
     {
-        $customerGuard = Auth::guard('customer');
-        $credentials = [
-            'customerUsername' => 'rezky221197',
-        ];
-
-        $user = customer_logins::where($credentials)->first();
+        $customer = Auth::guard('customer')->user();
         $response = [
             'message' => Str::random(60),
-            'JWT' => $customerGuard->fromUser($user),
-            'parseToken' => $customerGuard->parseToken()->getPayload()
+            'data' => $customer
 
         ];
         return response()->json($response, 200);
+    }
+    public function login(Request $request)
+    {
+        $customer = customer_logins::where('customerUsername', $request->input('username'))->first();
+        if ($customer) {
+            if (Hash::check($request->input('password'), $customer->customerPassword)) {
+                $customer = customer_details::where('id', $customer->customerId)->first();
+                $customer = $customer->createToken('Login', ['customer'])->accessToken;
+                return response()->json($customer);
+            }
+        }
+        return response()->json('NotAuthorized', 200);
     }
     public function readFile(Request $request)
     {
@@ -47,9 +53,12 @@ class TesterController extends Controller
     }
     public function JWTTest()
     {
-        $customClaims = ['foo' => 'bar', 'baz' => 'bob'];
-        // $payload = JWTFactory::make($customClaims);
-        $token = Auth::guard('customer')->fromUser($customClaims);
-        return response()->json($token, 200);
+        $credentials = [
+            'customerUsername' => 'rezky221196'
+        ];
+        $user = CustomerLoginJWT::where($credentials);
+        $user = $user->first();
+        $JWT = JWTAuth::fromUser($user);
+        return var_dump($JWT);
     }
 }

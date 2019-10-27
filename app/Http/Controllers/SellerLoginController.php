@@ -9,6 +9,7 @@ use App\Model\SellerLogin as seller_logins;
 use App\Model\SellerLoginLog as seller_login_logs;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Validator;
 
 class SellerLoginController extends Controller
 {
@@ -19,7 +20,19 @@ class SellerLoginController extends Controller
      */
     public function index()
     {
-        return view('login');
+        $customerData = Auth::guard('seller')->user();
+        if (!$customerData) {
+            $response = [
+                'status' => 401,
+                'Message' => "You're Not Authorized"
+            ];
+            return response()->json($response, 401);
+        }
+        $response = [
+            'status' => 200,
+            'data' => $customerData
+        ];
+        return response()->json($response, 200);
     }
 
     /**
@@ -40,6 +53,18 @@ class SellerLoginController extends Controller
      */
     public function store(Request $request)
     {
+        // input Validation
+        $validation = Validator::make($request->all(), [
+            'username' => ['required'],
+            'password' => ['required', 'min:8', 'max:12']
+        ]);
+        if ($validation->fails()) {
+            $response = [
+                'status' => 400,
+                'message' => $validation->errors()
+            ];
+            return response()->json($response, 403);
+        }
 
         $username_input = $request->username;
         $password_input = $request->password;
@@ -63,22 +88,22 @@ class SellerLoginController extends Controller
             $loginInfo['loginSuccess'] = 1;
             seller_login_logs::insert($loginInfo);
             $sellerData = seller_details::where('id', $loginInfo['sellerId'])->first();
-            unset($loginInfo['created_at'], $loginInfo['updated_at']);
-            $loginData = [
-                'id' => $sellerData->id,
-                'username' => $sellerData->sellerUsername,
-                'fullname' => $sellerData->sellerFullname,
-                'DOB' => $sellerData->sellerDOB,
-                'address' => $sellerData->sellerAddress,
-                'sex' => $sellerData->sellerSex == 0 ? 'Male' : 'Female',
-                'email' => $sellerData->sellerEmail,
-                'phone' => $sellerData->sellerPhone,
-                'loginTime' => date_format(now(), 'Y-m-d H:i:s')
-            ];
+            // unset($loginInfo['created_at'], $loginInfo['updated_at']);
+            // $loginData = [
+            //     'id' => $sellerData->id,
+            //     'username' => $sellerData->sellerUsername,
+            //     'fullname' => $sellerData->sellerFullname,
+            //     'DOB' => $sellerData->sellerDOB,
+            //     'address' => $sellerData->sellerAddress,
+            //     'sex' => $sellerData->sellerSex == 0 ? 'Male' : 'Female',
+            //     'email' => $sellerData->sellerEmail,
+            //     'phone' => $sellerData->sellerPhone,
+            //     'loginTime' => date_format(now(), 'Y-m-d H:i:s')
+            // ];
             $response = [
                 'status' => 200,
-                'token' => $sellerLogin->sellerToken,
-                'data' => $loginData
+                // 'data' => $loginData,
+                'token' => $sellerData->createToken('loginToken', ['seller'])->accessToken,
             ];
             return response()->json($response, 200);
         }

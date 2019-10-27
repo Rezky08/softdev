@@ -43,12 +43,15 @@ class MigrateAllCommand extends Command
         // Artisan::call('migrate:install', ['--database' => $schema]);
         foreach ($this->argument('schema') as $schema) {
             $tables = DB::connection($schema)->select('SHOW TABLES');
+
             $this->info('Drop all table in ' . $schema);
+            Schema::connection($schema)->disableForeignKeyConstraints();
             foreach ($tables as $tablein) {
                 foreach ($tablein as $table) {
                     Schema::connection($schema)->drop($table);
                 }
             }
+            schema::enableForeignKeyConstraints();
             // $this->info('install migrate table in' . $schema);
         }
         Artisan::call('migrate');
