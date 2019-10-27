@@ -18,21 +18,15 @@ class checkScopes
     public function handle($request, Closure $next, ...$scopes)
     {
         $guard = ['customer', 'seller'];
-        foreach ($guard as $guardname) {
-            $guardname = Auth::guard($guardname)->user();
-            if ($guardname) {
-                if (is_array($scopes)) {
-                    foreach ($scopes as $scopesTemplate) {
-                        if ($guardname->tokenCan($scopesTemplate)) {
-                            $request->request->add([$scopesTemplate . 'Data' => $guardname]);
-                            return $next($request);
-                        }
-                    }
+        foreach ($scopes as $scopesTemplate) {
+            $user = Auth::guard($scopesTemplate)->user();
+            if ($user) {
+                if ($user->tokenCan($scopesTemplate)) {
+                    $request->request->add([$scopesTemplate . 'Data' => $user]);
+                    return $next($request);
                 }
-                break;
             }
         }
-
         $response = [
             'status' => 401,
             'Message' => "You're Not Authorized"
