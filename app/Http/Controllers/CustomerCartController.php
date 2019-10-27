@@ -17,10 +17,11 @@ class CustomerCartController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($customerId)
+    public function index(Request $request)
     {
         $customerCartData = [];
-        $customerCart = customer_cart::where(['customerId' => $customerId, 'customerStatus' => 0]);
+        $customerData = $request->customerData;
+        $customerCart = customer_cart::where(['customerId' => $customerData->id, 'customerStatus' => 0]);
         if (!$customerCart->exists()) {
             $response = [
                 'status' => 400,
@@ -183,8 +184,8 @@ class CustomerCartController extends Controller
     public function update(Request $request)
     {
         $validation = Validator::make($request->all(), [
-            'id' => ['required', 'regex:/[\d]/'],
-            'qty' => ['required', 'regex:/[\d]/']
+            'id' => ['required', 'numeric'],
+            'qty' => ['required', 'numeric']
         ]);
         if ($validation->fails()) {
             $response = [
@@ -197,7 +198,6 @@ class CustomerCartController extends Controller
         $whereCond = [
             'id' => $request->id,
             'customerId' => $customerData->id,
-            ['customerStatus', '!=', '99']
         ];
         $cartData = customer_cart::where($whereCond);
         if (!$cartData->exists()) {
@@ -209,11 +209,8 @@ class CustomerCartController extends Controller
         }
         if ($request->qty <= 0) {
             // cancel product
-            $cartUpdate = $cartData->update([
-                'customerProductQty' => $request->qty,
-                'customerStatus' => 99,
-            ]);
-            $cartData = $cartData->first();
+            $cartDelete = $cartData->delete();
+            $cartData = customer_cart::onlyTrashed()->where($whereCond)->first();
             $response = [
                 'status ' => 200,
                 'message' => $cartData->customerProductName . " has been removed from the cart"
@@ -252,7 +249,7 @@ class CustomerCartController extends Controller
     public function destroy(Request $request)
     {
         $validation = Validator::make($request->all(), [
-            'id' => ['required', 'regex:/[\d]/'],
+            'id' => ['required', 'numeric'],
         ]);
         if ($validation->fails()) {
             $response = [
@@ -265,7 +262,6 @@ class CustomerCartController extends Controller
         $whereCond = [
             'id' => $request->id,
             'customerId' => $customerData->id,
-            ['customerStatus', '!=', '99']
         ];
         $cartData = customer_cart::where($whereCond);
         if (!$cartData->exists()) {
@@ -277,10 +273,8 @@ class CustomerCartController extends Controller
         }
 
         // cancel product
-        $cartUpdate = $cartData->update([
-            'customerStatus' => 99
-        ]);
-        $cartData = customer_cart::where('id', $request->id)->first();
+        $cartUpdate = $cartData->delete();
+        $cartData = customer_cart::onlyTrashed()->where($whereCond)->first();
         $response = [
             'status ' => 200,
             'message' => $cartData->customerProductName . " has been removed from the cart"
