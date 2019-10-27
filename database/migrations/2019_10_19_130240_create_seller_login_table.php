@@ -20,6 +20,7 @@ class CreateSellerLoginTable extends Migration
             $table->text('sellerPassword');
             $table->tinyInteger('sellerStatus')->default(0);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

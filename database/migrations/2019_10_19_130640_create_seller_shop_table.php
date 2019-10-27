@@ -21,6 +21,7 @@ class CreateSellerShopTable extends Migration
             $table->string('sellerShopPhone', 20)->nullable();
             $table->string('sellerShopCertificate', 100)->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

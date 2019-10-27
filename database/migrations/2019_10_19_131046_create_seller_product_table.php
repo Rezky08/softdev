@@ -21,6 +21,7 @@ class CreateSellerProductTable extends Migration
             $table->integer('sellerProductStock');
             $table->text('sellerProductImage')->nullable()->comment('path Image');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

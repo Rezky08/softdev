@@ -7,6 +7,7 @@ use App\Model\SellerProduct as seller_products;
 use App\Model\SellerShop as seller_shops;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Validator;
 
 class SellerProductController extends Controller
 {
@@ -44,6 +45,21 @@ class SellerProductController extends Controller
      */
     public function store(Request $request)
     {
+        // Validation
+        $validation = Validator::make($request->all(), [
+            'productName' => ['required'],
+            'productPrice' => ['required', 'numeric'],
+            'productStock' => ['required', 'numeric'],
+            'productImage' => ['required', 'mimes:png,jpg,bmp,jpeg']
+        ]);
+        if ($validation->fails()) {
+            $response = [
+                'status' => 200,
+                'message' => $validation->errors()
+            ];
+            return response()->json($response);
+        }
+
         $sellerData = $request->sellerData;
         $sellerShopId = seller_shops::where('sellerId', $sellerData->id)->first();
         $productDetail = [
@@ -73,7 +89,7 @@ class SellerProductController extends Controller
 
         $response = [
             'status' => 200,
-            'message' => 'Add product successfully'
+            'message' => $request->productName . ' has been added successfully'
         ];
         return response()->json($response, 200);
     }
@@ -117,9 +133,71 @@ class SellerProductController extends Controller
      * @param  \App\SellerProduct  $sellerProduct
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, SellerProduct $sellerProduct)
+    public function update(Request $request)
     {
-        //
+        // Validation
+        $validation = Validator::make($request->all(), [
+            'id' => ['required', 'numeric'],
+            'productName' => ['required'],
+            'productPrice' => ['required', 'numeric'],
+            'productStock' => ['required', 'numeric'],
+            'productImage' => ['required', 'image', 'mimes:png,jpg,bmp,jpeg', 'max:102400']
+        ]);
+        if ($validation->fails()) {
+            $response = [
+                'status' => 400,
+                'message' => $validation->errors()
+            ];
+            return response()->json($response, 400);
+        }
+
+        $sellerData = $request->sellerData;
+        $whereCond = [
+            'sellerId' => $sellerData->id,
+        ];
+        $sellerShopData = seller_shops::where($whereCond);
+        if (!$sellerShopData->exists()) {
+            $response = [
+                'status' => 400,
+                'message' => 'sorry, we cannot find your shop'
+            ];
+            return response()->json($response, 400);
+        }
+        $sellerShopData = $sellerShopData->first();
+        $whereCond = [
+            'id' => $request->id,
+            'sellerShopId' => $sellerShopData->id,
+        ];
+        $sellerProductData = seller_products::where($whereCond);
+        if (!$sellerProductData->exists()) {
+            $response = [
+                'status' => 400,
+                'message' => 'sorry, we cannot find your product'
+            ];
+            return response()->json($response, 400);
+        }
+
+        $productDetail = [
+            'sellerShopId' => $sellerShopData->id,
+            'sellerProductName' => $request->input('productName'),
+            'sellerProductPrice' => $request->input('productPrice'),
+            'sellerProductStock' => $request->input('productStock'),
+            'updated_at' => date_format(now(), 'Y-m-d H:i:s')
+        ];
+        $productImage = $request->file('productImage');
+        $productImagePath = Storage::url($productImage->store('public/image/sellers/' . $sellerShopData->sellerShopName));
+        $productDetail['sellerProductImage'] = $productImagePath;
+
+        // update Product
+        $status = seller_products::where($whereCond)->update($productDetail);
+        $productDetail = seller_products::where($whereCond)->first();
+        if ($status) {
+            $response = [
+                'status' => 200,
+                'data' => $productDetail
+            ];
+            return response()->json($response);
+        }
     }
 
     /**
@@ -128,8 +206,45 @@ class SellerProductController extends Controller
      * @param  \App\SellerProduct  $sellerProduct
      * @return \Illuminate\Http\Response
      */
-    public function destroy(SellerProduct $sellerProduct)
+    public function destroy(Request $request)
     {
-        //
+        // validation
+        $validation = Validator::make($request->all(), [
+            'id' => ['required', 'numeric']
+        ]);
+        $sellerData = $request->sellerData;
+        $whereCond = [
+            'sellerId' => $sellerData->id
+        ];
+        $sellerShopData = seller_shops::where($whereCond);
+        if (!$sellerShopData->exists()) {
+            $response = [
+                'status' => 400,
+                'message' => 'sorry, we cannot find your shop'
+            ];
+            return response()->json($response, 400);
+        }
+        $sellerShopData =  $sellerShopData->first();
+        $whereCond = [
+            'id' => $request->id,
+            'sellerShopId' => $sellerShopData->id,
+        ];
+        $sellerProductData = seller_products::where($whereCond);
+        if (!$sellerProductData->exists()) {
+            $response = [
+                'status' => 400,
+                'message' => 'sorry, we cannot find your product'
+            ];
+            return response()->json($response, 400);
+        }
+        $sellerProductData = $sellerProductData->first();
+        $status = seller_products::where($whereCond)->delete();
+        if ($status) {
+            $response = [
+                'status' => 200,
+                'message' => $sellerProductData->sellerProductName . ' was deleted'
+            ];
+            return response()->json($response);
+        }
     }
 }

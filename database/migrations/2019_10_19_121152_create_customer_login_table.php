@@ -20,6 +20,7 @@ class CreateCustomerLoginTable extends Migration
             $table->text('customerPassword');
             $table->tinyInteger('customerStatus')->default(0);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

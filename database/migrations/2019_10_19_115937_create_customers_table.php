@@ -23,6 +23,7 @@ class CreateCustomersTable extends Migration
             $table->string('customerPhone', 20)->nullable();
             $table->string('customerUsername', 100)->unique();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

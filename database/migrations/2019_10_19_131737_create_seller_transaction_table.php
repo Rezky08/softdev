@@ -19,6 +19,7 @@ class CreateSellerTransactionTable extends Migration
             $table->bigInteger('customerId')->unsigned();
             $table->integer('sellerTotalPrice')->default(12)->comment('seller price received');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

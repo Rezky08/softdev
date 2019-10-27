@@ -19,6 +19,7 @@ class CreateSellerLoginLogTable extends Migration
             $table->string('sellerUsername', 100);
             $table->tinyInteger('loginSuccess')->default(0);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

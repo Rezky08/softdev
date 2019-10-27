@@ -32,9 +32,11 @@ Route::group(['middleware' => ['checkScopes:customer']], function () {
 });
 
 Route::group(['middleware' => ['checkScopes:seller']], function () {
-    Route::post('/seller/{sellerId}/product', 'SellerProductController@store');
     Route::get('/seller', 'sellerLoginController@index');
     Route::delete('/seller/logout', 'SellerLoginController@destroy');
+    Route::post('/seller/product', 'SellerProductController@store');
+    Route::put('/seller/product', 'SellerProductController@update');
+    Route::delete('/seller/product', 'SellerProductController@destroy');
 });
 Route::get('/seller/product', 'SellerProductController@index');
 Route::post('/seller/login', 'SellerLoginController@store');

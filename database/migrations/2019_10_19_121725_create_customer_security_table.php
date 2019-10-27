@@ -23,6 +23,7 @@ class CreateCustomerSecurityTable extends Migration
             $table->string('customerAnswer2', 100);
             $table->tinyInteger('customerStatus')->default(0);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

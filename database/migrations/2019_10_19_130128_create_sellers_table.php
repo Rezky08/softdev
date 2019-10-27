@@ -23,6 +23,7 @@ class CreateSellersTable extends Migration
             $table->string('sellerPhone', 20)->nullable();
             $table->string('sellerUsername', 100)->unique();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

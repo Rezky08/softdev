@@ -23,6 +23,7 @@ class CreateCustomerCartTable extends Migration
             $table->integer('customerProductQty')->default(12);
             $table->tinyInteger('customerStatus')->default(0);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

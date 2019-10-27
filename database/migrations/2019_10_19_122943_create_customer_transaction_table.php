@@ -18,6 +18,7 @@ class CreateCustomerTransactionTable extends Migration
             $table->bigInteger('customerId')->unsigned();
             $table->integer('CustomerTotalPrice')->default(12)->comment('customer price pay');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

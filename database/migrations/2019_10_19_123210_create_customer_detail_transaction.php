@@ -22,6 +22,7 @@ class CreateCustomerDetailTransaction extends Migration
             $table->integer('customerProductPrice')->default(12);
             $table->integer('customerProductQty')->default(12);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

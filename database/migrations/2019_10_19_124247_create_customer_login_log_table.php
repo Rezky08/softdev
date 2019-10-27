@@ -19,6 +19,7 @@ class CreateCustomerLoginLogTable extends Migration
             $table->string('customerUsername', 100);
             $table->tinyInteger('loginSuccess')->default(0);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
