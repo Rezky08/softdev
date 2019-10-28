@@ -2,6 +2,8 @@
 
 namespace Tests\Unit;
 
+use App\Model\CustomerCart as customer_carts;
+use App\Model\SellerProduct as seller_products;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Str;
@@ -14,7 +16,6 @@ class customerTest extends TestCase
      *
      * @return void
      */
-    /** @test */
     public function customerCanRegister()
     {
         $input = [
@@ -26,28 +27,74 @@ class customerTest extends TestCase
         ];
         $response = $this->post('/api/customer/register', $input);
         $response->assertStatus(200);
+        return $input;
     }
 
-    /** @test */
-    public function customerCanLogin()
+    public function customerProfile($token)
     {
-        $input = [
-            'username' => 'rezky221197',
-            'password' => 'Test123#'
-        ];
-        $response = $this->post('/api/customer/login', $input);
+        $this->token = $token;
+        $this->withHeaders(['Authorization' => $this->token]);
+        $response = $this->get('/api/customer');
         $response->assertStatus(200);
+        return $response->decodeResponseJson();
     }
 
-    /** @test */
-    public function customerCanAddToCart()
+    public function customerCanLogin($input)
     {
-        $this->withHeaders(['Authorization' => 'CJAJewRn70ksnRV7kpWfe17NWVOggwmN3LYGJ1tV83lzUqXGuViziQFDRcOV']);
+        $response = $this->post('/api/customer/login', $input);
+        $this->token = "Bearer " . $response->decodeResponseJson()['token'];
+        $response->assertStatus(200);
+        return $this->token;
+    }
+
+    public function customerCanAddToCart($token, $productId)
+    {
+        $this->token = $token;
+        $this->withHeaders(['Authorization' => $this->token]);
         $input = [
-            'productId' => rand(1, 10),
+            'productId' => $productId,
             'qty' => 2,
         ];
-        $response = $this->post('/api/customer/2/cart', $input);
+        $response = $this->post('/api/customer/cart', $input);
         $response->assertStatus(200);
+    }
+    public function customerCanUpdateCart($token, $productId)
+    {
+        $this->token = $token;
+        $this->withHeaders(['Authorization' => $this->token]);
+        $input = [
+            'productId' => $productId,
+            'qty' => 2,
+        ];
+        $response = $this->post('/api/customer/cart', $input);
+        $response->assertStatus(200);
+    }
+    public function customerCanRemoveCart($token, $cartId)
+    {
+        $this->token = $token;
+        $this->withHeaders(['Authorization' => $this->token]);
+        $input = [
+            'id' => $cartId,
+            '_method' => 'DELETE'
+        ];
+        $response = $this->post('/api/customer/cart', $input);
+        $response->assertStatus(200);
+    }
+
+    /** @test */
+    public function customerAction()
+    {
+        $productId = seller_products::all()->first()->id;
+        $input = $this->customerCanRegister();
+        $input = [
+            'username' => $input['username'],
+            'password' => $input['password']
+        ];
+        $this->token = $this->customerCanLogin($input);
+        $this->customerCanAddToCart($this->token, $productId);
+        $customerAcc = $this->customerProfile($this->token)['data'];
+        $cartId = customer_carts::where('customerId', $customerAcc['id'])->orderBy('created_at', 'desc')->first()->id;
+        $this->customerCanUpdateCart($this->token, $cartId);
+        $this->customerCanRemoveCart($this->token, $cartId);
     }
 }

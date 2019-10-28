@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Model\SellerProduct as seller_products;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile;
@@ -11,6 +12,7 @@ use Tests\TestCase;
 
 class sellerTest extends TestCase
 {
+
     /**
      * A basic unit test example.
      *
@@ -30,28 +32,66 @@ class sellerTest extends TestCase
         $response->assertStatus(200);
     }
 
-    /** @test */
     public function sellerCanLogin()
     {
         $input = [
-            'username' => 'rezky2211977',
+            'username' => 'rezky221190',
             'password' => 'Test123#'
         ];
         $response = $this->post('/api/seller/login', $input);
+        $this->token = "Bearer " . $response->decodeResponseJson()['token'];
         $response->assertStatus(200);
+        return $this->token;
     }
 
-    /** @test */
-    public function sellerCanAddTheirProduct()
+    public function sellerCanAddTheirProduct($token)
     {
-        $this->withHeaders(['Authorization' => 'aHhy7AIAvzPBdQdpB0YbaRH6N9Zw0rbhWCjenCOLhMZKSjq9tvenCidF8Y05']);
+        $this->token = $token;
+        $this->withHeaders(['Authorization' => $this->token]);
         $input = [
             'productName' => Str::random(20),
             'productPrice' => rand(1, 99999),
             'productStock' =>  rand(1, 100),
             'productImage' => UploadedFile::fake()->image('fakerImage.jpg')->size(100)
         ];
-        $response = $this->post('/api/seller/1/product', $input);
+        $response = $this->post('/api/seller/product', $input);
         $response->assertStatus(200);
+    }
+
+
+    public function sellerCanUpdateTheirProduct($token, $id)
+    {
+        $this->token = $token;
+        $this->withHeaders(['Authorization' => $this->token]);
+        $input = [
+            'id' => $id,
+            'productName' => Str::random(20),
+            'productPrice' => rand(1, 99999),
+            'productStock' =>  rand(1, 100),
+            'productImage' => UploadedFile::fake()->image('fakerImage.jpg')->size(100),
+            '_method' => 'PUT'
+        ];
+        $response = $this->post('/api/seller/product', $input);
+        $response->assertStatus(200);
+    }
+    public function sellerCanDeleteTheirProduct($token, $id)
+    {
+        $this->token = $token;
+        $this->withHeaders(['Authorization' => $this->token]);
+        $input = [
+            'id' => $id,
+            '_method' => "DELETE"
+        ];
+        $response = $this->post('/api/seller/product', $input);
+        $response->assertStatus(200);
+    }
+    /** @test */
+    public function sellerAction()
+    {
+        $this->token = $this->sellerCanLogin();
+        $this->id = seller_products::all()->first()->id;
+        $this->sellerCanAddTheirProduct($this->token);
+        $this->sellerCanUpdateTheirProduct($this->token, $this->id);
+        $this->sellerCanDeleteTheirProduct($this->token, $this->id);
     }
 }

@@ -21,7 +21,7 @@ class CustomerCartController extends Controller
     {
         $customerCartData = [];
         $customerData = $request->customerData;
-        $customerCart = customer_cart::where(['customerId' => $customerData->id, 'customerStatus' => 0]);
+        $customerCart = customer_cart::where(['customerId' => $customerData->id, 'customerStatus' => 0])->leftJoin('dbmarketsellers.sellerproducts as products', 'customerCarts.customerSellerProductId', '=', 'products.id');
         if (!$customerCart->exists()) {
             $response = [
                 'status' => 400,
@@ -29,14 +29,13 @@ class CustomerCartController extends Controller
             ];
             return response()->json($response, 400);
         }
-        $customerCart = $customerCart->get();
+        $customerCart = $customerCart->get(['customerCarts.*', 'products.sellerProductImage AS customerProductImage']);
         foreach ($customerCart as $cartId => $cartData) {
-            $productImage = seller_product::where('id', $cartData->customerSellerProductId)->first();
             $customerCartData[] = [
                 'id' => $cartData->id,
                 'idShop' => $cartData->customerSellerShopId,
                 'productId' => $cartData->customerSellerProductId,
-                'productImage' => $productImage->sellerProductImage,
+                'productImage' => $cartData->customerProductImage,
                 'productName' => $cartData->customerProductName,
                 'productPrice' => $cartData->customerProductPrice,
                 'productQty' => $cartData->customerProductQty,
@@ -106,14 +105,13 @@ class CustomerCartController extends Controller
                 ];
                 return response()->json($response, 500);
             }
-            $cartData = customer_cart::find($cartData->id);
+            $cartData = customer_cart::where('customerCarts.id', $cartData->id)->leftJoin('dbmarketsellers.sellerproducts as products', 'customerCarts.customerSellerProductId', '=', 'products.id')->get(['customerCarts.*', 'products.sellerProductImage AS customerProductImage'])->first();
             $customerCartData = [];
-            $productImage = seller_product::where('id', $cartData->customerSellerProductId)->first();
             $customerCartData[] = [
                 'id' => $cartData->id,
                 'idShop' => $cartData->customerSellerShopId,
                 'productId' => $cartData->customerSellerProductId,
-                'productImage' => $productImage->sellerProductImage,
+                'productImage' => $cartData->customerProductImage,
                 'productName' => $cartData->customerProductName,
                 'productPrice' => $cartData->customerProductPrice,
                 'productQty' => $cartData->customerProductQty,
@@ -145,10 +143,11 @@ class CustomerCartController extends Controller
      * @param  \App\Model\CustomerCart  $CustomerCart
      * @return \Illuminate\Http\Response
      */
-    public function show($customerId, $cartId)
+    public function show(Request $request, $cartId)
     {
-        $whereCond = ['customerId' => $customerId, 'id' => $cartId];
-        $customerCartData = customer_cart::where($whereCond);
+        $customerData = $request->customerData;
+        $whereCond = ['customerCarts.customerId' => $customerData->id, 'customerCarts.id' => $cartId];
+        $customerCartData = customer_cart::where($whereCond)->leftJoin('dbmarketsellers.sellerproducts as products', 'customerCarts.customerSellerProductId', '=', 'products.id');
         if (!$customerCartData->exists()) {
             $response = [
                 'status' => 400,
@@ -156,7 +155,7 @@ class CustomerCartController extends Controller
             ];
             return response()->json($response, 400);
         }
-        $customerCartData = $customerCartData->first();
+        $customerCartData = $customerCartData->get(['customerCarts.*', 'products.sellerProductImage AS customerProductImage'])->first();
         $productImage = seller_product::where('id', $customerCartData->customerSellerProductId)->first();
         $customerCartData = [
             'id' => $customerCartData->id,
@@ -221,14 +220,17 @@ class CustomerCartController extends Controller
                 'customerProductQty' => $request->qty
             ]);
         }
-        $cartData = customer_cart::where($whereCond)->first();
+        $whereCond = [
+            'customerCarts.id' => $request->id,
+            'customerCarts.customerId' => $customerData->id
+        ];
+        $cartData = customer_cart::where($whereCond)->leftJoin('dbmarketsellers.sellerproducts as products', 'customerCarts.customerSellerProductId', '=', 'products.id')->get(['customerCarts.*', 'products.sellerProductImage AS customerProductImage'])->first();
         $customerCartData = [];
-        $productImage = seller_product::where('id', $cartData->customerSellerProductId)->first();
         $customerCartData[] = [
             'id' => $cartData->id,
             'idShop' => $cartData->customerSellerShopId,
             'productId' => $cartData->customerSellerProductId,
-            'productImage' => $productImage->sellerProductImage,
+            'productImage' => $cartData->customerProductImage,
             'productName' => $cartData->customerProductName,
             'productPrice' => $cartData->customerProductPrice,
             'productQty' => $cartData->customerProductQty,
