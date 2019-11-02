@@ -13,15 +13,15 @@ class CreateCustomerSecurityTable extends Migration
      */
     public function up()
     {
-        Schema::connection('dbmarketcustomers')->create('customerSecuritys', function (Blueprint $table) {
+        Schema::connection('dbmarketcustomers')->create('customer_securitys', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('customerId')->unsigned();
-            $table->string('customerUsername', 100)->unique();
-            $table->string('customerQuestion1', 100);
-            $table->string('customerAnswer1', 100);
-            $table->string('customerQuestion2', 100);
-            $table->string('customerAnswer2', 100);
-            $table->tinyInteger('customerStatus')->default(0);
+            $table->bigInteger('customer_id')->unsigned();
+            $table->string('customer_username', 100)->unique();
+            $table->string('customer_question1', 100);
+            $table->string('customer_answer1', 100);
+            $table->string('customer_question2', 100);
+            $table->string('customer_answer2', 100);
+            $table->tinyInteger('customer_status')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -34,6 +34,6 @@ class CreateCustomerSecurityTable extends Migration
      */
     public function down()
     {
-        Schema::connection('dbmarketcustomers')->dropIfExists('customerSecuritys');
+        Schema::connection(dbmarketcustomers)->dropIfExists(customer_securitys);
     }
 }

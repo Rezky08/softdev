@@ -13,15 +13,15 @@ class CreateSellerSecuirtyTable extends Migration
      */
     public function up()
     {
-        Schema::connection('dbmarketsellers')->create('sellerSecuritys', function (Blueprint $table) {
+        Schema::connection('dbmarketsellers')->create('seller_securitys', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('sellerId')->unsigned();
-            $table->string('sellerUsername', 100)->unique();
-            $table->string('sellerQuestion1', 100);
-            $table->string('sellerAnswer1', 100);
-            $table->string('sellerQuestion2', 100);
+            $table->bigInteger('seller_id')->unsigned();
+            $table->string('seller_username', 100)->unique();
+            $table->string('seller_question1', 100);
+            $table->string('seller_answer1', 100);
+            $table->string('seller_question2', 100);
             $table->string('sellerAnswer2', 100);
-            $table->tinyInteger('sellerStatus')->default(0);
+            $table->tinyInteger('seller_status')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -34,6 +34,6 @@ class CreateSellerSecuirtyTable extends Migration
      */
     public function down()
     {
-        Schema::connection('dbmarketsellers')->dropIfExists('sellerSecuritys');
+        Schema::connection('dbmarketsellers')->dropIfExists('seller_securitys');
     }
 }

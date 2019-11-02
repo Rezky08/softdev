@@ -24,7 +24,7 @@ class SellerLoginController extends Controller
         if (!$customerData) {
             $response = [
                 'status' => 401,
-                'Message' => "You're Not Authorized"
+                'message' => "You're Not Authorized"
             ];
             return response()->json($response, 401);
         }
@@ -68,7 +68,7 @@ class SellerLoginController extends Controller
 
         $username_input = $request->username;
         $password_input = $request->password;
-        $sellerLogin  = seller_details::where('sellerUsername', $username_input);
+        $sellerLogin  = seller_details::where('seller_username', $username_input);
         if (!$sellerLogin->exists()) {
             // Redirect to login page again
             $response = [
@@ -77,33 +77,21 @@ class SellerLoginController extends Controller
             ];
             return response()->json($response, 403);
         }
-        $sellerLogin = seller_logins::where('sellerUsername', $username_input)->first();
+        $sellerLogin = seller_logins::where('seller_username', $username_input)->first();
         $loginInfo = [
-            'sellerId' => $sellerLogin->sellerId,
-            'sellerUsername' => $sellerLogin->sellerUsername,
+            'seller_id' => $sellerLogin->seller_id,
+            'seller_username' => $sellerLogin->seller_username,
             'created_at' => date_format(now(), 'Y-m-d H:i:s'),
             'updated_at' => date_format(now(), 'Y-m-d H:i:s')
         ];
-        if (Hash::check($password_input, $sellerLogin->sellerPassword)) {
-            $loginInfo['loginSuccess'] = 1;
+        if (Hash::check($password_input, $sellerLogin->seller_password)) {
+            $loginInfo['login_success'] = 1;
             seller_login_logs::insert($loginInfo);
-            $sellerData = seller_details::where('id', $loginInfo['sellerId'])->first();
-            // unset($loginInfo['created_at'], $loginInfo['updated_at']);
-            // $loginData = [
-            //     'id' => $sellerData->id,
-            //     'username' => $sellerData->sellerUsername,
-            //     'fullname' => $sellerData->sellerFullname,
-            //     'DOB' => $sellerData->sellerDOB,
-            //     'address' => $sellerData->sellerAddress,
-            //     'sex' => $sellerData->sellerSex == 0 ? 'Male' : 'Female',
-            //     'email' => $sellerData->sellerEmail,
-            //     'phone' => $sellerData->sellerPhone,
-            //     'loginTime' => date_format(now(), 'Y-m-d H:i:s')
-            // ];
+            $sellerData = seller_details::where('id', $loginInfo['seller_id'])->first();
             $response = [
                 'status' => 200,
                 // 'data' => $loginData,
-                'token' => $sellerData->createToken('loginToken', ['seller'])->accessToken,
+                'token' => $sellerData->createToken('login_token', ['seller'])->accessToken,
             ];
             return response()->json($response, 200);
         }
@@ -112,7 +100,7 @@ class SellerLoginController extends Controller
             'status' => 403,
             'message' => 'Login Failed'
         ];
-        $loginInfo['loginSuccess'] = 0;
+        $loginInfo['login_success'] = 0;
         seller_login_logs::insert($loginInfo);
         return response()->json($response, 403);
     }
@@ -169,7 +157,7 @@ class SellerLoginController extends Controller
         }
         $response = [
             'status' => 401,
-            'Message' => "You're Not Authorized"
+            'message' => "You're Not Authorized"
         ];
         return response()->json($response, 401);
     }

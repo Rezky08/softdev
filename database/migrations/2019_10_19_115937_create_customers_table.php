@@ -13,15 +13,15 @@ class CreateCustomersTable extends Migration
      */
     public function up()
     {
-        Schema::connection('dbmarketcustomers')->create('customerDetails', function (Blueprint $table) {
+        Schema::connection('dbmarketcustomers')->create('customer_details', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('customerFullname', 100);
-            $table->date('customerDOB')->nullable();
-            $table->text('customerAddress')->nullable();
-            $table->tinyInteger('customerSex')->default(0);
-            $table->string('customerEmail', 100);
-            $table->string('customerPhone', 20)->nullable();
-            $table->string('customerUsername', 100)->unique();
+            $table->string('customer_fullname', 100);
+            $table->date('customer_dob')->nullable();
+            $table->text('customer_address')->nullable();
+            $table->tinyInteger('customer_sex')->default(0);
+            $table->string('customer_email', 100);
+            $table->string('customer_phone', 20)->nullable();
+            $table->string('customer_username', 100)->unique();
             $table->timestamps();
             $table->softDeletes();
         });
@@ -34,6 +34,6 @@ class CreateCustomersTable extends Migration
      */
     public function down()
     {
-        Schema::connection('dbmarketcustomers')->dropIfExists('customerDetails');
+        Schema::connection('dbmarketcustomers')->dropIfExists('customer_details');
     }
 }

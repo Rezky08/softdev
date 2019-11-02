@@ -9,28 +9,28 @@ class AddForeignInCustomer extends Migration
     protected $connection = 'dbmarketcustomers';
     protected $configForeign = [
         [
-            'foreignTables' => ['customerLogins', 'customerSecuritys', 'customerLoginLogs', 'customerCarts', 'customerTransactions'],
-            'foreignKey' => 'customerId',
-            'referenceKey' => 'id',
-            'referenceTable' => 'customerDetails'
+            'foreign_tables' => ['customer_logins', 'customer_securitys', 'customer_login_logs', 'customer_carts', 'customer_transactions'],
+            'foreign_key' => 'customer_id',
+            'reference_key' => 'id',
+            'reference_table' => 'customer_details'
         ],
         [
-            'foreignTables' => ['customerDetailTransactions'],
-            'foreignKey' => 'customerTransactionId',
-            'referenceKey' => 'id',
-            'referenceTable' => 'customerTransactions'
+            'foreign_tables' => ['customer_detail_transactions'],
+            'foreign_key' => 'customer_transaction_id',
+            'reference_key' => 'id',
+            'reference_table' => 'customer_transactions'
         ],
         [
-            'foreignTables' => ['customerCarts', 'customerDetailTransactions'],
-            'foreignKey' => 'customerSellerShopId',
-            'referenceKey' => 'id',
-            'referenceTable' => 'dbmarketsellers.sellerShops'
+            'foreign_tables' => ['customer_carts', 'customer_detail_transactions'],
+            'foreign_key' => 'customer_seller_shop_id',
+            'reference_key' => 'id',
+            'reference_table' => 'dbmarketsellers.seller_shops'
         ],
         [
-            'foreignTables' => ['customerCarts', 'customerDetailTransactions'],
-            'foreignKey' => 'customerSellerProductId',
-            'referenceKey' => 'id',
-            'referenceTable' => 'dbmarketsellers.sellerProducts'
+            'foreign_tables' => ['customer_carts', 'customer_detail_transactions'],
+            'foreign_key' => 'customer_seller_product_id',
+            'reference_key' => 'id',
+            'reference_table' => 'dbmarketsellers.seller_products'
         ],
     ];
     /**
@@ -42,10 +42,10 @@ class AddForeignInCustomer extends Migration
     {
         // Add Foreign
         foreach ($this->configForeign as $config) {
-            $tablesWantToAdd = $config['foreignTables'];
-            $foreignKey = $config['foreignKey'];
-            $referenceKey = $config['referenceKey'];
-            $referenceTable = $config['referenceTable'];
+            $tablesWantToAdd = $config['foreign_tables'];
+            $foreignKey = $config['foreign_key'];
+            $referenceKey = $config['reference_key'];
+            $referenceTable = $config['reference_table'];
             foreach ($tablesWantToAdd as $tableWTA) {
                 if (Schema::connection($this->connection)->hasColumn($tableWTA, $foreignKey)) {
                     Schema::connection($this->connection)->table($tableWTA, function (Blueprint $table) use ($referenceKey, $referenceTable, $foreignKey) {
@@ -67,8 +67,8 @@ class AddForeignInCustomer extends Migration
         Schema::connection($this->connection)->disableForeignKeyConstraints();
         foreach ($this->configForeign as $config) {
             // Remove ForeignKey
-            $tablesWantToRemove = $config['foreignTables'];
-            $foreignKey = $config['foreignKey'];
+            $tablesWantToRemove = $config['foreign_tables'];
+            $foreignKey = $config['foreign_key'];
             foreach ($tablesWantToRemove as $tableWTR) {
                 if (Schema::connection($this->connection)->hasColumn($tableWTR, $foreignKey)) {
                     Schema::connection($this->connection)->table($tableWTR, function (Blueprint $table) use ($tableWTR, $foreignKey) {

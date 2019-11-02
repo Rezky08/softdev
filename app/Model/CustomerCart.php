@@ -9,7 +9,7 @@ class CustomerCart extends Model
 {
     use SoftDeletes;
     protected $connection = 'dbmarketcustomers';
-    protected $table = 'customerCarts';
+    protected $table = 'customer_carts';
     protected $softDelete = true;
     public function getTableColumns()
     {

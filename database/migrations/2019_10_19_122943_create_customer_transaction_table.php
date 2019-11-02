@@ -13,10 +13,10 @@ class CreateCustomerTransactionTable extends Migration
      */
     public function up()
     {
-        Schema::connection('dbmarketcustomers')->create('customerTransactions', function (Blueprint $table) {
+        Schema::connection('dbmarketcustomers')->create('customer_transactions', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('customerId')->unsigned();
-            $table->integer('CustomerTotalPrice')->default(12)->comment('customer price pay');
+            $table->bigInteger('customer_id')->unsigned();
+            $table->integer('customer_total_price')->default(12)->comment('customer price pay');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -29,6 +29,6 @@ class CreateCustomerTransactionTable extends Migration
      */
     public function down()
     {
-        Schema::connection('dbmarketcustomers')->dropIfExists('customerTransactions');
+        Schema::connection('dbmarketcustomers')->dropIfExists('customer_transactions');
     }
 }

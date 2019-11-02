@@ -13,7 +13,7 @@ class SellerDetail extends Authenticable
     use SoftDeletes;
     use Notifiable, HasApiTokens;
     protected $connection = 'dbmarketsellers';
-    protected $table = 'sellerDetails';
+    protected $table = 'seller_details';
     protected $softDelete = true;
 
     public function getTableColumns()

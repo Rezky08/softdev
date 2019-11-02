@@ -24,14 +24,14 @@ class CustomerRegisterController extends Controller
         foreach ($customerDetails as $customer => $detail) {
             $customerData[] = [
                 'id' => $detail->id,
-                'username' => $detail->customerUsername,
-                'fullname' => $detail->customerFullname,
-                'DOB' => $detail->customerDOB,
-                'address' => $detail->customerAddress,
-                'sex' => $detail->customerSex == 0 ? 'Male' : 'Female',
-                'email' => $detail->customerEmail,
-                'phone' => $detail->customerPhone,
-                'joinDate' => date_format($detail->created_at, 'Y-m-d H:i:s')
+                'username' => $detail->customer_username,
+                'fullname' => $detail->customer_fullname,
+                'dob' => $detail->customer_dob,
+                'address' => $detail->customer_address,
+                'sex' => $detail->customer_sex == 0 ? 'male' : 'female',
+                'email' => $detail->customer_email,
+                'phone' => $detail->customer_phone,
+                'join_date' => date_format($detail->created_at, 'Y-m-d H:i:s')
             ];
         }
         $response = [
@@ -62,9 +62,9 @@ class CustomerRegisterController extends Controller
         // return dd($request->all());
         // input validation
         $validation = Validator::make($request->all(), [
-            'username' => ['required', 'unique:dbmarketsellers.sellerLogins,sellerUsername', 'unique:dbmarketcustomers.customerLogins,customerUsername'],
+            'username' => ['required', 'unique:dbmarketsellers.seller_logins,seller_username', 'unique:dbmarketcustomers.customer_logins,customer_username'],
             'password' => ['required', 'min:8', 'max:12', 'regex:/^(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*[\d]).{8,12}$/'],
-            'email' => ['required', 'email', 'unique:dbmarketsellers.sellerDetails,sellerEmail', 'unique:dbmarketcustomers.customerDetails,customerEmail']
+            'email' => ['required', 'email', 'unique:dbmarketsellers.seller_details,seller_email', 'unique:dbmarketcustomers.customer_details,customer_email']
         ]);
         if ($validation->fails()) {
             $response = [
@@ -75,22 +75,22 @@ class CustomerRegisterController extends Controller
         }
 
         $customerDetail = [
-            'customerFullname' => $request->input('fullname') ?: $request->input('username'),
-            'customerDOB' => $request->input('DOB'),
-            'customerAddress' => $request->input('address'),
-            'customerSex' => $request->input('sex'),
-            'customerEmail' => $request->input('email'),
-            'customerPhone' => $request->input('phone'),
-            'customerUsername' => $request->input('username'),
+            'customer_fullname' => $request->input('fullname') ?: $request->input('username'),
+            'customer_dob' => $request->input('dob'),
+            'customer_address' => $request->input('address'),
+            'customer_sex' => $request->input('sex'),
+            'customer_email' => $request->input('email'),
+            'customer_phone' => $request->input('phone'),
+            'customer_username' => $request->input('username'),
             'created_at' => date_format(now(), 'Y-m-d H:i:s'),
             'updated_at' => date_format(now(), 'Y-m-d H:i:s')
         ];
         $customerID = customer_details::insertGetId($customerDetail);
         $customerLogin = [
-            'customerUsername' => $request->input('username'),
-            'customerPassword' => Hash::make($request->input('password')),
-            'customerStatus' => 1,
-            'customerId' => $customerID,
+            'customer_username' => $request->input('username'),
+            'customer_password' => Hash::make($request->input('password')),
+            'customer_status' => 1,
+            'customer_id' => $customerID,
             'created_at' => date_format(now(), 'Y-m-d H:i:s'),
             'updated_at' => date_format(now(), 'Y-m-d H:i:s')
         ];
@@ -98,8 +98,8 @@ class CustomerRegisterController extends Controller
         if ($status) {
             $response = [
                 'status' => 200,
-                'customerUsername' => $customerLogin['customerUsername'],
-                'token' => customer_details::find($customerID)->createToken('registerToken', ['customer'])->accessToken
+                'customer_username' => $customerLogin['customer_username'],
+                'token' => customer_details::find($customerID)->createToken('register_token', ['customer'])->accessToken
             ];
             return response()->json($response, 200);
         }
@@ -124,14 +124,14 @@ class CustomerRegisterController extends Controller
         $customerDetails = $customerDetails->first();
         $customerDetails = [
             'id' => $customerDetails->id,
-            'username' => $customerDetails->customerUsername,
-            'fullname' => $customerDetails->customerFullname,
-            'DOB' => $customerDetails->customerDOB,
-            'address' => $customerDetails->customerAddress,
-            'sex' => $customerDetails->customerSex == 0 ? 'Male' : 'Female',
-            'email' => $customerDetails->customerEmail,
-            'phone' => $customerDetails->customerPhone,
-            'joinDate' => date_format($customerDetails->created_at, 'Y-m-d H:i:s')
+            'username' => $customerDetails->customer_username,
+            'fullname' => $customerDetails->customer_fullname,
+            'dob' => $customerDetails->customer_dob,
+            'address' => $customerDetails->customer_address,
+            'sex' => $customerDetails->customer_sex == 0 ? 'male' : 'female',
+            'email' => $customerDetails->customer_email,
+            'phone' => $customerDetails->customer_phone,
+            'join_date' => date_format($customerDetails->created_at, 'Y-m-d H:i:s')
         ];
         $response = [
             'status' => 200,

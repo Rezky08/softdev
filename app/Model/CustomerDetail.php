@@ -12,9 +12,9 @@ class CustomerDetail extends Authenticable
 {
     use Notifiable, HasApiTokens, SoftDeletes;
     protected $connection = 'dbmarketcustomers';
-    protected $table = 'customerDetails';
+    protected $table = 'customer_details';
     protected $softDelete = true;
-
+    protected $hidden = ['updated_at', 'deleted_at'];
     public function getTableColumns()
     {
         return $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable());

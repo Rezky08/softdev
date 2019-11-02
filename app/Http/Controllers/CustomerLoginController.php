@@ -25,7 +25,7 @@ class CustomerLoginController extends Controller
         if (!$customerData) {
             $response = [
                 'status' => 401,
-                'Message' => "You're Not Authorized"
+                'message' => "You're Not Authorized"
             ];
             return response()->json($response, 401);
         }
@@ -69,7 +69,7 @@ class CustomerLoginController extends Controller
 
         $username_input = $request->username;
         $password_input = $request->password;
-        $customerLogin  = customer_details::where('customerUsername', $username_input);
+        $customerLogin  = customer_details::where('customer_username', $username_input);
         if (!$customerLogin->exists()) {
             // Redirect to login page again
             $response = [
@@ -78,33 +78,21 @@ class CustomerLoginController extends Controller
             ];
             return response()->json($response, 403);
         }
-        $customerLogin = customer_logins::where('customerUsername', $username_input)->first();
+        $customerLogin = customer_logins::where('customer_username', $username_input)->first();
         $loginInfo = [
-            'customerId' => $customerLogin->customerId,
-            'customerUsername' => $customerLogin->customerUsername,
+            'customer_id' => $customerLogin->customer_id,
+            'customer_username' => $customerLogin->customer_username,
             'created_at' => date_format(now(), 'Y-m-d H:i:s'),
             'updated_at' => date_format(now(), 'Y-m-d H:i:s')
         ];
-        if (Hash::check($password_input, $customerLogin->customerPassword)) {
-            $loginInfo['loginSuccess'] = 1;
+        if (Hash::check($password_input, $customerLogin->customer_password)) {
+            $loginInfo['login_success'] = 1;
             customer_login_logs::insert($loginInfo);
-            $customerData = customer_details::where('id', $loginInfo['customerId'])->first();
-            // unset($loginInfo['created_at'], $loginInfo['updated_at']);
-            // $loginData = [
-            //     'id' => $customerData->id,
-            //     'username' => $customerData->customerUsername,
-            //     'fullname' => $customerData->customerFullname,
-            //     'DOB' => $customerData->customerDOB,
-            //     'address' => $customerData->customerAddress,
-            //     'sex' => $customerData->customerSex == 0 ? 'Male' : 'Female',
-            //     'email' => $customerData->customerEmail,
-            //     'phone' => $customerData->customerPhone,
-            //     'loginTime' => date_format(now(), 'Y-m-d H:i:s')
-            // ];
+            $customerData = customer_details::where('id', $loginInfo['customer_id'])->first();
             $response = [
                 'status' => 200,
                 // 'data' => $loginData,
-                'token' => $customerData->createToken('loginToken', ['customer'])->accessToken,
+                'token' => $customerData->createToken('login_token', ['customer'])->accessToken,
             ];
             return response()->json($response, 200);
         }
@@ -113,7 +101,7 @@ class CustomerLoginController extends Controller
             'status' => 403,
             'message' => 'Login Failed'
         ];
-        $loginInfo['loginSuccess'] = 0;
+        $loginInfo['login_success'] = 0;
         customer_login_logs::insert($loginInfo);
         return response()->json($response, 403);
     }
@@ -170,7 +158,7 @@ class CustomerLoginController extends Controller
         }
         $response = [
             'status' => 401,
-            'Message' => "You're Not Authorized"
+            'message' => "You're Not Authorized"
         ];
         return response()->json($response, 401);
     }

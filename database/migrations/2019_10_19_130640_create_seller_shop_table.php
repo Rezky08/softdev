@@ -13,13 +13,13 @@ class CreateSellerShopTable extends Migration
      */
     public function up()
     {
-        Schema::connection('dbmarketsellers')->create('sellerShops', function (Blueprint $table) {
+        Schema::connection('dbmarketsellers')->create('seller_shops', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('sellerId')->unsigned();
-            $table->string('sellerShopName', 100);
-            $table->string('sellerShopOwnerName', 100);
-            $table->string('sellerShopPhone', 20)->nullable();
-            $table->string('sellerShopCertificate', 100)->nullable();
+            $table->bigInteger('seller_id')->unsigned();
+            $table->string('seller_shop_name', 100);
+            $table->string('seller_shop_owner_name', 100);
+            $table->string('seller_shop_phone', 20)->nullable();
+            $table->string('seller_shop_certificate', 100)->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
@@ -32,6 +32,6 @@ class CreateSellerShopTable extends Migration
      */
     public function down()
     {
-        Schema::connection('dbmarketsellers')->dropIfExists('sellerShops');
+        Schema::connection('dbmarketsellers')->dropIfExists('seller_shops');
     }
 }

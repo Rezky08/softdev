@@ -13,14 +13,14 @@ class CreateCustomerDetailTransaction extends Migration
      */
     public function up()
     {
-        Schema::connection('dbmarketcustomers')->create('customerDetailTransactions', function (Blueprint $table) {
+        Schema::connection('dbmarketcustomers')->create('customer_detail_transactions', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('customerTransactionId')->unsigned();
-            $table->bigInteger('customerSellerShopId')->unsigned();
-            $table->bigInteger('customerSellerProductId')->unsigned();
-            $table->string('customerProductName', 100);
-            $table->integer('customerProductPrice')->default(12);
-            $table->integer('customerProductQty')->default(12);
+            $table->bigInteger('customer_transaction_id')->unsigned();
+            $table->bigInteger('customer_seller_shop_id')->unsigned();
+            $table->bigInteger('customer_seller_product_id')->unsigned();
+            $table->string('customer_product_name', 100);
+            $table->integer('customer_product_price')->default(12);
+            $table->integer('customer_product_qty')->default(12);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -33,6 +33,6 @@ class CreateCustomerDetailTransaction extends Migration
      */
     public function down()
     {
-        Schema::connection('dbmarketcustomers')->dropIfExists('customerDetailTransactions');
+        Schema::connection('dbmarketcustomers')->dropIfExists('customer_detail_transactions');
     }
 }

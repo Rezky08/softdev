@@ -13,11 +13,11 @@ class AddTokenColumn extends Migration
      */
     public function up()
     {
-        Schema::connection('dbmarketcustomers')->table('customerLogins', function (Blueprint $table) {
-            $table->string('customerToken', 100)->after('customerPassword');
+        Schema::connection('dbmarketcustomers')->table('customer_logins', function (Blueprint $table) {
+            $table->string('customer_token', 100)->after('customer_password');
         });
-        Schema::connection('dbmarketsellers')->table('sellerLogins', function (Blueprint $table) {
-            $table->string('sellerToken', 100)->after('sellerPassword');
+        Schema::connection('dbmarketsellers')->table('seller_logins', function (Blueprint $table) {
+            $table->string('seller_token', 100)->after('seller_password');
         });
     }
 
@@ -28,7 +28,7 @@ class AddTokenColumn extends Migration
      */
     public function down()
     {
-        Schema::table('customerLogins', function (Blueprint $table) {
+        Schema::table('customer_logins', function (Blueprint $table) {
             //
         });
     }

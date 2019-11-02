@@ -9,6 +9,6 @@ class CustomerLoginLog extends Model
 {
     use SoftDeletes;
     protected $connection = 'dbmarketcustomers';
-    protected $table = 'customerLoginLogs';
+    protected $table = 'customer_login_logs';
     protected $softDelete = true;
 }

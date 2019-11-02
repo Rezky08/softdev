@@ -9,7 +9,7 @@ class SellerProduct extends Model
 {
     use SoftDeletes;
     protected $connection = 'dbmarketsellers';
-    protected $table = 'sellerProducts';
+    protected $table = 'seller_products';
     protected $softDelete = true;
 
     public function getTableColumns()

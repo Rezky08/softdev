@@ -25,14 +25,14 @@ class SellerRegisterController extends Controller
         foreach ($sellerDetails as $seller => $detail) {
             $sellerData[] = [
                 'id' => $detail->id,
-                'username' => $detail->sellerUsername,
-                'fullname' => $detail->sellerFullname,
-                'DOB' => $detail->sellerDOB,
-                'address' => $detail->sellerAddress,
-                'sex' => $detail->sellerSex == 0 ? 'Male' : 'Female',
-                'email' => $detail->sellerEmail,
-                'phone' => $detail->sellerPhone,
-                'joinDate' => date_format($detail->created_at, 'Y-m-d H:i:s')
+                'username' => $detail->seller_username,
+                'fullname' => $detail->seller_fullname,
+                'dob' => $detail->seller_dob,
+                'address' => $detail->seller_address,
+                'sex' => $detail->seller_sex == 0 ? 'male' : 'female',
+                'email' => $detail->seller_email,
+                'phone' => $detail->seller_phone,
+                'join_date' => date_format($detail->created_at, 'Y-m-d H:i:s')
             ];
         }
         $response = [
@@ -62,9 +62,9 @@ class SellerRegisterController extends Controller
     {
         // input validation
         $validation = Validator::make($request->all(), [
-            'username' => ['required', 'unique:dbmarketsellers.sellerLogins,sellerUsername', 'unique:dbmarketcustomers.customerLogins,customerUsername'],
+            'username' => ['required', 'unique:dbmarketsellers.seller_logins,seller_username', 'unique:dbmarketcustomers.customer_logins,customer_username'],
             'password' => ['required', 'min:8', 'max:12', 'regex:/^(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*[\d]).{8,12}$/'],
-            'email' => ['required', 'email', 'unique:dbmarketsellers.sellerDetails,sellerEmail', 'unique:dbmarketcustomers.customerDetails,customerEmail']
+            'email' => ['required', 'email', 'unique:dbmarketsellers.seller_details,seller_email', 'unique:dbmarketcustomers.customer_details,customer_email']
         ]);
         if ($validation->fails()) {
             $response = [
@@ -75,33 +75,33 @@ class SellerRegisterController extends Controller
         }
 
         $sellerDetail = [
-            'sellerFullname' => $request->input('fullname') ?: $request->input('username'),
-            'sellerDOB' => $request->input('DOB'),
-            'sellerAddress' => $request->input('address'),
-            'sellerSex' => $request->input('sex'),
-            'sellerEmail' => $request->input('email'),
-            'sellerPhone' => $request->input('phone'),
-            'sellerUsername' => $request->input('username'),
+            'seller_fullname' => $request->input('fullname') ?: $request->input('username'),
+            'seller_dob' => $request->input('dob'),
+            'seller_address' => $request->input('address'),
+            'seller_sex' => $request->input('sex'),
+            'seller_email' => $request->input('email'),
+            'seller_phone' => $request->input('phone'),
+            'seller_username' => $request->input('username'),
             'created_at' => date_format(now(), 'Y-m-d H:i:s'),
             'updated_at' => date_format(now(), 'Y-m-d H:i:s')
         ];
         $sellerID = seller_details::insertGetId($sellerDetail);
         $sellerLogin = [
-            'sellerUsername' => $request->input('username'),
-            'sellerPassword' => Hash::make($request->input('password')),
-            'sellerStatus' => 1,
-            'sellerId' => $sellerID,
+            'seller_username' => $request->input('username'),
+            'seller_password' => Hash::make($request->input('password')),
+            'seller_status' => 1,
+            'seller_id' => $sellerID,
             'created_at' => date_format(now(), 'Y-m-d H:i:s'),
             'updated_at' => date_format(now(), 'Y-m-d H:i:s')
         ];
         $status = seller_logins::insert($sellerLogin);
         if ($status) {
             $sellerShop = [
-                'sellerId' => $sellerID,
-                'sellerShopName' => $request->input('username'),
-                'sellerShopOwnerName' => $request->input('fullname') ?: $request->input('username'),
-                'sellerShopPhone' => $request->input('phone'),
-                'sellerShopCertificate' => $request->input('shopCertificate'),
+                'seller_id' => $sellerID,
+                'seller_shop_name' => $request->input('username'),
+                'seller_shop_owner_name' => $request->input('fullname') ?: $request->input('username'),
+                'seller_shop_phone' => $request->input('phone'),
+                'seller_shop_certificate' => $request->input('shop_certificate'),
                 'created_at' => date_format(now(), 'Y-m-d H:i:s'),
                 'updated_at' => date_format(now(), 'Y-m-d H:i:s')
             ];
@@ -109,8 +109,8 @@ class SellerRegisterController extends Controller
             if ($status) {
                 $response = [
                     'status' => 200,
-                    'sellerUsername' => $sellerLogin['sellerUsername'],
-                    'token' => seller_details::find($sellerID)->createToken('regiterToken', ['seller'])->accessToken
+                    'seller_username' => $sellerLogin['seller_username'],
+                    'token' => seller_details::find($sellerID)->createToken('regiter_token', ['seller'])->accessToken
                 ];
                 return response()->json($response, 200);
             }
@@ -143,14 +143,14 @@ class SellerRegisterController extends Controller
         $sellerDetails = $sellerDetails->first();
         $sellerDetails = [
             'id' => $sellerDetails->id,
-            'username' => $sellerDetails->sellerUsername,
-            'fullname' => $sellerDetails->sellerFullname,
-            'DOB' => $sellerDetails->sellerDOB,
-            'address' => $sellerDetails->sellerAddress,
-            'sex' => $sellerDetails->sellerSex == 0 ? 'Male' : 'Female',
-            'email' => $sellerDetails->sellerEmail,
-            'phone' => $sellerDetails->sellerPhone,
-            'joinDate' => date_format($sellerDetails->created_at, 'Y-m-d H:i:s')
+            'username' => $sellerDetails->seller_username,
+            'fullname' => $sellerDetails->seller_fullname,
+            'dob' => $sellerDetails->seller_dob,
+            'address' => $sellerDetails->seller_address,
+            'sex' => $sellerDetails->seller_sex == 0 ? 'male' : 'female',
+            'email' => $sellerDetails->seller_email,
+            'phone' => $sellerDetails->seller_phone,
+            'join_date' => date_format($sellerDetails->created_at, 'Y-m-d H:i:s')
         ];
         $response = [
             'status' => 200,

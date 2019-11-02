@@ -21,24 +21,24 @@ class CustomerCartController extends Controller
     {
         $customerCartData = [];
         $customerData = $request->customerData;
-        $customerCart = customer_cart::where(['customerId' => $customerData->id, 'customerStatus' => 0])->leftJoin('dbmarketsellers.sellerproducts as products', 'customerCarts.customerSellerProductId', '=', 'products.id');
+        $customerCart = customer_cart::where(['customer_id' => $customerData->id, 'customer_status' => 0])->leftJoin('dbmarketsellers.seller_products as products', 'customer_carts.customer_seller_product_id', '=', 'products.id');
         if (!$customerCart->exists()) {
             $response = [
                 'status' => 400,
-                'Message' => 'Are you want to buy something?'
+                'message' => 'Are you want to buy something?'
             ];
             return response()->json($response, 400);
         }
-        $customerCart = $customerCart->get(['customerCarts.*', 'products.sellerProductImage AS customerProductImage']);
+        $customerCart = $customerCart->get(['customer_carts.*', 'products.seller_product_image AS customer_product_image']);
         foreach ($customerCart as $cartId => $cartData) {
             $customerCartData[] = [
                 'id' => $cartData->id,
-                'idShop' => $cartData->customerSellerShopId,
-                'productId' => $cartData->customerSellerProductId,
-                'productImage' => $cartData->customerProductImage,
-                'productName' => $cartData->customerProductName,
-                'productPrice' => $cartData->customerProductPrice,
-                'productQty' => $cartData->customerProductQty,
+                'id_shop' => $cartData->customer_seller_shop_id,
+                'product_id' => $cartData->customer_seller_product_id,
+                'product_image' => $cartData->customer_product_image,
+                'product_name' => $cartData->customer_product_name,
+                'product_price' => $cartData->customer_product_price,
+                'product_qty' => $cartData->customer_product_qty,
             ];
         }
         $response = [
@@ -61,60 +61,60 @@ class CustomerCartController extends Controller
         if (!$productDetails->exists()) {
             $response = [
                 'status' => 404,
-                'Message' => 'Product Not Found'
+                'message' => 'Product Not Found'
             ];
             return response()->json($response, 404);
         }
         $productDetails = $productDetails->first();
 
         $productAddtoCart = [
-            'customerId' => $customerData->id,
-            'customerSellerShopId' => $productDetails->sellerShopId,
-            'customerSellerProductId' => $request->productId,
-            'customerProductName' => $productDetails->sellerProductName,
-            'customerProductPrice' => $productDetails->sellerProductPrice,
-            'customerProductQty' => $request->qty,
-            'customerStatus' => 0,
+            'customer_id' => $customerData->id,
+            'customer_seller_shop_id' => $productDetails->seller_shop_id,
+            'customer_seller_product_id' => $request->productId,
+            'customer_product_name' => $productDetails->seller_product_name,
+            'customer_product_price' => $productDetails->seller_product_price,
+            'customer_product_qty' => $request->qty,
+            'customer_status' => 0,
             'created_at' => date_format(now(), 'Y-m-d H:i:s'),
             'updated_at' => date_format(now(), 'Y-m-d H:i:s')
         ];
         $whereCond = [
-            'customerId' => $productAddtoCart['customerId'],
-            'customerSellerProductId' => $productAddtoCart['customerSellerProductId'],
-            'customerStatus' => 0,
+            'customer_id' => $productAddtoCart['customer_id'],
+            'customer_seller_product_id' => $productAddtoCart['customer_seller_product_id'],
+            'customer_status' => 0,
         ];
         $status = customer_cart::where($whereCond);
         $cartData = $status->first();
         if ($status->exists()) {
-            if ($productDetails->sellerProductStock < $request->qty + $cartData->customerProductQty) {
+            if ($productDetails->seller_product_stock < $request->qty + $cartData->customer_product_qty) {
                 $response = [
                     'status' => 400,
-                    'Message' => $productDetails->sellerProductName . " " . $productDetails->sellerProductStock . "  Left"
+                    'message' => $productDetails->seller_product_name . " " . $productDetails->seller_product_stock . "  Left"
                 ];
                 return response()->json($response, 400);
             }
             $updateCart = [
-                'customerProductQty' => $cartData->customerProductQty + $request->qty,
+                'customer_product_qty' => $cartData->customer_product_qty + $request->qty,
                 'updated_at' => date_format(now(), 'Y-m-d H:i:s')
             ];
             $status = $status->update($updateCart);
             if (!$status) {
                 $response = [
                     'status' => 500,
-                    'Message' => 'Internal Server Error'
+                    'message' => 'Internal Server Error'
                 ];
                 return response()->json($response, 500);
             }
-            $cartData = customer_cart::where('customerCarts.id', $cartData->id)->leftJoin('dbmarketsellers.sellerproducts as products', 'customerCarts.customerSellerProductId', '=', 'products.id')->get(['customerCarts.*', 'products.sellerProductImage AS customerProductImage'])->first();
+            $cartData = customer_cart::where('customer_carts.id', $cartData->id)->leftJoin('dbmarketsellers.seller_products as products', 'customer_carts.customer_seller_product_id', '=', 'products.id')->get(['customer_carts.*', 'products.seller_product_image AS customer_product_image'])->first();
             $customerCartData = [];
             $customerCartData[] = [
                 'id' => $cartData->id,
-                'idShop' => $cartData->customerSellerShopId,
-                'productId' => $cartData->customerSellerProductId,
-                'productImage' => $cartData->customerProductImage,
-                'productName' => $cartData->customerProductName,
-                'productPrice' => $cartData->customerProductPrice,
-                'productQty' => $cartData->customerProductQty,
+                'id_shop' => $cartData->customer_seller_shop_id,
+                'product_id' => $cartData->customer_seller_product_id,
+                'product_image' => $cartData->customer_product_image,
+                'product_name' => $cartData->customer_product_name,
+                'product_price' => $cartData->customer_product_price,
+                'product_qty' => $cartData->customer_product_qty,
             ];
             $response = [
                 'status' => 200,
@@ -126,13 +126,13 @@ class CustomerCartController extends Controller
         if (!$status) {
             $response = [
                 'status' => 405,
-                'Message' => 'Failed add ' . $productDetails->sellerProductName . 'to cart'
+                'message' => 'Failed add ' . $productDetails->seller_product_name . 'to cart'
             ];
             return response()->json($response, 405);
         }
         $response = [
             'status' => 200,
-            'Message' => 'Success add ' . $productDetails->sellerProductName . ' to Cart'
+            'message' => 'Success add ' . $productDetails->seller_product_name . ' to Cart'
         ];
         return response()->json($response, 200);
     }
@@ -146,8 +146,8 @@ class CustomerCartController extends Controller
     public function show(Request $request, $cartId)
     {
         $customerData = $request->customerData;
-        $whereCond = ['customerCarts.customerId' => $customerData->id, 'customerCarts.id' => $cartId];
-        $customerCartData = customer_cart::where($whereCond)->leftJoin('dbmarketsellers.sellerproducts as products', 'customerCarts.customerSellerProductId', '=', 'products.id');
+        $whereCond = ['customer_carts.customerId' => $customerData->id, 'customer_carts.id' => $cartId];
+        $customerCartData = customer_cart::where($whereCond)->leftJoin('dbmarketsellers.seller_products as products', 'customer_carts.customer_seller_product_id', '=', 'products.id');
         if (!$customerCartData->exists()) {
             $response = [
                 'status' => 400,
@@ -155,16 +155,16 @@ class CustomerCartController extends Controller
             ];
             return response()->json($response, 400);
         }
-        $customerCartData = $customerCartData->get(['customerCarts.*', 'products.sellerProductImage AS customerProductImage'])->first();
-        $productImage = seller_product::where('id', $customerCartData->customerSellerProductId)->first();
+        $customerCartData = $customerCartData->get(['customer_carts.*', 'products.seller_product_image AS customer_product_image'])->first();
+        $productImage = seller_product::where('id', $customerCartData->customer_seller_product_id)->first();
         $customerCartData = [
             'id' => $customerCartData->id,
-            'idShop' => $customerCartData->customerSellerShopId,
-            'productId' => $customerCartData->customerSellerProductId,
-            'productImage' => $productImage->sellerProductImage,
-            'productName' => $customerCartData->customerProductName,
-            'productPrice' => $customerCartData->customerProductPrice,
-            'productQty' => $customerCartData->customerProductQty,
+            'id_shop' => $customerCartData->customer_seller_shop_id,
+            'product_id' => $customerCartData->customer_seller_product_id,
+            'product_image' => $productImage->seller_product_image,
+            'product_name' => $customerCartData->customer_product_name,
+            'product_price' => $customerCartData->customer_product_price,
+            'product_qty' => $customerCartData->customer_product_qty,
         ];
         $response = [
             'status' => 200,
@@ -196,7 +196,7 @@ class CustomerCartController extends Controller
         $customerData = $request->customerData;
         $whereCond = [
             'id' => $request->id,
-            'customerId' => $customerData->id,
+            'customer_id' => $customerData->id,
         ];
         $cartData = customer_cart::where($whereCond);
         if (!$cartData->exists()) {
@@ -212,28 +212,28 @@ class CustomerCartController extends Controller
             $cartData = customer_cart::onlyTrashed()->where($whereCond)->first();
             $response = [
                 'status ' => 200,
-                'message' => $cartData->customerProductName . " has been removed from the cart"
+                'message' => $cartData->customer_product_name . " has been removed from the cart"
             ];
             return response()->json($response);
         } else {
             $cartUpdate = $cartData->update([
-                'customerProductQty' => $request->qty
+                'customer_product_qty' => $request->qty
             ]);
         }
         $whereCond = [
-            'customerCarts.id' => $request->id,
-            'customerCarts.customerId' => $customerData->id
+            'customer_carts.id' => $request->id,
+            'customer_carts.customerId' => $customerData->id
         ];
-        $cartData = customer_cart::where($whereCond)->leftJoin('dbmarketsellers.sellerproducts as products', 'customerCarts.customerSellerProductId', '=', 'products.id')->get(['customerCarts.*', 'products.sellerProductImage AS customerProductImage'])->first();
+        $cartData = customer_cart::where($whereCond)->leftJoin('dbmarketsellers.seller_products as products', 'customer_carts.customer_seller_product_id', '=', 'products.id')->get(['customer_carts.*', 'products.seller_product_image AS customer_product_image'])->first();
         $customerCartData = [];
         $customerCartData[] = [
             'id' => $cartData->id,
-            'idShop' => $cartData->customerSellerShopId,
-            'productId' => $cartData->customerSellerProductId,
-            'productImage' => $cartData->customerProductImage,
-            'productName' => $cartData->customerProductName,
-            'productPrice' => $cartData->customerProductPrice,
-            'productQty' => $cartData->customerProductQty,
+            'id_shop' => $cartData->customer_seller_shop_id,
+            'product_id' => $cartData->customer_seller_product_id,
+            'product_image' => $cartData->customer_product_image,
+            'product_name' => $cartData->customer_product_name,
+            'product_price' => $cartData->customer_product_price,
+            'product_qty' => $cartData->customer_product_qty,
         ];
         $response = [
             'status' => 200,
@@ -263,7 +263,7 @@ class CustomerCartController extends Controller
         $customerData = $request->customerData;
         $whereCond = [
             'id' => $request->id,
-            'customerId' => $customerData->id,
+            'customer_id' => $customerData->id,
         ];
         $cartData = customer_cart::where($whereCond);
         if (!$cartData->exists()) {
@@ -279,7 +279,7 @@ class CustomerCartController extends Controller
         $cartData = customer_cart::onlyTrashed()->where($whereCond)->first();
         $response = [
             'status ' => 200,
-            'message' => $cartData->customerProductName . " has been removed from the cart"
+            'message' => $cartData->customer_product_name . " has been removed from the cart"
         ];
         return response()->json($response);
     }

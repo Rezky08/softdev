@@ -13,12 +13,12 @@ class CreateSellerLoginTable extends Migration
      */
     public function up()
     {
-        Schema::connection('dbmarketsellers')->create('sellerLogins', function (Blueprint $table) {
+        Schema::connection('dbmarketsellers')->create('seller_logins', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('sellerId')->unsigned();
-            $table->string('sellerUsername', 100)->unique();
-            $table->text('sellerPassword');
-            $table->tinyInteger('sellerStatus')->default(0);
+            $table->bigInteger('seller_id')->unsigned();
+            $table->string('seller_username', 100)->unique();
+            $table->text('seller_password');
+            $table->tinyInteger('seller_status')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -31,6 +31,6 @@ class CreateSellerLoginTable extends Migration
      */
     public function down()
     {
-        Schema::connection('dbmarketsellers')->dropIfExists('sellerLogins');
+        Schema::connection('dbmarketsellers')->dropIfExists('seller_logins');
     }
 }

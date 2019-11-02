@@ -13,12 +13,12 @@ class CreateCustomerLoginTable extends Migration
      */
     public function up()
     {
-        Schema::connection('dbmarketcustomers')->create('customerLogins', function (Blueprint $table) {
+        Schema::connection('dbmarketcustomers')->create('customer_logins', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('customerId')->unsigned();
-            $table->string('customerUsername', 100)->unique();
-            $table->text('customerPassword');
-            $table->tinyInteger('customerStatus')->default(0);
+            $table->bigInteger('customer_id')->unsigned();
+            $table->string('customer_username', 100)->unique();
+            $table->text('customer_password');
+            $table->tinyInteger('customer_status')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -31,6 +31,6 @@ class CreateCustomerLoginTable extends Migration
      */
     public function down()
     {
-        Schema::connection('dbmarketcustomers')->dropIfExists('customerLogins');
+        Schema::connection('dbmarketcustomers')->dropIfExists('customer_logins');
     }
 }
