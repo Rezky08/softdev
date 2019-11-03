@@ -17,7 +17,7 @@ class CreateCustomerLoginLogTable extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('customer_id')->unsigned();
             $table->string('customer_username', 100);
-            $table->tinyInteger('login_success')->default(0);
+            $table->boolean('login_success')->default(0)->comment('0 Fail, 1 Success');
             $table->timestamps();
             $table->softDeletes();
         });

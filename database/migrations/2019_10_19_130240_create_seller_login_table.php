@@ -18,7 +18,7 @@ class CreateSellerLoginTable extends Migration
             $table->bigInteger('seller_id')->unsigned();
             $table->string('seller_username', 100)->unique();
             $table->text('seller_password');
-            $table->tinyInteger('seller_status')->default(0);
+            $table->boolean('seller_status')->default(0)->comment('0 Banned, 1 Active');
             $table->timestamps();
             $table->softDeletes();
         });

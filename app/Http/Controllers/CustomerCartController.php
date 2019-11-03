@@ -57,7 +57,7 @@ class CustomerCartController extends Controller
     public function store(Request $request)
     {
         $customerData = $request->customerData;
-        $productDetails = seller_product::where('id', $request->productId);
+        $productDetails = seller_product::where('id', $request->product_id);
         if (!$productDetails->exists()) {
             $response = [
                 'status' => 404,
@@ -70,7 +70,7 @@ class CustomerCartController extends Controller
         $productAddtoCart = [
             'customer_id' => $customerData->id,
             'customer_seller_shop_id' => $productDetails->seller_shop_id,
-            'customer_seller_product_id' => $request->productId,
+            'customer_seller_product_id' => $request->product_id,
             'customer_product_name' => $productDetails->seller_product_name,
             'customer_product_price' => $productDetails->seller_product_price,
             'customer_product_qty' => $request->qty,

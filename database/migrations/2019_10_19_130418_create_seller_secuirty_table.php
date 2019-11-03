@@ -21,7 +21,7 @@ class CreateSellerSecuirtyTable extends Migration
             $table->string('seller_answer1', 100);
             $table->string('seller_question2', 100);
             $table->string('sellerAnswer2', 100);
-            $table->tinyInteger('seller_status')->default(0);
+            $table->boolean('seller_status')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });

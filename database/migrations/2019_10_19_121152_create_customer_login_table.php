@@ -18,7 +18,7 @@ class CreateCustomerLoginTable extends Migration
             $table->bigInteger('customer_id')->unsigned();
             $table->string('customer_username', 100)->unique();
             $table->text('customer_password');
-            $table->tinyInteger('customer_status')->default(0);
+            $table->boolean('customer_status')->default(0)->comment('0 Banned, 1 Active');
             $table->timestamps();
             $table->softDeletes();
         });

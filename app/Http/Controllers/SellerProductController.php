@@ -82,14 +82,14 @@ class SellerProductController extends Controller
                 ];
                 return response()->json($response, 400);
             }
-            $productImagePath = Storage::url($productImage->store('public/image/sellers/' . $sellerData->sellerUsername));
+            $productImagePath = Storage::url($productImage->store('public/image/sellers/' . $sellerData->seller_username));
             $productDetail['seller_product_image'] = $productImagePath;
         }
         $status = seller_products::insert($productDetail);
 
         $response = [
             'status' => 200,
-            'message' => $request->productName . ' has been added successfully'
+            'message' => $request->product_name . ' has been added successfully'
         ];
         return response()->json($response, 200);
     }
@@ -246,5 +246,30 @@ class SellerProductController extends Controller
             ];
             return response()->json($response);
         }
+    }
+
+    public function updateStock($productId, $buyQty)
+    { }
+    public function availabeCheck(...$productId)
+    {
+        $productId = collect($productId);
+        $productId = $productId->flatten();
+        $productIdCheck =  seller_products::find($productId);
+        $productIdCheck = $productIdCheck->map(function ($item) {
+            return $item->id;
+        });
+        $status = $productId->diff($productIdCheck);
+        if (!$status->isEmpty()) {
+            $response = [
+                'status' => 400,
+                'data' => $status->all()
+            ];
+            return response()->json($response, 400);
+        }
+        $response = [
+            'status' => 200,
+            'message' => 'Product Available'
+        ];
+        return response()->json($response, 200);
     }
 }

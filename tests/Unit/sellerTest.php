@@ -24,7 +24,7 @@ class sellerTest extends TestCase
         $input = [
             'username' => 'iniusername' . Str::random(3),
             'fullname' => 'ini nama ' . Str::random(4),
-            'email' => 'iniEmail' . Str::random(4) . '@gmail.com',
+            'email' => 'ini_email' . Str::random(4) . '@gmail.com',
             'password' => 'P@sswr0d!',
             'sex' => 0
         ];
@@ -44,15 +44,22 @@ class sellerTest extends TestCase
         return $this->token;
     }
 
+    public function selllerGetInfo($token)
+    {
+        $this->token = $token;
+        $this->withHeaders(['Authorization' => $this->token]);
+        $response = $this->get('/api/seller');
+        return $response->decodeResponseJson();
+    }
     public function sellerCanAddTheirProduct($token)
     {
         $this->token = $token;
         $this->withHeaders(['Authorization' => $this->token]);
         $input = [
-            'productName' => Str::random(20),
-            'productPrice' => rand(1, 99999),
-            'productStock' =>  rand(1, 100),
-            'productImage' => UploadedFile::fake()->image('fakerImage.jpg')->size(100)
+            'product_name' => Str::random(20),
+            'product_price' => rand(1, 99999),
+            'product_stock' =>  rand(1, 100),
+            'product_image' => UploadedFile::fake()->image('fakerImage.jpg')->size(100)
         ];
         $response = $this->post('/api/seller/product', $input);
         $response->assertStatus(200);
@@ -65,10 +72,10 @@ class sellerTest extends TestCase
         $this->withHeaders(['Authorization' => $this->token]);
         $input = [
             'id' => $id,
-            'productName' => Str::random(20),
-            'productPrice' => rand(1, 99999),
-            'productStock' =>  rand(1, 100),
-            'productImage' => UploadedFile::fake()->image('fakerImage.jpg')->size(100),
+            'product_name' => Str::random(20),
+            'product_price' => rand(1, 99999),
+            'product_stock' =>  rand(1, 100),
+            'product_image' => UploadedFile::fake()->image('fakerImage.jpg')->size(100),
             '_method' => 'PUT'
         ];
         $response = $this->post('/api/seller/product', $input);
@@ -89,8 +96,9 @@ class sellerTest extends TestCase
     public function sellerAction()
     {
         $this->token = $this->sellerCanLogin();
-        $this->id = seller_products::all()->first()->id;
+        $this->sellerShop = $this->selllerGetInfo($this->token)['data']['shop'];
         $this->sellerCanAddTheirProduct($this->token);
+        $this->id = seller_products::where('seller_shop_id', $this->sellerShop['id'])->first()->id;
         $this->sellerCanUpdateTheirProduct($this->token, $this->id);
         $this->sellerCanDeleteTheirProduct($this->token, $this->id);
     }

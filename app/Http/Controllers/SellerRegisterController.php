@@ -29,7 +29,7 @@ class SellerRegisterController extends Controller
                 'fullname' => $detail->seller_fullname,
                 'dob' => $detail->seller_dob,
                 'address' => $detail->seller_address,
-                'sex' => $detail->seller_sex == 0 ? 'male' : 'female',
+                'sex' => $detail->seller_sex == 0 ? 'female' : 'male',
                 'email' => $detail->seller_email,
                 'phone' => $detail->seller_phone,
                 'join_date' => date_format($detail->created_at, 'Y-m-d H:i:s')
@@ -147,7 +147,7 @@ class SellerRegisterController extends Controller
             'fullname' => $sellerDetails->seller_fullname,
             'dob' => $sellerDetails->seller_dob,
             'address' => $sellerDetails->seller_address,
-            'sex' => $sellerDetails->seller_sex == 0 ? 'male' : 'female',
+            'sex' => $sellerDetails->seller_sex == 0 ? 'female' : 'male',
             'email' => $sellerDetails->seller_email,
             'phone' => $sellerDetails->seller_phone,
             'join_date' => date_format($sellerDetails->created_at, 'Y-m-d H:i:s')

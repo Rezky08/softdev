@@ -7,7 +7,9 @@ namespace App\Http\Controllers;
 use App\Model\SellerDetail as seller_details;
 use App\Model\SellerLogin as seller_logins;
 use App\Model\SellerLoginLog as seller_login_logs;
+use App\Model\SellerShop as seller_shops;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Validator;
 
@@ -20,8 +22,9 @@ class SellerLoginController extends Controller
      */
     public function index()
     {
-        $customerData = Auth::guard('seller')->user();
-        if (!$customerData) {
+        $sellerData = Auth::guard('seller')->user();
+        $sellerShopData = seller_shops::where('seller_id', $sellerData->id)->first();
+        if (!$sellerData) {
             $response = [
                 'status' => 401,
                 'message' => "You're Not Authorized"
@@ -30,7 +33,10 @@ class SellerLoginController extends Controller
         }
         $response = [
             'status' => 200,
-            'data' => $customerData
+            'data' => [
+                'seller' => $sellerData,
+                'shop'  => $sellerShopData
+            ]
         ];
         return response()->json($response, 200);
     }

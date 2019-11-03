@@ -18,7 +18,7 @@ class CreateCustomersTable extends Migration
             $table->string('customer_fullname', 100);
             $table->date('customer_dob')->nullable();
             $table->text('customer_address')->nullable();
-            $table->tinyInteger('customer_sex')->default(0);
+            $table->boolean('customer_sex')->default(0)->comment('0 Female , 1 Male');
             $table->string('customer_email', 100);
             $table->string('customer_phone', 20)->nullable();
             $table->string('customer_username', 100)->unique();

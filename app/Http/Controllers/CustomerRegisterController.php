@@ -28,7 +28,7 @@ class CustomerRegisterController extends Controller
                 'fullname' => $detail->customer_fullname,
                 'dob' => $detail->customer_dob,
                 'address' => $detail->customer_address,
-                'sex' => $detail->customer_sex == 0 ? 'male' : 'female',
+                'sex' => $detail->customer_sex == 0 ? 'female' : 'male',
                 'email' => $detail->customer_email,
                 'phone' => $detail->customer_phone,
                 'join_date' => date_format($detail->created_at, 'Y-m-d H:i:s')
@@ -128,7 +128,7 @@ class CustomerRegisterController extends Controller
             'fullname' => $customerDetails->customer_fullname,
             'dob' => $customerDetails->customer_dob,
             'address' => $customerDetails->customer_address,
-            'sex' => $customerDetails->customer_sex == 0 ? 'male' : 'female',
+            'sex' => $customerDetails->customer_sex == 0 ? 'female' : 'male',
             'email' => $customerDetails->customer_email,
             'phone' => $customerDetails->customer_phone,
             'join_date' => date_format($customerDetails->created_at, 'Y-m-d H:i:s')

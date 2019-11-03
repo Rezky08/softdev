@@ -29,6 +29,17 @@ class CustomerLoginController extends Controller
             ];
             return response()->json($response, 401);
         }
+        $customerData = [
+            'id' => $customerData->id,
+            'username' => $customerData->customer_username,
+            'fullname' => $customerData->customer_fullname,
+            'dob' => $customerData->customer_dob,
+            'address' => $customerData->customer_address,
+            'sex' => $customerData->customer_sex == 0 ? 'female' : 'male',
+            'email' => $customerData->customer_email,
+            'phone' => $customerData->customer_phone,
+            'join_date' => date_format($customerData->created_at, 'Y-m-d H:i:s')
+        ];
         $response = [
             'status' => 200,
             'data' => $customerData

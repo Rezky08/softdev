@@ -20,6 +20,8 @@ class CreateSellerDetailTransactionTable extends Migration
             $table->string('seller_product_name', 100);
             $table->integer('seller_product_price')->default(12);
             $table->integer('seller_product_qty');
+            $table->timestamps();
+            $table->softDeletes();
         });
     }
 

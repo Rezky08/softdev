@@ -52,7 +52,7 @@ class customerTest extends TestCase
         $this->token = $token;
         $this->withHeaders(['Authorization' => $this->token]);
         $input = [
-            'productId' => $productId,
+            'product_id' => $productId,
             'qty' => 2,
         ];
         $response = $this->post('/api/customer/cart', $input);
@@ -63,7 +63,7 @@ class customerTest extends TestCase
         $this->token = $token;
         $this->withHeaders(['Authorization' => $this->token]);
         $input = [
-            'productId' => $productId,
+            'product_id' => $productId,
             'qty' => 2,
         ];
         $response = $this->post('/api/customer/cart', $input);
@@ -93,7 +93,7 @@ class customerTest extends TestCase
         $this->token = $this->customerCanLogin($input);
         $this->customerCanAddToCart($this->token, $productId);
         $customerAcc = $this->customerProfile($this->token)['data'];
-        $cartId = customer_carts::where('customerId', $customerAcc['id'])->orderBy('created_at', 'desc')->first()->id;
+        $cartId = customer_carts::where('customer_id', $customerAcc['id'])->orderBy('created_at', 'desc')->first()->id;
         $this->customerCanUpdateCart($this->token, $cartId);
         $this->customerCanRemoveCart($this->token, $cartId);
     }

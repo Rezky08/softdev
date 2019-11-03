@@ -30,6 +30,12 @@ Route::group(['middleware' => ['checkScopes:customer']], function () {
     Route::delete('/customer/logout', 'CustomerLoginController@destroy');
 });
 
+Route::get('/seller/product', 'SellerProductController@index');
+Route::post('/seller/login', 'SellerLoginController@store');
+Route::post('/seller/register', 'SellerRegisterController@store');
+Route::get('/seller/{sellerId}/product/{productId?}', 'SellerProductController@show');
+Route::get('/seller/profile', 'SellerRegisterController@index');
+Route::get('/seller/{id}/profile', 'SellerRegisterController@show');
 Route::group(['middleware' => ['checkScopes:seller']], function () {
     Route::get('/seller', 'sellerLoginController@index');
     Route::delete('/seller/logout', 'SellerLoginController@destroy');
@@ -37,21 +43,3 @@ Route::group(['middleware' => ['checkScopes:seller']], function () {
     Route::put('/seller/product', 'SellerProductController@update');
     Route::delete('/seller/product', 'SellerProductController@destroy');
 });
-Route::get('/seller/product', 'SellerProductController@index');
-Route::post('/seller/login', 'SellerLoginController@store');
-Route::post('/seller/register', 'SellerRegisterController@store');
-Route::get('/seller/{sellerId}/product/{productId?}', 'SellerProductController@show');
-Route::get('/seller/profile', 'SellerRegisterController@index');
-Route::get('/seller/{id}/profile', 'SellerRegisterController@show');
-
-// Route::group(['middleware' => ['scopes:seller']], function () {
-//     Route::get('/apitest/getAccount', function () {
-//         return dd('Test');
-//     });
-// });
-// Route::get('/apitest', 'TesterController@index');
-// Route::post('/apitest/login', 'TesterController@login');
-
-
-// Route::get('/paramtest/{param1}/{param2}', 'TesterController@paramTest');
-// Route::post('/apitest', 'TesterController@readFile');

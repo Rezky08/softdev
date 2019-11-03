@@ -18,7 +18,7 @@ class CreateSellersTable extends Migration
             $table->string('seller_fullname', 100);
             $table->date('seller_dob')->nullable();
             $table->text('seller_address')->nullable();
-            $table->tinyInteger('seller_sex')->default(0);
+            $table->boolean('seller_sex')->default(0)->comment('0 Female, 1 Male');
             $table->string('seller_email', 100);
             $table->string('seller_phone', 20)->nullable();
             $table->string('seller_username', 100)->unique();

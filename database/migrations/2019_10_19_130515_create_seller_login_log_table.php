@@ -17,7 +17,7 @@ class CreateSellerLoginLogTable extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('seller_id')->unsigned();
             $table->string('seller_username', 100);
-            $table->tinyInteger('login_success')->default(0);
+            $table->boolean('login_success')->default(0)->comment('0 Fail, 1 Success');
             $table->timestamps();
             $table->softDeletes();
         });
