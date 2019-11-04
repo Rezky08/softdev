@@ -56,6 +56,13 @@ class CustomerCartController extends Controller
      */
     public function store(Request $request)
     {
+        // check Stock
+        $sellerProduct = new SellerProductController;
+        $status = $sellerProduct->checkStock($request->product_id);
+        if ($status->getStatusCode() != 200) {
+            return $status;
+        }
+
         $customerData = $request->customerData;
         $productDetails = seller_product::where('id', $request->product_id);
         if (!$productDetails->exists()) {

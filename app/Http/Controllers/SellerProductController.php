@@ -278,7 +278,6 @@ class SellerProductController extends Controller
         $productUpdated = $productUpdated->each(function ($item, $key) use ($product) {
             $item[0]->seller_product_stock = $item[0]->seller_product_stock - $product[$key][0]->seller_product_qty;
             $item = $item[0]->only(['seller_product_stock']);
-
             // update stock
             seller_products::where('id', $key)->update($item);
         });
@@ -286,6 +285,42 @@ class SellerProductController extends Controller
         $response = [
             'status' => 200,
             'message' => 'Stock updated'
+        ];
+        return response()->json($response, 200);
+    }
+    public function checkStock(...$productId)
+    {
+        $productId = collect($productId);
+        $productId = $productId->flatten();
+        $status = $this->availabeCheck($productId);
+        if ($status->getStatusCode() != 200) {
+            return $status;
+        }
+        $product = seller_products::find($productId);
+        $status = $product->map(function ($item) {
+            if ($item->seller_product_stock <= 0) {
+                $item = [
+                    'id' => $item->id,
+                    'shop_id' => $item->seller_shop_id,
+                    'product_price' => $item->seller_product_price,
+                    'product_stock' => $item->seller_product_stock,
+                    'product_image' => $item->seller_product_image
+                ];
+                return $item;
+            }
+        });
+        $status = $status->filter();
+        if (!$status->isEmpty()) {
+            $response = [
+                'status' => 400,
+                'message' => 'out of stock',
+                'data' => $status->all()
+            ];
+            return response()->json($response, 400);
+        }
+        $response = [
+            'status' => 200,
+            'message' => 'Product Available'
         ];
         return response()->json($response, 200);
     }

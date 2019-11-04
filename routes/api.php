@@ -20,7 +20,7 @@ Route::get('/customer/profile', 'CustomerRegisterController@index');
 Route::get('/customer/{customerId}/profile', 'CustomerRegisterController@show');
 
 Route::group(['middleware' => ['checkScopes:customer']], function () {
-    Route::post('/customer/purchase', 'CustomerTransactionController@store');
+    Route::post('/customer/purchase', 'CustomerTransactionController@store')->middleware(['cartValidate']);
     Route::get('/customer', 'CustomerLoginController@index');
     Route::get('/customer/cart', 'CustomerCartController@index');
     Route::get('/customer/cart/{cartId}', 'CustomerCartController@show');
