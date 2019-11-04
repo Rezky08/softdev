@@ -248,8 +248,47 @@ class SellerProductController extends Controller
         }
     }
 
-    public function updateStock($productId, $buyQty)
-    { }
+    public function updateStock(...$product)
+    {
+        $product = collect($product)->flatten(1);
+        $product = $product->map(function ($item) {
+            $item = (object) $item;
+            return $item;
+        });
+        $productId = $product->map(function ($item) {
+            return $item->seller_product_id;
+        });
+        $productUpdated = seller_products::find($productId);
+
+        // check product
+        $productIdCheck = $productUpdated->map(function ($item) {
+            return $item->id;
+        });
+        $status = $productId->diff($productIdCheck);
+        if (!$status->isEmpty()) {
+            $response = [
+                'status' => 400,
+                'data' => $status->all()
+            ];
+            return response()->json($response, 400);
+        }
+
+        $product = $product->groupBy('seller_product_id');
+        $productUpdated = $productUpdated->groupBy('id');
+        $productUpdated = $productUpdated->each(function ($item, $key) use ($product) {
+            $item[0]->seller_product_stock = $item[0]->seller_product_stock - $product[$key][0]->seller_product_qty;
+            $item = $item[0]->only(['seller_product_stock']);
+
+            // update stock
+            seller_products::where('id', $key)->update($item);
+        });
+
+        $response = [
+            'status' => 200,
+            'message' => 'Stock updated'
+        ];
+        return response()->json($response, 200);
+    }
     public function availabeCheck(...$productId)
     {
         $productId = collect($productId);

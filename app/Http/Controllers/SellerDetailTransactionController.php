@@ -43,10 +43,28 @@ class SellerDetailTransactionController extends Controller
             });
         });
 
-        $sellerDetailTransactions = $sellerDetailTransactions->flatten(1)->all();
+        $sellerDetailTransactions = $sellerDetailTransactions->flatten(1);
         // insert and check status
-        $status = seller_detail_transactions::insert($sellerDetailTransactions);
+        $status = seller_detail_transactions::insert($sellerDetailTransactions->all());
         if (!$status) {
+            $response = [
+                'status' => 500,
+                'message' => 'Internal Server Error'
+            ];
+            return response()->json($response, 500);
+        }
+
+        // update stock
+        $sellerUpdateStocks = $sellerDetailTransactions->map(function ($item) {
+            $product = [
+                'seller_product_id' => $item['seller_product_id'],
+                'seller_product_qty' => $item['seller_product_qty']
+            ];
+            return $product;
+        });
+        $sellerProducts = new SellerProductController;
+        $status = $sellerProducts->updateStock($sellerUpdateStocks);
+        if ($status->getStatusCode() != 200) {
             $response = [
                 'status' => 500,
                 'message' => 'Internal Server Error'

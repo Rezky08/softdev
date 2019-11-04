@@ -49,12 +49,10 @@ class CustomerTransactionController extends Controller
         $productId = $customerCart->map(function ($item) {
             return $item->customer_seller_product_id;
         });
-        $productId = $productId;
         $productAvailabes = new SellerProductController;
         $productAvailabes = $productAvailabes->availabeCheck($productId);
         if ($productAvailabes->getStatusCode() != 200) {
-            $productAvailabes = collect($productAvailabes->getData()->data);
-            $productAvailabes = $productAvailabes->flatten();
+            $productAvailabes = collect($productAvailabes->getData()->data)->flatten();
             $productNotAvailabes = $customerCart->whereIn('customer_seller_product_id', $productAvailabes)->flatten();
             $response['status'] = 400;
             $response['message'] = $productNotAvailabes->map(function ($item) {
@@ -89,6 +87,7 @@ class CustomerTransactionController extends Controller
             $item->customer_transaction_id = $transactionId;
             return $item;
         });
+
 
 
         // send to customer detail transaction controller
