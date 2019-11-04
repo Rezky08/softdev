@@ -60,6 +60,14 @@ class SellerRegisterController extends Controller
      */
     public function store(Request $request)
     {
+        // create coin account
+        $request->request->add(['account_type' => 2]);
+        $coinDetails = new CoinRegisterController;
+        $status = $coinDetails->store($request);
+        if ($status->getStatusCode() != 200) {
+            return $status;
+        }
+
         // input validation
         $validation = Validator::make($request->all(), [
             'username' => ['required', 'unique:dbmarketsellers.seller_logins,seller_username', 'unique:dbmarketcustomers.customer_logins,customer_username'],
@@ -115,6 +123,7 @@ class SellerRegisterController extends Controller
                 return response()->json($response, 200);
             }
         }
+
         // Fail Register
         $destroyAccount = seller_details::where('id', $sellerID)->delete();
         $response = [
@@ -132,6 +141,7 @@ class SellerRegisterController extends Controller
      */
     public function show($sellerID)
     {
+
         $sellerDetails = seller_details::where('id', $sellerID);
         if (!$sellerDetails->exists()) {
             $response = [

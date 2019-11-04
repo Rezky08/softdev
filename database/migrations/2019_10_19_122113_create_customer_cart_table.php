@@ -21,7 +21,7 @@ class CreateCustomerCartTable extends Migration
             $table->string('customer_product_name');
             $table->integer('customer_product_price')->default(12);
             $table->integer('customer_product_qty')->default(12);
-            $table->boolean('customer_status')->unsigned()->default(0);
+            $table->integer('customer_status')->unsigned()->default(0)->comment('0 not purchased, 1 purchased');
             $table->timestamps();
             $table->softDeletes();
         });

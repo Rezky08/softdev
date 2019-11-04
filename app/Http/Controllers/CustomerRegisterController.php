@@ -59,7 +59,14 @@ class CustomerRegisterController extends Controller
      */
     public function store(Request $request)
     {
-        // return dd($request->all());
+        // create coin account
+        $request->request->add(['account_type' => 1]);
+        $coinDetails = new CoinRegisterController;
+        $status = $coinDetails->store($request);
+        if ($status->getStatusCode() != 200) {
+            return $status;
+        }
+
         // input validation
         $validation = Validator::make($request->all(), [
             'username' => ['required', 'unique:dbmarketsellers.seller_logins,seller_username', 'unique:dbmarketcustomers.customer_logins,customer_username'],
@@ -95,14 +102,20 @@ class CustomerRegisterController extends Controller
             'updated_at' => date_format(now(), 'Y-m-d H:i:s')
         ];
         $status = customer_logins::insert($customerLogin);
-        if ($status) {
+        if (!$status) {
             $response = [
-                'status' => 200,
-                'customer_username' => $customerLogin['customer_username'],
-                'token' => customer_details::find($customerID)->createToken('register_token', ['customer'])->accessToken
+                'status' => 500,
+                'message' => 'Internal Server Error'
             ];
-            return response()->json($response, 200);
+            return response()->json($response, 500);
         }
+
+        $response = [
+            'status' => 200,
+            'customer_username' => $customerLogin['customer_username'],
+            'token' => customer_details::find($customerID)->createToken('register_token', ['customer'])->accessToken
+        ];
+        return response()->json($response, 200);
     }
 
     /**

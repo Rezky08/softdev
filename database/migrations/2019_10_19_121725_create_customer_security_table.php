@@ -17,10 +17,10 @@ class CreateCustomerSecurityTable extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('customer_id')->unsigned();
             $table->string('customer_username', 100)->unique();
-            $table->string('customer_question1', 100);
-            $table->string('customer_answer1', 100);
-            $table->string('customer_question2', 100);
-            $table->string('customer_answer2', 100);
+            $table->string('customer_question1', 100)->nullable();
+            $table->string('customer_answer1', 100)->nullable();
+            $table->string('customer_question2', 100)->nullable();
+            $table->string('customer_answer2', 100)->nullable();
             $table->boolean('customer_status')->default(0);
             $table->timestamps();
             $table->softDeletes();

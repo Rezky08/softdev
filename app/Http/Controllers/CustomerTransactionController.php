@@ -36,30 +36,6 @@ class CustomerTransactionController extends Controller
             'customer_id' => $customerData->id,
             ['customer_status', '!=', 1]
         ];
-        // if (!$customerCart->exists()) {
-        //     $response = [
-        //         'status' => 400,
-        //         'message' => 'sorry, cannot find your product. Do want to buy something product?'
-        //     ];
-        //     return response()->json($response, 400);
-        // }
-        // $customerCart = $customerCart->get();
-
-        // // check product stock
-        // $productId = $customerCart->map(function ($item) {
-        //     return $item->customer_seller_product_id;
-        // });
-        // $productAvailabes = new SellerProductController;
-        // $productAvailabes = $productAvailabes->availabeCheck($productId);
-        // if ($productAvailabes->getStatusCode() != 200) {
-        //     $productAvailabes = collect($productAvailabes->getData()->data)->flatten();
-        //     $productNotAvailabes = $customerCart->whereIn('customer_seller_product_id', $productAvailabes)->flatten();
-        //     $response['status'] = 400;
-        //     $response['message'] = $productNotAvailabes->map(function ($item) {
-        //         return "Sorry, " . $item->customer_product_name . " Out of Stock";
-        //     });
-        //     return response()->json($response, 400);
-        // }
 
         $subTotal = $customerCart->map(function ($item) {
             $item->customer_product_sub_total = $item->customer_product_price * $item->customer_product_qty;

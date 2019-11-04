@@ -17,10 +17,10 @@ class CreateSellerSecuirtyTable extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('seller_id')->unsigned();
             $table->string('seller_username', 100)->unique();
-            $table->string('seller_question1', 100);
-            $table->string('seller_answer1', 100);
-            $table->string('seller_question2', 100);
-            $table->string('sellerAnswer2', 100);
+            $table->string('seller_question1', 100)->nullable();
+            $table->string('seller_answer1', 100)->nullable();
+            $table->string('seller_question2', 100)->nullable();
+            $table->string('seller_answer2', 100)->nullable();
             $table->boolean('seller_status')->default(0);
             $table->timestamps();
             $table->softDeletes();

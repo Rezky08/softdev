@@ -26,6 +26,7 @@ class SellerTransactionController extends Controller
      */
     public function store(Request $request)
     {
+        $customerData = $request->customerData;
         $sellerTransactions = $request->seller_transactions;
         $sellerDetailTransactions = $sellerTransactions->groupBy('customer_seller_shop_id');
         $sellerTransactions = $sellerDetailTransactions->map(function ($item) {
@@ -39,6 +40,14 @@ class SellerTransactionController extends Controller
             return $transaction;
         });
 
+        // balance validation
+        $totalPrice = $sellerTransactions->sum('seller_total_price');
+        $coinBalance = new CoinBalanceController;
+        $status = $coinBalance->validateBalance($customerData->customer_username, $totalPrice);
+        if ($status->getStatusCode() != 200) {
+            return $status;
+        }
+
         // insert transactions
         $transactionId = $sellerTransactions->map(function ($item) {
             return seller_transactions::insertGetId($item);
@@ -49,6 +58,19 @@ class SellerTransactionController extends Controller
 
         $sellerDetailTransactions = new  SellerDetailTransactionController;
         $status = $sellerDetailTransactions->store($request);
+
+        if ($status->getStatusCode() != 200) {
+            return $status;
+        }
+
+        // insert transaction to coin transaction
+        $coinTransactions = new CoinTransactionController;
+        $status = $coinTransactions->storeCustomerSellerTransaction($request);
+        if ($status->getStatusCode() != 200) {
+            return $status;
+        }
+
+
         return $status;
     }
 

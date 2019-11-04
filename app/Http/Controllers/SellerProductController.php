@@ -336,6 +336,7 @@ class SellerProductController extends Controller
         if (!$status->isEmpty()) {
             $response = [
                 'status' => 400,
+                'message' => 'Product Not Available',
                 'data' => $status->all()
             ];
             return response()->json($response, 400);

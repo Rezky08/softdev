@@ -30,7 +30,8 @@ class AuthServiceProvider extends ServiceProvider
         Passport::personalAccessTokensExpireIn(now()->addHours(24));
         Passport::tokensCan([
             'customer' => 'only can buy product in seller',
-            'seller' => 'sell product from supplier to customer'
+            'seller' => 'sell product from supplier to customer',
+            'coin' => 'all user connected with it',
         ]);
         //
     }
