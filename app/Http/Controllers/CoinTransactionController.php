@@ -43,7 +43,17 @@ class CoinTransactionController extends Controller
     {
         $sellerTransactionIds = $request->seller_transaction_ids;
         $sellerTransactionIds = $sellerTransactionIds->flatten();
-        $sellerTransactions = seller_transactions::find($sellerTransactionIds);
+
+        // get seller transactions
+        $sellerTransactions = new SellerTransactionController;
+        $sellerTransactions = $sellerTransactions->show($sellerTransactionIds);
+        if ($sellerTransactions->getStatusCode() != 200) {
+            return $sellerTransactions;
+        }
+        $sellerTransactions = json_decode($sellerTransactions->getContent());
+        $sellerTransactions = collect($sellerTransactions->data);
+        //
+
         $sellersId = $sellerTransactions->mapToGroups(function ($item) {
             return [$item->id => $item->seller_shop_id];
         });

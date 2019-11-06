@@ -16,4 +16,8 @@ class SellerLogin extends Model
     {
         return $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable());
     }
+    public function seller()
+    {
+        return $this->belongsTo('App\Model\SellerDetail', 'seller_id');
+    }
 }

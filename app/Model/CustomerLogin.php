@@ -16,4 +16,8 @@ class CustomerLogin extends Model
     {
         return $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable());
     }
+    public function customer()
+    {
+        return $this->belongsTo('App\Model\CustomerDetail', 'customer_id');
+    }
 }

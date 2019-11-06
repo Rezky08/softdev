@@ -16,4 +16,16 @@ class SellerShop extends Model
     {
         return $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable());
     }
+    public function seller()
+    {
+        return $this->belongsTo('App\Model\SellerDetail', 'seller_id');
+    }
+    public function transaction()
+    {
+        return $this->hasMany('App\Model\SellerTransaction', 'seller_shop_id');
+    }
+    public function product()
+    {
+        return $this->hasMany('App\Model\SellerProduct', 'seller_shop_id');
+    }
 }

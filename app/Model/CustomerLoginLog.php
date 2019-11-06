@@ -11,4 +11,8 @@ class CustomerLoginLog extends Model
     protected $connection = 'dbmarketcustomers';
     protected $table = 'customer_login_logs';
     protected $softDelete = true;
+    public function customer()
+    {
+        return $this->belongsTo('App\Model\CustomerDetail', 'customer_id');
+    }
 }

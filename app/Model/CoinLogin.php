@@ -16,4 +16,8 @@ class CoinLogin extends Model
     {
         return $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable());
     }
+    public function coin()
+    {
+        return $this->belongsTo('App\Model\CoinDetail', 'coin_id');
+    }
 }

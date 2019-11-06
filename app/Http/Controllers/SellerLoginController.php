@@ -23,7 +23,7 @@ class SellerLoginController extends Controller
     public function index()
     {
         $sellerData = Auth::guard('seller')->user();
-        $sellerShopData = seller_shops::where('seller_id', $sellerData->id)->first();
+        $sellerData->shop;
         if (!$sellerData) {
             $response = [
                 'status' => 401,
@@ -33,10 +33,7 @@ class SellerLoginController extends Controller
         }
         $response = [
             'status' => 200,
-            'data' => [
-                'seller' => $sellerData,
-                'shop'  => $sellerShopData
-            ]
+            'data' => $sellerData
         ];
         return response()->json($response, 200);
     }
@@ -46,10 +43,33 @@ class SellerLoginController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        $sellerID = $request->seller_id;
+        $sellerLogin = [
+            'seller_username' => $request->input('username'),
+            'seller_password' => Hash::make($request->input('password')),
+            'seller_status' => 1,
+            'seller_id' => $sellerID,
+            'created_at' => date_format(now(), 'Y-m-d H:i:s'),
+            'updated_at' => date_format(now(), 'Y-m-d H:i:s')
+        ];
+        $status = seller_logins::insert($sellerLogin);
+        if (!$status) {
+            $response = [
+                'status' => 500,
+                'message' => 'Internal Server Error',
+            ];
+            return response()->json($response, 500);
+        }
+
+        $response = [
+            'status' => 200,
+            'message' => 'Login account has been created',
+        ];
+        return response()->json($response, 200);
     }
+
 
     /**
      * Store a newly created resource in storage.
@@ -74,16 +94,15 @@ class SellerLoginController extends Controller
 
         $username_input = $request->username;
         $password_input = $request->password;
-        $sellerLogin  = seller_details::where('seller_username', $username_input);
+        $sellerLogin  = seller_details::where('seller_details.seller_username', $username_input)->leftJoin('seller_logins', 'seller_details.seller_username', '=', 'seller_logins.seller_username');
         if (!$sellerLogin->exists()) {
-            // Redirect to login page again
             $response = [
                 'status' => 403,
-                'message' => 'Login Failed'
+                'message' => 'You have entered an invalid username or password'
             ];
             return response()->json($response, 403);
         }
-        $sellerLogin = seller_logins::where('seller_username', $username_input)->first();
+        $sellerLogin = $sellerLogin->first();
         $loginInfo = [
             'seller_id' => $sellerLogin->seller_id,
             'seller_username' => $sellerLogin->seller_username,
@@ -92,8 +111,17 @@ class SellerLoginController extends Controller
         ];
         if (Hash::check($password_input, $sellerLogin->seller_password)) {
             $loginInfo['login_success'] = 1;
-            seller_login_logs::insert($loginInfo);
-            $sellerData = seller_details::where('id', $loginInfo['seller_id'])->first();
+            $request->request->add(['login_info' => $loginInfo]);
+
+            // create login log
+            $sellerLoginLog = new SellerLoginLogController;
+            $status = $sellerLoginLog->store($request);
+            if ($status->getStatusCode() != 200) {
+                return $status;
+            }
+            //
+
+            $sellerData = $sellerLogin;
             $response = [
                 'status' => 200,
                 // 'data' => $loginData,
@@ -101,13 +129,22 @@ class SellerLoginController extends Controller
             ];
             return response()->json($response, 200);
         }
-        // Redirect to login page again
+
+        $loginInfo['login_success'] = 0;
+        $request->request->add(['login_info' => $loginInfo]);
+
+        // create login log
+        $sellerLoginLog = new SellerLoginLogController;
+        $status = $sellerLoginLog->store($request);
+        if ($status->getStatusCode() != 200) {
+            return $status;
+        }
+        //
+
         $response = [
             'status' => 403,
-            'message' => 'Login Failed'
+            'message' => 'You have entered an invalid username or password'
         ];
-        $loginInfo['login_success'] = 0;
-        seller_login_logs::insert($loginInfo);
         return response()->json($response, 403);
     }
 

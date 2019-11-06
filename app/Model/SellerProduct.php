@@ -16,4 +16,8 @@ class SellerProduct extends Model
     {
         return $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable());
     }
+    public function shop()
+    {
+        return $this->belongsTo('App\Model\SellerShop', 'shop_id');
+    }
 }

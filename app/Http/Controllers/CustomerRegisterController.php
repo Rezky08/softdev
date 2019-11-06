@@ -93,26 +93,18 @@ class CustomerRegisterController extends Controller
             'updated_at' => date_format(now(), 'Y-m-d H:i:s')
         ];
         $customerID = customer_details::insertGetId($customerDetail);
-        $customerLogin = [
-            'customer_username' => $request->input('username'),
-            'customer_password' => Hash::make($request->input('password')),
-            'customer_status' => 1,
-            'customer_id' => $customerID,
-            'created_at' => date_format(now(), 'Y-m-d H:i:s'),
-            'updated_at' => date_format(now(), 'Y-m-d H:i:s')
-        ];
-        $status = customer_logins::insert($customerLogin);
-        if (!$status) {
-            $response = [
-                'status' => 500,
-                'message' => 'Internal Server Error'
-            ];
-            return response()->json($response, 500);
+        $request->request->add(['customer_id' => $customerID]);
+
+        // send to CustomerLoginController to create login account
+        $customerLogin = new CustomerLoginController;
+        $status = $customerLogin->create($request);
+        if ($status->getStatusCode() != 200) {
+            return $status;
         }
 
         $response = [
             'status' => 200,
-            'customer_username' => $customerLogin['customer_username'],
+            'customer_username' => $request->username,
             'token' => customer_details::find($customerID)->createToken('register_token', ['customer'])->accessToken
         ];
         return response()->json($response, 200);

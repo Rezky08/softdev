@@ -96,7 +96,6 @@ class CoinRegisterController extends Controller
         ];
         $status = coin_logins::insert($coinLogin);
 
-
         if (!$status) {
             $response = [
                 'status' => 500,

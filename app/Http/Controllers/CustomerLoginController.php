@@ -52,9 +52,30 @@ class CustomerLoginController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        $customerID = $request->customer_id;
+        $customerLogin = [
+            'customer_username' => $request->input('username'),
+            'customer_password' => Hash::make($request->input('password')),
+            'customer_status' => 1,
+            'customer_id' => $customerID,
+            'created_at' => date_format(now(), 'Y-m-d H:i:s'),
+            'updated_at' => date_format(now(), 'Y-m-d H:i:s')
+        ];
+        $status = customer_logins::insert($customerLogin);
+        if (!$status) {
+            $response = [
+                'status' => 500,
+                'message' => 'Internal Server Error'
+            ];
+            return response()->json($response, 500);
+        }
+        $response = [
+            'status' => 200,
+            'message' => 'Login account has been created'
+        ];
+        return response()->json($response, 200);
     }
 
     /**
@@ -80,16 +101,16 @@ class CustomerLoginController extends Controller
 
         $username_input = $request->username;
         $password_input = $request->password;
-        $customerLogin  = customer_details::where('customer_username', $username_input);
+        $customerLogin  = customer_details::where('customer_details.customer_username', $username_input)->leftJoin('customer_logins', 'customer_details.customer_username', '=', 'customer_logins.customer_username');
         if (!$customerLogin->exists()) {
             // Redirect to login page again
             $response = [
                 'status' => 403,
-                'message' => 'Login Failed'
+                'message' => 'You have entered an invalid username or password'
             ];
             return response()->json($response, 403);
         }
-        $customerLogin = customer_logins::where('customer_username', $username_input)->first();
+        $customerLogin = $customerLogin->first();
         $loginInfo = [
             'customer_id' => $customerLogin->customer_id,
             'customer_username' => $customerLogin->customer_username,
@@ -98,8 +119,17 @@ class CustomerLoginController extends Controller
         ];
         if (Hash::check($password_input, $customerLogin->customer_password)) {
             $loginInfo['login_success'] = 1;
-            customer_login_logs::insert($loginInfo);
-            $customerData = customer_details::where('id', $loginInfo['customer_id'])->first();
+            $request->request->add(['login_info' => $loginInfo]);
+
+            // create login log
+            $customerLoginLog = new CustomerLoginLogController;
+            $status = $customerLoginLog->store($request);
+            //
+            if ($status->getStatusCode() != 200) {
+                return $status;
+            }
+
+            $customerData = $customerLogin;
             $response = [
                 'status' => 200,
                 // 'data' => $loginData,
@@ -108,12 +138,22 @@ class CustomerLoginController extends Controller
             return response()->json($response, 200);
         }
         // Redirect to login page again
+
+        $loginInfo['login_success'] = 0;
+        $request->request->add(['login_info' => $loginInfo]);
+
+        // create login log
+        $customerLoginLog = new CustomerLoginLogController;
+        $status = $customerLoginLog->store($request);
+        //
+        if ($status->getStatusCode() != 200) {
+            return $status;
+        }
+
         $response = [
             'status' => 403,
-            'message' => 'Login Failed'
+            'message' => 'You have entered an invalid username or password'
         ];
-        $loginInfo['login_success'] = 0;
-        customer_login_logs::insert($loginInfo);
         return response()->json($response, 403);
     }
 

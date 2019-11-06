@@ -14,9 +14,7 @@ class SellerTransactionController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {
-        //
-    }
+    { }
 
     /**
      * Store a newly created resource in storage.
@@ -80,9 +78,41 @@ class SellerTransactionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(...$id)
     {
-        //
+        $ids = collect($id)->flatten();
+        $sellerTransactions = seller_transactions::whereIn('id', $ids)->get();
+
+        // // short variable name
+        // $sellerTransactions = $sellerTransactions->map(function ($item) {
+        //     $display = [
+        //         'id' => $item->id,
+        //         'shop_id' => $item->seller_shop_id,
+        //         'customer_id' => $item->customer_id,
+        //         'total_price' => $item->seller_total_price,
+        //         'created_at' => $item->created_at->toDateTimeString()
+        //     ];
+        //     return (object) $display;
+        // });
+        // //
+
+        $sellerTransactionIdChecks = $sellerTransactions->map(function ($item) {
+            return $item->id;
+        });
+        $sellerTransactionIdChecks = $ids->diff($sellerTransactionIdChecks);
+        if (!$sellerTransactionIdChecks->isEmpty()) {
+            $response = [
+                'status' => 400,
+                'message' => 'Transaction not found',
+                'data' => ['transaction_id' => $sellerTransactionIdChecks]
+            ];
+            return response()->json($response, 400);
+        }
+        $response = [
+            'status' => 200,
+            'data' => $sellerTransactions
+        ];
+        return response()->json($response, 200);
     }
 
     /**

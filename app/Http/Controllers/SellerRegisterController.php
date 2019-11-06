@@ -20,10 +20,9 @@ class SellerRegisterController extends Controller
      */
     public function index()
     {
-        $sellerData = [];
         $sellerDetails = seller_details::all();
-        foreach ($sellerDetails as $seller => $detail) {
-            $sellerData[] = [
+        $sellerDetails = $sellerDetails->map(function ($detail) {
+            $sellerData = [
                 'id' => $detail->id,
                 'username' => $detail->seller_username,
                 'fullname' => $detail->seller_fullname,
@@ -34,10 +33,11 @@ class SellerRegisterController extends Controller
                 'phone' => $detail->seller_phone,
                 'join_date' => date_format($detail->created_at, 'Y-m-d H:i:s')
             ];
-        }
+            return $sellerData;
+        });
         $response = [
             'status' => 200,
-            'data' => $sellerData
+            'data' => $sellerDetails
         ];
         return response()->json($response, 200);
     }
@@ -94,43 +94,39 @@ class SellerRegisterController extends Controller
             'updated_at' => date_format(now(), 'Y-m-d H:i:s')
         ];
         $sellerID = seller_details::insertGetId($sellerDetail);
-        $sellerLogin = [
-            'seller_username' => $request->input('username'),
-            'seller_password' => Hash::make($request->input('password')),
-            'seller_status' => 1,
-            'seller_id' => $sellerID,
-            'created_at' => date_format(now(), 'Y-m-d H:i:s'),
-            'updated_at' => date_format(now(), 'Y-m-d H:i:s')
-        ];
-        $status = seller_logins::insert($sellerLogin);
-        if ($status) {
-            $sellerShop = [
-                'seller_id' => $sellerID,
-                'seller_shop_name' => $request->input('username'),
-                'seller_shop_owner_name' => $request->input('fullname') ?: $request->input('username'),
-                'seller_shop_phone' => $request->input('phone'),
-                'seller_shop_certificate' => $request->input('shop_certificate'),
-                'created_at' => date_format(now(), 'Y-m-d H:i:s'),
-                'updated_at' => date_format(now(), 'Y-m-d H:i:s')
+        if (!$sellerID) {
+            $response = [
+                'status' => 500,
+                'message' => 'Internal Server Error',
             ];
-            $status = seller_shops::insert($sellerShop);
-            if ($status) {
-                $response = [
-                    'status' => 200,
-                    'seller_username' => $sellerLogin['seller_username'],
-                    'token' => seller_details::find($sellerID)->createToken('regiter_token', ['seller'])->accessToken
-                ];
-                return response()->json($response, 200);
-            }
+            return response()->json($response, 500);
+        }
+        $request->request->add(['seller_id' => $sellerID]);
+
+        // send to SellerLoginController to create l account
+        $sellerLogin = new SellerLoginController;
+        $status = $sellerLogin->create($request);
+        //
+
+        if ($status->getStatusCode() != 200) {
+            return $status;
         }
 
-        // Fail Register
-        $destroyAccount = seller_details::where('id', $sellerID)->delete();
+        // send to sellerShopController to add shop info
+        $sellerShop = new SellerShopController;
+        $status = $sellerShop->store($request);
+        //
+
+        if ($status->getStatusCode() != 200) {
+            return $status;
+        }
+
         $response = [
-            'status' => 400,
-            'message' => 'Sorry, unable create account'
+            'status' => 200,
+            'seller_username' => $request->username,
+            'token' => seller_details::find($sellerID)->createToken('register_token', ['seller'])->accessToken
         ];
-        return response()->json($response, 400);
+        return response()->json($response, 200);
     }
 
     /**

@@ -19,4 +19,20 @@ class CustomerDetail extends Authenticable
     {
         return $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable());
     }
+    public function login()
+    {
+        return $this->hasOne('App\Model\CustomerLogin', 'customer_id');
+    }
+    public function loginLog()
+    {
+        return $this->hasMany('App\Model\CustomerLoginLog', 'customer_id');
+    }
+    public function cart()
+    {
+        return $this->hasMany('App\Model\CustomerCart', 'customer_id');
+    }
+    public function transaction()
+    {
+        return $this->hasMany('App\Model\CustomerTransaction', 'customer_id');
+    }
 }

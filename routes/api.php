@@ -13,6 +13,15 @@ use Illuminate\Http\Request;
 |
 */
 
+// Route Pattern
+Route::pattern('id', '[0-9]+');
+Route::pattern('sellerId', '[0-9]+');
+Route::pattern('customerId', '[0-9]+');
+Route::pattern('cartId', '[0-9]+');
+Route::pattern('productId', '[0-9]+');
+Route::pattern('shopId', '[0-9]+');
+
+//
 
 Route::post('/customer/login', 'CustomerLoginController@store');
 Route::post('/customer/register', 'CustomerRegisterController@store');
@@ -33,7 +42,8 @@ Route::group(['middleware' => ['checkScopes:customer']], function () {
 Route::get('/seller/product', 'SellerProductController@index');
 Route::post('/seller/login', 'SellerLoginController@store');
 Route::post('/seller/register', 'SellerRegisterController@store');
-Route::get('/seller/{sellerId}/product/{productId?}', 'SellerProductController@show');
+Route::get('/seller/{shopId}/product', 'SellerProductController@showByShop');
+Route::get('/seller/product/{productId}', 'SellerProductController@showById');
 Route::get('/seller/profile', 'SellerRegisterController@index');
 Route::get('/seller/{id}/profile', 'SellerRegisterController@show');
 Route::group(['middleware' => ['checkScopes:seller']], function () {
@@ -43,3 +53,6 @@ Route::group(['middleware' => ['checkScopes:seller']], function () {
     Route::put('/seller/product', 'SellerProductController@update');
     Route::delete('/seller/product', 'SellerProductController@destroy');
 });
+
+Route::get('/seller/transaction/{id}', 'SellerTransactionController@show');
+Route::get('/test', 'TesterController@checkShop');

@@ -18,20 +18,21 @@ class SellerProductController extends Controller
      */
     public function index()
     {
-        $showProductData = [];
         $sellerProductData = seller_products::all();
-        foreach ($sellerProductData as $productCount => $productData) {
-            $showProductData[] = [
-                'id' => $productData->id,
-                'shop_id' => $productData->seller_id,
-                'product_name' => $productData->seller_product_name,
-                'product_price' => $productData->seller_product_price,
-                'product_image' => $productData->seller_product_image ?: Storage::url('public/image/default/ImageCrash.png')
+        $sellerProductData  = $sellerProductData->map(function ($item) {
+            $showProductData = [
+                'id' => $item->id,
+                'shop_id' => $item->seller_id,
+                'product_name' => $item->seller_product_name,
+                'product_price' => $item->seller_product_price,
+                'product_image' => $item->seller_product_image ?: Storage::url('public/image/default/ImageCrash.png')
             ];
-        }
+            return $showProductData;
+        });
+
         $response = [
             'status' => 200,
-            'product' => $showProductData
+            'product' => $sellerProductData
         ];
 
         return response()->json($response, 200);
@@ -59,9 +60,8 @@ class SellerProductController extends Controller
             ];
             return response()->json($response);
         }
-
         $sellerData = $request->sellerData;
-        $sellerShopId = seller_shops::where('seller_id', $sellerData->id)->first();
+        $sellerShopId = $sellerData->shop;
         $productDetail = [
             'seller_shop_id' => $sellerShopId->id,
             'seller_product_name' => $request->input('product_name'),
@@ -100,27 +100,82 @@ class SellerProductController extends Controller
      * @param  \App\SellerProduct  $sellerProduct
      * @return \Illuminate\Http\Response
      */
-    public function show($sellerShopId, $productId = null)
+    public function showByShop(...$id)
     {
-        $showProductData = [];
-        $sellerProductData = seller_products::where('seller_shop_id', $sellerShopId);
-        if ($productId) {
-            $sellerProductData = $sellerProductData->where('id', $productId)->first();
-        } else {
-            $sellerProductData = $sellerProductData->get();
-        }
-        foreach ($sellerProductData as $productCount => $productData) {
-            $showProductData[] = [
-                'id' => $productData->id,
-                'seller_shop_id' => $productData->seller_shop_id,
-                'product_name' => $productData->seller_product_name,
-                'product_price' => $productData->seller_product_price,
-                'product_image' => $productData->seller_product_image ?: Storage::url('public/image/default/ImageCrash.png')
+        $sellerShopId = collect($id)->flatten();
+        $sellerShop = seller_shops::whereIn('id', $sellerShopId)->get();
+        // check shop exists
+        $sellerShopIdCheck = $sellerShop->map(function ($item) {
+            return $item->id;
+        });
+        $status = $sellerShopId->diff($sellerShopIdCheck);
+        if (!$status->isEmpty()) {
+            $response = [
+                'status' => 400,
+                'message' => 'sorry, cannot find your shop',
+                'data' => $status->all()
             ];
+            return response()->json($response, 400);
         }
+        //
+
+        $sellerProductData = $sellerShop->map(function ($item) {
+            return $item->product;
+        });
+        $sellerProductData = $sellerProductData->flatten();
+
+        $sellerProductData = $sellerProductData->map(function ($item) {
+            $showProductData = [
+                'id' => $item->id,
+                'seller_shop_id' => $item->seller_shop_id,
+                'product_name' => $item->seller_product_name,
+                'product_price' => $item->seller_product_price,
+                'product_image' => $item->seller_product_image ?: Storage::url('public/image/default/ImageCrash.png')
+            ];
+            return $showProductData;
+        });
+
         $response = [
             'status' => 200,
-            'product' => $showProductData
+            'product' => $sellerProductData
+        ];
+
+        return response()->json($response, 200);
+    }
+
+    public function showById(...$id)
+    {
+        $sellerProductId = collect($id)->flatten();
+        $sellerProduct = seller_products::whereIn('id', $sellerProductId)->get();
+        // check shop exists
+        $sellerProductIdCheck = $sellerProduct->map(function ($item) {
+            return $item->id;
+        });
+        $status = $sellerProductId->diff($sellerProductIdCheck);
+        if (!$status->isEmpty()) {
+            $response = [
+                'status' => 400,
+                'message' => 'sorry, cannot find your shop',
+                'data' => $status->all()
+            ];
+            return response()->json($response, 400);
+        }
+        //
+
+        $sellerProductData = $sellerProduct->map(function ($item) {
+            $showProductData = [
+                'id' => $item->id,
+                'seller_shop_id' => $item->seller_shop_id,
+                'product_name' => $item->seller_product_name,
+                'product_price' => $item->seller_product_price,
+                'product_image' => $item->seller_product_image ?: Storage::url('public/image/default/ImageCrash.png')
+            ];
+            return $showProductData;
+        });
+
+        $response = [
+            'status' => 200,
+            'product' => $sellerProductData
         ];
 
         return response()->json($response, 200);
@@ -152,24 +207,12 @@ class SellerProductController extends Controller
         }
 
         $sellerData = $request->sellerData;
+        $sellerShopData = $sellerData->shop;
         $whereCond = [
-            'seller_id' => $sellerData->id,
+            'id' => $request->id
         ];
-        $sellerShopData = seller_shops::where($whereCond);
-        if (!$sellerShopData->exists()) {
-            $response = [
-                'status' => 400,
-                'message' => 'sorry, we cannot find your shop'
-            ];
-            return response()->json($response, 400);
-        }
-        $sellerShopData = $sellerShopData->first();
-        $whereCond = [
-            'id' => $request->id,
-            'seller_shop_id' => $sellerShopData->id,
-        ];
-        $sellerProductData = seller_products::where($whereCond);
-        if (!$sellerProductData->exists()) {
+        $sellerProductData = $sellerShopData->product->where('id', $request->id);
+        if ($sellerProductData->isEmpty()) {
             $response = [
                 'status' => 400,
                 'message' => 'sorry, we cannot find your product'
@@ -191,10 +234,17 @@ class SellerProductController extends Controller
         // update Product
         $status = seller_products::where($whereCond)->update($productDetail);
         $productDetail = seller_products::where($whereCond)->first();
+        $showProductData = [
+            'id' => $productDetail->id,
+            'shop_id' => $productDetail->seller_id,
+            'product_name' => $productDetail->seller_product_name,
+            'product_price' => $productDetail->seller_product_price,
+            'product_image' => $productDetail->seller_product_image ?: Storage::url('public/image/default/ImageCrash.png')
+        ];
         if ($status) {
             $response = [
                 'status' => 200,
-                'data' => $productDetail
+                'data' => $showProductData
             ];
             return response()->json($response);
         }
@@ -212,25 +262,25 @@ class SellerProductController extends Controller
         $validation = Validator::make($request->all(), [
             'id' => ['required', 'numeric']
         ]);
+        if ($validation->fails()) {
+            $response = [
+                'status' => 400,
+                'message' => $validation->errors()
+            ];
+            return response()->json($response, 400);
+        }
+
         $sellerData = $request->sellerData;
         $whereCond = [
             'seller_id' => $sellerData->id
         ];
-        $sellerShopData = seller_shops::where($whereCond);
-        if (!$sellerShopData->exists()) {
-            $response = [
-                'status' => 400,
-                'message' => 'sorry, we cannot find your shop'
-            ];
-            return response()->json($response, 400);
-        }
-        $sellerShopData =  $sellerShopData->first();
+        $sellerShopData = $sellerData->shop;
         $whereCond = [
             'id' => $request->id,
             'seller_shop_id' => $sellerShopData->id,
         ];
-        $sellerProductData = seller_products::where($whereCond);
-        if (!$sellerProductData->exists()) {
+        $sellerProductData = $sellerShopData->product->where('id', $request->id);
+        if ($sellerProductData->isEmpty()) {
             $response = [
                 'status' => 400,
                 'message' => 'sorry, we cannot find your product'

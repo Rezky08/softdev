@@ -85,9 +85,43 @@ class SellerDetailTransactionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(...$id)
     {
-        //
+        $ids = collect($id)->flatten();
+        $sellerDetailTransactions = seller_detail_transactions::whereIn('id', $ids)->get();
+
+        // // short variable name
+        // $sellerDetailTransactions = $sellerDetailTransactions->map(function ($item) {
+        //     $display = [
+        //         'id' => $item->id,
+        //         'transaction_id' => $item->seller_transaction_id,
+        //         'product_id' => $item->seller_product_id,
+        //         'product_name' => $item->seller_product_name,
+        //         'product_price' => $item->seller_product_price,
+        //         'product_qty' => $item->seller_product_qty,
+        //         'created_at' => $item->created_at->toDateTimeString()
+        //     ];
+        //     return (object) $display;
+        // });
+        // //
+
+        $sellerDetailTransactionIdChecks = $sellerDetailTransactions->map(function ($item) {
+            return $item->id;
+        });
+        $sellerDetailTransactionIdChecks = $ids->diff($sellerDetailTransactionIdChecks);
+        if (!$sellerDetailTransactionIdChecks->isEmpty()) {
+            $response = [
+                'status' => 400,
+                'message' => 'Transaction detail not found',
+                'data' => ['transaction_detail_id' => $sellerDetailTransactionIdChecks]
+            ];
+            return response()->json($response, 400);
+        }
+        $response = [
+            'status' => 200,
+            'data' => $sellerDetailTransactions
+        ];
+        return response()->json($response, 200);
     }
 
     /**

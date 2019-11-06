@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Model\CustomerDetail as customer_details;
 use App\Model\CustomerLogin as customer_logins;
+use App\Model\SellerDetail as seller_details;
+use App\Model\SellerDetailTransaction as seller_detail_transactions;
+use App\Model\SellerShop as seller_shops;
+use App\Model\SellerTransaction as seller_transactions;
 use Illuminate\Http\Request;
 use Illuminate\Session\Store;
 use Illuminate\Support\Facades\Auth;
@@ -61,5 +65,11 @@ class TesterController extends Controller
         $user = $user->first();
         $JWT = JWTAuth::fromUser($user);
         return var_dump($JWT);
+    }
+    public function checkShop()
+    {
+        $seller = seller_details::find(1);
+        $seller->shop->transaction;
+        dd($seller);
     }
 }

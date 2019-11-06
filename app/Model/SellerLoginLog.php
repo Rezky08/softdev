@@ -11,4 +11,8 @@ class SellerLoginLog extends Model
     protected $connection = 'dbmarketsellers';
     protected $table = 'seller_login_logs';
     protected $softDelete = true;
+    public function seller()
+    {
+        return $this->belongsTo('App\Model\SellerDetail', 'seller_id');
+    }
 }

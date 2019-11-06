@@ -15,4 +15,8 @@ class CustomerDetailTransaction extends Model
     {
         return $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable());
     }
+    public function transaction()
+    {
+        return $this->belongsTo('App\Model\CustomerTransaction', 'customer_transaction_id');
+    }
 }
