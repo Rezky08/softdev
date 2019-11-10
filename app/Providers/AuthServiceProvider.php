@@ -32,6 +32,7 @@ class AuthServiceProvider extends ServiceProvider
             'customer' => 'only can buy product in seller',
             'seller' => 'sell product from supplier to customer',
             'coin' => 'all user connected with it',
+            'supplier' => 'sell product to seller'
         ]);
         //
     }

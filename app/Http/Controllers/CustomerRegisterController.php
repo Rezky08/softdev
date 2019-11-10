@@ -116,28 +116,37 @@ class CustomerRegisterController extends Controller
      * @param  \App\CustomerRegister  $customerRegister
      * @return \Illuminate\Http\Response
      */
-    public function show($customerID)
+    public function show(...$customerID)
     {
-        $customerDetails = customer_details::where('id', $customerID);
-        if (!$customerDetails->exists()) {
+        $customerID = collect($customerID);
+        $customerID = $customerID->flatten();
+        $customerDetails = customer_details::whereIn('id', $customerID)->get();
+        $customerIdCheck = $customerDetails->map(function ($item) {
+            return $item->id;
+        });
+        $status = $customerID->diff($customerIdCheck);
+        if (!$status->isEmpty()) {
             $response = [
                 'status' => 404,
-                'message' => 'Data not found'
+                'message' => 'Data not found',
+                'data' => $status->all()
             ];
             return response()->json($response, 404);
         }
-        $customerDetails = $customerDetails->first();
-        $customerDetails = [
-            'id' => $customerDetails->id,
-            'username' => $customerDetails->customer_username,
-            'fullname' => $customerDetails->customer_fullname,
-            'dob' => $customerDetails->customer_dob,
-            'address' => $customerDetails->customer_address,
-            'sex' => $customerDetails->customer_sex == 0 ? 'female' : 'male',
-            'email' => $customerDetails->customer_email,
-            'phone' => $customerDetails->customer_phone,
-            'join_date' => date_format($customerDetails->created_at, 'Y-m-d H:i:s')
-        ];
+        $customerDetails = $customerDetails->map(function ($item) {
+            $item = [
+                'id' => $item->id,
+                'username' => $item->customer_username,
+                'fullname' => $item->customer_fullname,
+                'dob' => $item->customer_dob,
+                'address' => $item->customer_address,
+                'sex' => $item->customer_sex == 0 ? 'female' : 'male',
+                'email' => $item->customer_email,
+                'phone' => $item->customer_phone,
+                'join_date' => date_format($item->created_at, 'Y-m-d H:i:s')
+            ];
+            return $item;
+        });
         $response = [
             'status' => 200,
             'data' => $customerDetails

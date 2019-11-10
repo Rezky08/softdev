@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Http\Controllers\CustomerCartController;
+use App\Http\Controllers\SellerCartController;
 use App\Model\CustomerCart as customer_carts;
 use App\Model\SellerProduct as seller_products;
 use Closure;
@@ -15,67 +17,44 @@ class CartValidate
      * @param  \Closure  $next
      * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle($request, Closure $next, $scope)
     {
-        $customerData = $request->customerData;
-        $whereCond = [
-            'customer_id' => $customerData->id,
-            'customer_status' => 0
+        $userController = [
+            'seller' => new SellerCartController,
+            'customer' => new CustomerCartController,
         ];
+        $scopeTemplate  = $scope . 'Data';
+        $userData = $request->$scopeTemplate;
+        if (!$userData) {
+            $response = [
+                'status' => 401,
+                'Message' => "You're Not Authorized"
+            ];
+            return response()->json($response, 401);
+        }
+        $userController = $userController[$scope];
         if ($request->has('cart_id')) {
-            $customerCarts = customer_carts::where($whereCond)->whereIn('id', $request->cart_id)->get();
+            $cartValidation = $userController->cartValidation($request, $request->cart_id);
+            $userCarts = $userController->showById($request, $request->cart_id);
         } else {
-            $customerCarts = customer_carts::where($whereCond);
-            if (!$customerCarts->exists()) {
-                $response = [
-                    'status' => 400,
-                    'message' => 'sorry, cannot find your product. Do want to buy something product?'
-                ];
-                return response()->json($response, 400);
-            }
-            $customerCarts = $customerCarts->get();
+            $cartValidation = $userController->cartValidation($request);
+            $userCarts = $userController->index($request);
         }
-        $productId = $customerCarts->map(function ($item) {
-            return $item->customer_seller_product_id;
-        });
-        $products = seller_products::find($productId);
+        if ($userCarts->getStatusCode() != 200) {
+            return $userCarts;
+        }
+        if ($cartValidation->getStatusCode() != 200) {
+            return $cartValidation;
+        }
 
-        // check product is availabe
-        $productCheckId = $products->map(function ($item) {
-            return $item->id;
-        });
-        $status = $productId->diff($productCheckId);
-        if (!$status->isEmpty()) {
-            $status = $customerCarts->whereIn('customer_seller_product_id', $status);
-            $response = [
-                'status' => 404,
-                'message' => 'product not availabe',
-                'data' => $status->all()
-            ];
-            return response()->json($response, 404);
-        }
-        $products = $products->groupBy('id');
-        $status = $customerCarts->groupBy('customer_seller_product_id')->map(function ($item, $key) use ($products) {
-            $item = $item[0];
-            $products[$key] = $products[$key][0];
-            if ($item->customer_product_qty > $products[$key]->seller_product_stock) {
-                return $item->customer_product_name;
-                // return (object) [$item->id => $item->customer_product_name];
-            }
-        });
-        $status = $status->filter()->flatten();
-        if (!$status->isEmpty()) {
-            $response = [
-                'status' => 400,
-                'message' => 'out of stock',
-                'data' => $status->all()
-            ];
-            return response()->json($response, 400);
-        }
+        $userCarts = json_decode($userCarts->getContent())->data;
+        $userCarts = collect($userCarts);
+        $products = json_decode($cartValidation->getContent())->data;
+        $products = collect($products);
 
         // add to request
         $request->request->add([
-            'customerCartData' => $customerCarts,
+            $scope . 'CartData' => $userCarts,
             'products' => $products
         ]);
 

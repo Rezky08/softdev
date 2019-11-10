@@ -56,6 +56,17 @@ return [
             'provider' => 'sellers',
             'hash' => false,
         ],
+        'supplier' => [
+            'driver' => 'passport',
+            'provider' => 'suppliers',
+            'hash' => false,
+        ],
+        'coin' => [
+            'driver' => 'passport',
+            'provider' => 'coins',
+            'hash' => false,
+        ],
+
 
     ],
 
@@ -88,6 +99,14 @@ return [
         'sellers' => [
             'driver' => 'eloquent',
             'model' => App\Model\SellerDetail::class,
+        ],
+        'suppliers' => [
+            'driver' => 'eloquent',
+            'model' => App\Model\SupplierDetail::class,
+        ],
+        'coins' => [
+            'driver' => 'eloquent',
+            'model' => App\Model\CoinDetail::class,
         ],
 
         // 'users' => [

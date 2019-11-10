@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Model\CustomerDetailTransaction as customer_detailTransactions;
+use App\Model\SupplierLoginLog as supplier_login_logs;
 use Illuminate\Http\Request;
 
-class CustomerDetailTransactionController extends Controller
+class SupplierLoginLogController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -25,18 +25,18 @@ class CustomerDetailTransactionController extends Controller
      */
     public function store(Request $request)
     {
-        $transactionDetails = $request->transaction_details;
-        $status = customer_detailTransactions::insert($transactionDetails);
+        $loginInfo = $request->login_info;
+        $status = supplier_login_logs::insert($loginInfo);
         if (!$status) {
             $response = [
                 'status' => 500,
-                'message' => 'sorry, system overload'
+                'message' => 'Internal Server Error'
             ];
             return response()->json($response, 500);
         }
         $response = [
             'status' => 200,
-            'message' => 'item has been purchased'
+            'message' => 'Log has been created'
         ];
         return response()->json($response, 200);
     }

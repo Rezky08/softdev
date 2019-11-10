@@ -135,29 +135,37 @@ class SellerRegisterController extends Controller
      * @param  \App\SellerRegister  $sellerRegister
      * @return \Illuminate\Http\Response
      */
-    public function show($sellerID)
+    public function show(...$sellerID)
     {
-
-        $sellerDetails = seller_details::where('id', $sellerID);
-        if (!$sellerDetails->exists()) {
+        $sellerID = collect($sellerID);
+        $sellerID = $sellerID->flatten();
+        $sellerDetails = seller_details::whereIn('id', $sellerID)->get();
+        $sellerIdCheck = $sellerDetails->map(function ($item) {
+            return $item->id;
+        });
+        $status = $sellerID->diff($sellerIdCheck);
+        if (!$status->isEmpty()) {
             $response = [
                 'status' => 404,
-                'message' => 'Data not found'
+                'message' => 'Data not found',
+                'data' => $status->all()
             ];
             return response()->json($response, 404);
         }
-        $sellerDetails = $sellerDetails->first();
-        $sellerDetails = [
-            'id' => $sellerDetails->id,
-            'username' => $sellerDetails->seller_username,
-            'fullname' => $sellerDetails->seller_fullname,
-            'dob' => $sellerDetails->seller_dob,
-            'address' => $sellerDetails->seller_address,
-            'sex' => $sellerDetails->seller_sex == 0 ? 'female' : 'male',
-            'email' => $sellerDetails->seller_email,
-            'phone' => $sellerDetails->seller_phone,
-            'join_date' => date_format($sellerDetails->created_at, 'Y-m-d H:i:s')
-        ];
+        $sellerDetails = $sellerDetails->map(function ($item) {
+            $item = [
+                'id' => $item->id,
+                'username' => $item->seller_username,
+                'fullname' => $item->seller_fullname,
+                'dob' => $item->seller_dob,
+                'address' => $item->seller_address,
+                'sex' => $item->seller_sex == 0 ? 'female' : 'male',
+                'email' => $item->seller_email,
+                'phone' => $item->seller_phone,
+                'join_date' => date_format($item->created_at, 'Y-m-d H:i:s')
+            ];
+            return $item;
+        });
         $response = [
             'status' => 200,
             'data' => $sellerDetails

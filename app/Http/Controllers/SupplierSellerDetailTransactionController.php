@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Model\SellerDetailTransaction as seller_detail_transactions;
+use App\Model\SupplierSellerDetailTransaction as supplier_seller_detail_transactions;
 use Illuminate\Http\Request;
 
-class SellerDetailTransactionController extends Controller
+class SupplierSellerDetailTransactionController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -25,17 +25,17 @@ class SellerDetailTransactionController extends Controller
      */
     public function store(Request $request)
     {
-        $sellerDetailTransactions = $request->seller_detail_transactions;
-        $transactionId = $request->seller_transaction_ids;
+        $supplierDetailTransactions = $request->supplier_seller_detail_transaction;
+        $transactionId = $request->supplier_seller_transaction_ids;
         // prepare insert detail transactions
-        $transactionId->each(function ($id, $group) use ($sellerDetailTransactions) {
-            $sellerDetailTransactions[$group] = $sellerDetailTransactions[$group]->map(function ($item) use ($id) {
+        $transactionId->each(function ($id, $group) use ($supplierDetailTransactions) {
+            $supplierDetailTransactions[$group] = $supplierDetailTransactions[$group]->map(function ($item) use ($id) {
                 $transactionDetail = [
-                    'seller_transaction_id' => $id,
-                    'seller_product_id' => $item->customer_seller_product_id,
-                    'seller_product_name' => $item->customer_product_name,
-                    'seller_product_price' => $item->customer_product_price,
-                    'seller_product_qty' => $item->customer_product_qty,
+                    'supplier_seller_transaction_id' => $id,
+                    'supplier_product_id' => $item->product_id,
+                    'supplier_product_name' => $item->product_name,
+                    'supplier_product_price' => $item->product_price,
+                    'supplier_product_qty' => $item->product_qty,
                     'created_at' => date_format(now(), 'Y-m-d H:i:s'),
                     'updated_at' => date_format(now(), 'Y-m-d H:i:s')
                 ];
@@ -43,9 +43,9 @@ class SellerDetailTransactionController extends Controller
             });
         });
 
-        $sellerDetailTransactions = $sellerDetailTransactions->flatten(1);
+        $supplierDetailTransactions = $supplierDetailTransactions->flatten(1);
         // insert and check status
-        $status = seller_detail_transactions::insert($sellerDetailTransactions->all());
+        $status = supplier_seller_detail_transactions::insert($supplierDetailTransactions->all());
         if (!$status) {
             $response = [
                 'status' => 500,
@@ -55,15 +55,15 @@ class SellerDetailTransactionController extends Controller
         }
 
         // update stock
-        $sellerUpdateStocks = $sellerDetailTransactions->map(function ($item) {
+        $supplierUpdateStocks = $supplierDetailTransactions->map(function ($item) {
             $product = [
-                'seller_product_id' => $item['seller_product_id'],
-                'seller_product_qty' => $item['seller_product_qty']
+                'supplier_product_id' => $item['supplier_product_id'],
+                'supplier_product_qty' => $item['supplier_product_qty']
             ];
             return $product;
         });
-        $sellerProducts = new SellerProductController;
-        $status = $sellerProducts->updateStock($sellerUpdateStocks);
+        $supplierProducts = new SupplierProductController;
+        $status = $supplierProducts->updateStock($supplierUpdateStocks);
         if ($status->getStatusCode() != 200) {
             $response = [
                 'status' => 500,
@@ -88,38 +88,38 @@ class SellerDetailTransactionController extends Controller
     public function show(...$id)
     {
         $ids = collect($id)->flatten();
-        $sellerDetailTransactions = seller_detail_transactions::whereIn('id', $ids)->get();
+        $supplierDetailTransactions = supplier_seller_detail_transactions::whereIn('id', $ids)->get();
 
         // // short variable name
-        // $sellerDetailTransactions = $sellerDetailTransactions->map(function ($item) {
+        // $supplierDetailTransactions = $supplierDetailTransactions->map(function ($item) {
         //     $display = [
         //         'id' => $item->id,
-        //         'transaction_id' => $item->seller_transaction_id,
-        //         'product_id' => $item->seller_product_id,
-        //         'product_name' => $item->seller_product_name,
-        //         'product_price' => $item->seller_product_price,
-        //         'product_qty' => $item->seller_product_qty,
+        //         'transaction_id' => $item->supplier_seller_transaction_id,
+        //         'product_id' => $item->supplier_product_id,
+        //         'product_name' => $item->supplier_product_name,
+        //         'product_price' => $item->supplier_product_price,
+        //         'product_qty' => $item->supplier_product_qty,
         //         'created_at' => $item->created_at->toDateTimeString()
         //     ];
         //     return (object) $display;
         // });
         // //
 
-        $sellerDetailTransactionIdChecks = $sellerDetailTransactions->map(function ($item) {
+        $supplierDetailTransactionIdChecks = $supplierDetailTransactions->map(function ($item) {
             return $item->id;
         });
-        $sellerDetailTransactionIdChecks = $ids->diff($sellerDetailTransactionIdChecks);
-        if (!$sellerDetailTransactionIdChecks->isEmpty()) {
+        $supplierDetailTransactionIdChecks = $ids->diff($supplierDetailTransactionIdChecks);
+        if (!$supplierDetailTransactionIdChecks->isEmpty()) {
             $response = [
                 'status' => 400,
                 'message' => 'Transaction detail not found',
-                'data' => ['transaction_detail_id' => $sellerDetailTransactionIdChecks]
+                'data' => ['transaction_detail_id' => $supplierDetailTransactionIdChecks]
             ];
             return response()->json($response, 400);
         }
         $response = [
             'status' => 200,
-            'data' => $sellerDetailTransactions
+            'data' => $supplierDetailTransactions
         ];
         return response()->json($response, 200);
     }

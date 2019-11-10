@@ -5,11 +5,11 @@ namespace App\Model;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class CustomerDetailTransaction extends Model
+class SellerCustomerDetailTransaction extends Model
 {
     use SoftDeletes;
-    protected $connection = 'dbmarketcustomers';
-    protected $table = 'customer_detail_transactions';
+    protected $connection = 'dbmarketsellers';
+    protected $table = 'seller_customer_detail_transactions';
     protected $softDelete = true;
     public function getTableColumns()
     {
@@ -17,6 +17,6 @@ class CustomerDetailTransaction extends Model
     }
     public function transaction()
     {
-        return $this->belongsTo('App\Model\CustomerTransaction', 'customer_transaction_id');
+        return $this->belongsTo('App\Model\SellerCustomerTransaction', 'seller_customer_transaction_id');
     }
 }

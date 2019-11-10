@@ -5,11 +5,11 @@ namespace App\Model;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class CustomerTransaction extends Model
+class CustomerSellerTransaction extends Model
 {
     use SoftDeletes;
     protected $connection = 'dbmarketcustomers';
-    protected $table = 'customer_transactions';
+    protected $table = 'customer_seller_transactions';
     protected $softDelete = true;
     public function getTableColumns()
     {
@@ -21,6 +21,6 @@ class CustomerTransaction extends Model
     }
     public function detail()
     {
-        return $this->hasMany('App\Model\CustomerDetailTransaction', 'customer_transaction_id');
+        return $this->hasMany('App\Model\CustomerSellerDetailTransaction', 'customer_seller_transaction_id');
     }
 }

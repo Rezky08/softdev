@@ -5,11 +5,11 @@ namespace App\Model;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class SellerTransaction extends Model
+class SupplierSellerTransaction extends Model
 {
     use SoftDeletes;
-    protected $connection = 'dbmarketsellers';
-    protected $table = 'seller_transactions';
+    protected $connection = 'dbmarketsuppliers';
+    protected $table = 'supplier_seller_transactions';
     protected $softDelete = true;
     // protected $dates = ['created_at', 'updated_at', 'deleted_at'];
     protected $casts = [
@@ -23,10 +23,10 @@ class SellerTransaction extends Model
     }
     public function shop()
     {
-        return $this->belongsTo('App\Model\SellerShop', 'seller_shop_id');
+        return $this->belongsTo('App\Model\SupplierShop', 'supplier_shop_id');
     }
     public function detail()
     {
-        return $this->hasMany('App\Model\SellerDetailTransaction', 'seller_transaction_id');
+        return $this->hasMany('App\Model\SupplierSellerDetailTransaction', 'supplier_seller_transaction_id');
     }
 }

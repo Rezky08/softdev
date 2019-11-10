@@ -72,4 +72,15 @@ class TesterController extends Controller
         $seller->shop->transaction;
         dd($seller);
     }
+    public function supplierCheck()
+    {
+        $customer = Auth::guard('supplier')->user();
+        $response = [
+            'message' => Str::random(60),
+            'data' => $customer,
+            'scopes' => $customer->tokenCan('supplier')
+
+        ];
+        return response()->json($response, 200);
+    }
 }

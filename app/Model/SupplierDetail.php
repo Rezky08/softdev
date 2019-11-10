@@ -9,32 +9,32 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticable;
 
-class SellerDetail extends Authenticable
+class SupplierDetail extends Authenticable
 {
     use Notifiable, HasApiTokens, SoftDeletes;
 
-    protected $connection = 'dbmarketsellers';
-    protected $table = 'seller_details';
+    protected $connection = 'dbmarketsuppliers';
+    protected $table = 'supplier_details';
     protected $softDelete = true;
 
     public function getTableColumns()
     {
         return $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable());
     }
-    public function shop()
-    {
-        return $this->hasOne('App\Model\SellerShop', 'seller_id');
-    }
     public function login()
     {
-        return $this->hasOne('App\Model\SellerLogin', 'seller_id');
+        return $this->hasOne('App\Model\SupplierLogin', 'supplier_id');
     }
     public function loginLogs()
     {
-        return $this->hasMany('App\Model\SellerLoginLog', 'seller_id');
+        return $this->hasMany('App\Model\SupplierLoginLog', 'supplier_id');
     }
-    public function cart()
+    public function product()
     {
-        return $this->hasMany('App\Model\SellerCart', 'seller_id');
+        return $this->hasMany('App\Model\SupplierProduct', 'supplier_id');
+    }
+    public function transaction()
+    {
+        return $this->hasMany('App\Model\SupplierTransaction', 'supplier_id');
     }
 }

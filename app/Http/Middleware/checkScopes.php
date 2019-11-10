@@ -17,7 +17,7 @@ class checkScopes
      */
     public function handle($request, Closure $next, ...$scopes)
     {
-        $guard = ['customer', 'seller'];
+        $guard = ['customer', 'seller', 'supplier'];
         foreach ($scopes as $scopesTemplate) {
             $user = Auth::guard($scopesTemplate)->user();
             if ($user) {

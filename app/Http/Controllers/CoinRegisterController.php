@@ -31,6 +31,7 @@ class CoinRegisterController extends Controller
                 'sex' => $detail->coin_sex == 0 ? 'female' : 'male',
                 'email' => $detail->coin_email,
                 'phone' => $detail->coin_phone,
+                'coin_account_type' => $detail->coin_account_type,
                 'join_date' => date_format($detail->created_at, 'Y-m-d H:i:s')
             ];
         }
@@ -128,28 +129,76 @@ class CoinRegisterController extends Controller
      * @param  \App\CoinRegister  $coinRegister
      * @return \Illuminate\Http\Response
      */
-    public function show($coinID)
+    public function show(...$coinID)
     {
-        $coinDetails = coin_details::where('id', $coinID);
-        if (!$coinDetails->exists()) {
+        $coinID = collect($coinID);
+        $coinID = $coinID->flatten();
+        $coinDetails = coin_details::whereIn('id', $coinID)->get();
+        $coinIdCheck = $coinDetails->map(function ($item) {
+            return $item->id;
+        });
+        $status = $coinID->diff($coinIdCheck);
+        if (!$status->isEmpty()) {
             $response = [
                 'status' => 404,
-                'message' => 'Data not found'
+                'message' => 'Data not found',
+                'data' => $status->all()
             ];
             return response()->json($response, 404);
         }
-        $coinDetails = $coinDetails->first();
-        $coinDetails = [
-            'id' => $coinDetails->id,
-            'username' => $coinDetails->coin_username,
-            'fullname' => $coinDetails->coin_fullname,
-            'dob' => $coinDetails->coin_dob,
-            'address' => $coinDetails->coin_address,
-            'sex' => $coinDetails->coin_sex == 0 ? 'female' : 'male',
-            'email' => $coinDetails->coin_email,
-            'phone' => $coinDetails->coin_phone,
-            'join_date' => date_format($coinDetails->created_at, 'Y-m-d H:i:s')
+        $coinDetails = $coinDetails->map(function ($item) {
+            $item = [
+                'id' => $item->id,
+                'username' => $item->coin_username,
+                'fullname' => $item->coin_fullname,
+                'dob' => $item->coin_dob,
+                'address' => $item->coin_address,
+                'sex' => $item->coin_sex == 0 ? 'female' : 'male',
+                'email' => $item->coin_email,
+                'phone' => $item->coin_phone,
+                'join_date' => date_format($item->created_at, 'Y-m-d H:i:s')
+            ];
+            return $item;
+        });
+        $response = [
+            'status' => 200,
+            'data' => $coinDetails
         ];
+        return response()->json($response, 200);
+    }
+
+    public function showByUsername(...$coinUsername)
+    {
+        $coinUsername = collect($coinUsername);
+        $coinUsername = $coinUsername->flatten();
+        $coinDetails = coin_details::whereIn('coin_username', $coinUsername)->get();
+        $coinUsernameCheck = $coinDetails->map(function ($item) {
+            return $item->coin_username;
+        });
+        $status = $coinUsername->diff($coinUsernameCheck);
+        if (!$status->isEmpty()) {
+            $response = [
+                'status' => 404,
+                'message' => 'Data not found',
+                'data' => $status->all()
+            ];
+            return response()->json($response, 404);
+        }
+        $coinDetails = $coinDetails->map(function ($item) {
+            $item = [
+                'id' => $item->id,
+                'username' => $item->coin_username,
+                'fullname' => $item->coin_fullname,
+                'dob' => $item->coin_dob,
+                'address' => $item->coin_address,
+                'sex' => $item->coin_sex == 0 ? 'female' : 'male',
+                'email' => $item->coin_email,
+                'phone' => $item->coin_phone,
+                'accoun_type' => $item->coin_account_type,
+                'join_date' => date_format($item->created_at, 'Y-m-d H:i:s')
+            ];
+            return $item;
+        });
         $response = [
             'status' => 200,
             'data' => $coinDetails
