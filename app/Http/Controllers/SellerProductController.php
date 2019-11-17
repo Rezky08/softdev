@@ -52,7 +52,7 @@ class SellerProductController extends Controller
             'product_name' => ['required'],
             'product_price' => ['required', 'numeric'],
             'product_stock' => ['required', 'numeric'],
-            'product_image' => ['required', 'mimes:png,jpg,bmp,jpeg']
+            'product_image' => ['mimes:png,jpg,bmp,jpeg']
         ]);
         if ($validation->fails()) {
             $response = [

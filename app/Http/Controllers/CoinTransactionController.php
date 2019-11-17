@@ -9,6 +9,7 @@ use App\Model\SellerDetail as seller_details;
 use App\Model\SellerShop as seller_shops;
 use App\Model\SellerTransaction as seller_transactions;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class CoinTransactionController extends Controller
 {
@@ -30,10 +31,46 @@ class CoinTransactionController extends Controller
      */
     public function store(Request $request)
     {
-        $coinTransactions = $request->coin_transactions;
+
+        // Get request
+        if ($request->has('coin_transactions')) {
+            $coinTransactions = $request->coin_transactions;
+        } else {
+            // validate Request
+            $validation = Validator::make($request->all(), [
+                'username_source' => ['required'],
+                'username_destination' => ['required'],
+                'transaction_balance' => ['required', 'numeric', 'min:0']
+            ]);
+            if ($validation->fails()) {
+                $response = [
+                    'status' => 400,
+                    'message' => $validation->errors()
+                ];
+                return response()->json($response, 400);
+            }
+            //
+
+            // preparation
+            $coinTransactions[] = (object) [
+                'username_source' => $request->username_source,
+                'username_destination' => $request->username_destination,
+                'transaction_balance' => $request->transaction_balance
+            ];
+            //
+        }
+        //
+
+        $coinTransactions = collect($coinTransactions);
+        $coinUsername = $coinTransactions->map(function ($item) {
+            $item = collect($item);
+            $item = $item->except(['transaction_balance']);
+            return $item;
+        });
+
         // get coin data data
         $coin = new CoinRegisterController;
-        $status = $coin->index();
+        $status = $coin->showByUsername($coinUsername);
         if ($status->getStatusCode() != 200) {
             return $status;
         }

@@ -49,9 +49,10 @@ Route::get('/seller/{shopId}/product', 'SellerProductController@showByShop');
 Route::get('/seller/product/{productId}', 'SellerProductController@showById');
 Route::get('/seller/profile', 'SellerRegisterController@index');
 Route::get('/seller/{id}/profile', 'SellerRegisterController@show');
-Route::get('/seller/transaction/{id}', 'SellerCustomerTransactionController@show');
 
 Route::group(['middleware' => ['checkScopes:seller']], function () {
+    Route::get('/seller/transaction/{id}', 'SellerCustomerTransactionController@show');
+    Route::get('/seller/transaction', 'SellerCustomerTransactionController@index');
     Route::post('/seller/purchase', 'SellerSupplierTransactionController@store')->middleware(['cartValidate:seller']);
     Route::get('/seller/cart', 'SellerCartController@index');
     Route::get('/seller/cart/{cartId}', 'SellerCartController@show');
@@ -83,3 +84,4 @@ Route::group(['middleware' => ['checkScopes:supplier']], function () {
 //
 Route::get('/test', 'TesterController@checkShop');
 Route::get('/test/supplier', 'TesterController@supplierCheck');
+Route::post('/test/sendbalance', 'CoinTransactionController@store');

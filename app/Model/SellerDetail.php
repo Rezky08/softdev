@@ -37,4 +37,8 @@ class SellerDetail extends Authenticable
     {
         return $this->hasMany('App\Model\SellerCart', 'seller_id');
     }
+    public function transaction()
+    {
+        return $this->hasMany('App\Model\SellerSupplierTransaction','seller_id');
+    }
 }

@@ -13,8 +13,14 @@ class SellerCustomerTransactionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    { }
+    public function index(Request $request)
+    {
+        $sellerData = $request->sellerData;
+        $sellerShop = $sellerData->shop;
+        $shopCustomerTransaction = $sellerShop->transaction;
+        $sellerSupplierTransaction = $sellerData->transaction;
+        return dd($shopCustomerTransaction,$sellerSupplierTransaction);
+    }
 
     /**
      * Store a newly created resource in storage.

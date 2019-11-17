@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * This file handle supplier seller transaction, only transaction not other action
+ */
 namespace App\Http\Controllers;
 
 use App\Model\SupplierSellerDetailTransaction as supplier_seller_detail_transaction;
@@ -13,8 +15,10 @@ class SupplierSellerTransactionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    { }
+    public function index(Request $request)
+    {
+
+    }
 
     /**
      * Store a newly created resource in storage.
