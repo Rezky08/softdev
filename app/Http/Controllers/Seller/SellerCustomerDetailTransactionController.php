@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Seller;
+
+use App\Http\Controllers\Controller;
 
 use App\Model\SellerCustomerDetailTransaction as seller_customer_detail_transactions;
 use Illuminate\Http\Request;

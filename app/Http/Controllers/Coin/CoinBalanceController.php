@@ -1,6 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Coin;
+
+use App\Http\Controllers\Controller;
+
 
 use App\Model\CoinBalance as coin_balances;
 use App\Model\CoinDetail as coin_details;

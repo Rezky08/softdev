@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Seller;
 
-use App\Model\CustomerSellerDetailTransaction as customer_seller_detail_transaction;
+use App\Http\Controllers\Controller;
+
+use App\Model\SellerSupplierDetailTransaction as seller_supplier_detail_transaction;
 use Illuminate\Http\Request;
 
-class CustomerSellerDetailTransactionController extends Controller
+class SellerSupplierDetailTransactionController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -28,18 +30,18 @@ class CustomerSellerDetailTransactionController extends Controller
         $transactionDetails = $request->transaction_details;
         $transactionDetails = $transactionDetails->map(function ($item) {
             $item = [
-                'customer_seller_shop_id' => $item->shop_id,
-                'customer_seller_product_id' => $item->product_id,
-                'customer_product_name' => $item->product_name,
-                'customer_product_price' => $item->product_price,
-                'customer_seller_transaction_id' => $item->customer_seller_transaction_id,
-                'customer_product_qty' => $item->product_qty,
+                'seller_supplier_id' => $item->supplier_id,
+                'seller_supplier_product_id' => $item->product_id,
+                'seller_product_name' => $item->product_name,
+                'seller_product_price' => $item->product_price,
+                'seller_supplier_transaction_id' => $item->seller_supplier_transaction_id,
+                'seller_product_qty' => $item->product_qty,
                 'created_at' => date_format(now(), 'Y-m-d H:i:s'),
                 'updated_at' => date_format(now(), 'Y-m-d H:i:s')
             ];
             return $item;
         });
-        $status = customer_seller_detail_transaction::insert($transactionDetails->toArray());
+        $status = seller_supplier_detail_transaction::insert($transactionDetails->toArray());
         if (!$status) {
             $response = [
                 'status' => 500,

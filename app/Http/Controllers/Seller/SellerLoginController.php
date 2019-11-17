@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Seller;
+
+use App\Http\Controllers\Controller;
 
 // use App\SellerLogin;
 
 use App\Model\SellerDetail as seller_details;
 use App\Model\SellerLogin as seller_logins;
-use App\Model\SellerLoginLog as seller_login_logs;
-use App\Model\SellerShop as seller_shops;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;

@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Supplier;
+
+use App\Http\Controllers\Controller;
 
 use App\SupplierRegister;
 use App\Model\SupplierDetail as supplier_details;
@@ -59,19 +61,14 @@ class SupplierRegisterController extends Controller
      */
     public function store(Request $request)
     {
-        // create coin account
-        $request->request->add(['account_type' => 3]);
-        $coinDetails = new CoinRegisterController;
-        $status = $coinDetails->store($request);
-        if ($status->getStatusCode() != 200) {
-            return $status;
-        }
-
         // input validation
         $validation = Validator::make($request->all(), [
             'username' => ['required', 'unique:dbmarketsuppliers.supplier_logins,supplier_username', 'unique:dbmarketsellers.seller_logins,seller_username', 'unique:dbmarketcustomers.customer_logins,customer_username'],
             'password' => ['required', 'min:8', 'max:12', 'regex:/^(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*[\d]).{8,12}$/'],
-            'email' => ['required', 'email', 'unique:dbmarketsuppliers.supplier_details,supplier_email', 'unique:dbmarketsellers.seller_details,seller_email', 'unique:dbmarketcustomers.customer_details,customer_email']
+            'email' => ['required', 'email', 'unique:dbmarketsuppliers.supplier_details,supplier_email', 'unique:dbmarketsellers.seller_details,seller_email', 'unique:dbmarketcustomers.customer_details,customer_email'],
+            'customer_dob' => ['date'],
+            'customer_sex' => ['boolean'],
+            'customer_phone' => ['numeric'],
         ]);
         if ($validation->fails()) {
             $response = [

@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Supplier;
+
+use App\Http\Controllers\Controller;
 
 use App\Model\SupplierDetail as supplier_details;
 use App\Model\SupplierLogin as supplier_logins;
@@ -204,7 +206,7 @@ class SupplierProductController extends Controller
             'product_name' => ['required'],
             'product_price' => ['required', 'numeric'],
             'product_stock' => ['required', 'numeric'],
-            'product_image' => ['required', 'image', 'mimes:png,jpg,bmp,jpeg', 'max:102400']
+            'product_image' => ['image', 'mimes:png,jpg,bmp,jpeg', 'max:102400']
         ]);
         if ($validation->fails()) {
             $response = [
@@ -235,8 +237,10 @@ class SupplierProductController extends Controller
             'updated_at' => date_format(now(), 'Y-m-d H:i:s')
         ];
         $productImage = $request->file('product_image');
-        $productImagePath = Storage::url($productImage->store('public/image/suppliers/' . $supplierData->supplier_name));
-        $productDetail['supplier_product_image'] = $productImagePath;
+        if ($productImage != null) {
+            $productImagePath = Storage::url($productImage->store('public/image/suppliers/' . $supplierData->supplier_name));
+            $productDetail['supplier_product_image'] = $productImagePath;
+        }
 
         // update Product
         $status = supplier_products::where($whereCond)->update($productDetail);

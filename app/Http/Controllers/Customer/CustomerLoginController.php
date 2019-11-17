@@ -1,19 +1,20 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Customer;
 
-// use App\SupplierLogin;
+use App\Http\Controllers\Controller;
 
-use App\Model\SupplierDetail as supplier_details;
-use App\Model\SupplierLogin as supplier_logins;
-use App\Model\SupplierLoginLog as supplier_login_logs;
-use App\Model\SupplierShop as supplier_shops;
+// use App\CustomerLogin;
+
+use App\Model\CustomerDetail as customer_details;
+use App\Model\CustomerLogin as customer_logins;
+use App\Model\CustomerLoginLog as customer_login_logs;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Validator;
 
-class SupplierLoginController extends Controller
+class CustomerLoginController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -22,17 +23,28 @@ class SupplierLoginController extends Controller
      */
     public function index()
     {
-        $supplierData = Auth::guard('supplier')->user();
-        if (!$supplierData) {
+        $customerData = Auth::guard('customer')->user();
+        if (!$customerData) {
             $response = [
                 'status' => 401,
                 'message' => "You're Not Authorized"
             ];
             return response()->json($response, 401);
         }
+        $customerData = [
+            'id' => $customerData->id,
+            'username' => $customerData->customer_username,
+            'fullname' => $customerData->customer_fullname,
+            'dob' => $customerData->customer_dob,
+            'address' => $customerData->customer_address,
+            'sex' => $customerData->customer_sex == 0 ? 'female' : 'male',
+            'email' => $customerData->customer_email,
+            'phone' => $customerData->customer_phone,
+            'join_date' => date_format($customerData->created_at, 'Y-m-d H:i:s')
+        ];
         $response = [
             'status' => 200,
-            'data' => $supplierData
+            'data' => $customerData
         ];
         return response()->json($response, 200);
     }
@@ -44,31 +56,29 @@ class SupplierLoginController extends Controller
      */
     public function create(Request $request)
     {
-        $supplierID = $request->supplier_id;
-        $supplierLogin = [
-            'supplier_username' => $request->input('username'),
-            'supplier_password' => Hash::make($request->input('password')),
-            'supplier_status' => 1,
-            'supplier_id' => $supplierID,
+        $customerID = $request->customer_id;
+        $customerLogin = [
+            'customer_username' => $request->input('username'),
+            'customer_password' => Hash::make($request->input('password')),
+            'customer_status' => 1,
+            'customer_id' => $customerID,
             'created_at' => date_format(now(), 'Y-m-d H:i:s'),
             'updated_at' => date_format(now(), 'Y-m-d H:i:s')
         ];
-        $status = supplier_logins::insert($supplierLogin);
+        $status = customer_logins::insert($customerLogin);
         if (!$status) {
             $response = [
                 'status' => 500,
-                'message' => 'Internal Server Error',
+                'message' => 'Internal Server Error'
             ];
             return response()->json($response, 500);
         }
-
         $response = [
             'status' => 200,
-            'message' => 'Login account has been created',
+            'message' => 'Login account has been created'
         ];
         return response()->json($response, 200);
     }
-
 
     /**
      * Store a newly created resource in storage.
@@ -93,52 +103,54 @@ class SupplierLoginController extends Controller
 
         $username_input = $request->username;
         $password_input = $request->password;
-        $supplierLogin  = supplier_details::where('supplier_details.supplier_username', $username_input)->leftJoin('supplier_logins', 'supplier_details.supplier_username', '=', 'supplier_logins.supplier_username');
-        if (!$supplierLogin->exists()) {
+        $customerLogin  = customer_details::where('customer_details.customer_username', $username_input)->leftJoin('customer_logins', 'customer_details.customer_username', '=', 'customer_logins.customer_username');
+        if (!$customerLogin->exists()) {
+            // Redirect to login page again
             $response = [
                 'status' => 403,
                 'message' => 'You have entered an invalid username or password'
             ];
             return response()->json($response, 403);
         }
-        $supplierLogin = $supplierLogin->first();
+        $customerLogin = $customerLogin->first();
         $loginInfo = [
-            'supplier_id' => $supplierLogin->supplier_id,
-            'supplier_username' => $supplierLogin->supplier_username,
+            'customer_id' => $customerLogin->customer_id,
+            'customer_username' => $customerLogin->customer_username,
             'created_at' => date_format(now(), 'Y-m-d H:i:s'),
             'updated_at' => date_format(now(), 'Y-m-d H:i:s')
         ];
-        if (Hash::check($password_input, $supplierLogin->supplier_password)) {
+        if (Hash::check($password_input, $customerLogin->customer_password)) {
             $loginInfo['login_success'] = 1;
             $request->request->add(['login_info' => $loginInfo]);
 
             // create login log
-            $supplierLoginLog = new SupplierLoginLogController;
-            $status = $supplierLoginLog->store($request);
+            $customerLoginLog = new CustomerLoginLogController;
+            $status = $customerLoginLog->store($request);
+            //
             if ($status->getStatusCode() != 200) {
                 return $status;
             }
-            //
 
-            $supplierData = $supplierLogin;
+            $customerData = $customerLogin;
             $response = [
                 'status' => 200,
                 // 'data' => $loginData,
-                'token' => $supplierData->createToken('login_token', ['supplier'])->accessToken,
+                'token' => $customerData->createToken('login_token', ['customer'])->accessToken,
             ];
             return response()->json($response, 200);
         }
+        // Redirect to login page again
 
         $loginInfo['login_success'] = 0;
         $request->request->add(['login_info' => $loginInfo]);
 
         // create login log
-        $supplierLoginLog = new SupplierLoginLogController;
-        $status = $supplierLoginLog->store($request);
+        $customerLoginLog = new CustomerLoginLogController;
+        $status = $customerLoginLog->store($request);
+        //
         if ($status->getStatusCode() != 200) {
             return $status;
         }
-        //
 
         $response = [
             'status' => 403,
@@ -150,10 +162,10 @@ class SupplierLoginController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\SupplierLogin  $supplierLogin
+     * @param  \App\CustomerLogin  $customerLogin
      * @return \Illuminate\Http\Response
      */
-    public function show(SupplierLogin $supplierLogin)
+    public function show(CustomerLogin $customerLogin)
     {
         //
     }
@@ -161,10 +173,10 @@ class SupplierLoginController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\SupplierLogin  $supplierLogin
+     * @param  \App\CustomerLogin  $customerLogin
      * @return \Illuminate\Http\Response
      */
-    public function edit(SupplierLogin $supplierLogin)
+    public function edit(CustomerLogin $customerLogin)
     {
         //
     }
@@ -173,10 +185,10 @@ class SupplierLoginController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\SupplierLogin  $supplierLogin
+     * @param  \App\CustomerLogin  $customerLogin
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, SupplierLogin $supplierLogin)
+    public function update(Request $request, CustomerLogin $customerLogin)
     {
         //
     }
@@ -184,13 +196,13 @@ class SupplierLoginController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\SupplierLogin  $supplierLogin
+     * @param  \App\CustomerLogin  $customerLogin
      * @return \Illuminate\Http\Response
      */
     public function destroy(Request $request)
     {
-        $supplierData = $request->supplierData;
-        if ($supplierData->token()->revoke()) {
+        $customerData = $request->customerData;
+        if ($customerData->token()->revoke()) {
             $response = [
                 'status' => 200,
                 'message' => 'You Have Logged Out'

@@ -24,62 +24,62 @@ Route::pattern('shopId', '[0-9]+');
 //
 
 // Route customer
-Route::post('/customer/login', 'CustomerLoginController@store');
-Route::post('/customer/register', 'CustomerRegisterController@store');
-Route::get('/customer/profile', 'CustomerRegisterController@index');
-Route::get('/customer/{customerId}/profile', 'CustomerRegisterController@show');
+Route::post('/customer/login', 'Customer\CustomerLoginController@store');
+Route::post('/customer/register', 'Integrated\CustomerRegisterController@store');
+Route::get('/customer/profile', 'Customer\CustomerRegisterController@index');
+Route::get('/customer/{customerId}/profile', 'Customer\CustomerRegisterController@show');
 
 Route::group(['middleware' => ['checkScopes:customer']], function () {
-    Route::post('/customer/purchase', 'CustomerSellerTransactionController@store')->middleware(['cartValidate:customer']);
-    Route::get('/customer', 'CustomerLoginController@index');
-    Route::get('/customer/cart', 'CustomerCartController@index');
-    Route::get('/customer/cart/{cartId}', 'CustomerCartController@show');
-    Route::post('/customer/cart', 'CustomerCartController@store');
-    Route::put('/customer/cart', 'CustomerCartController@update');
-    Route::delete('/customer/cart', 'CustomerCartController@destroy');
-    Route::delete('/customer/logout', 'CustomerLoginController@destroy');
+    Route::post('/customer/purchase', 'Integrated\CustomerTransactionController@store')->middleware(['cartValidate:customer']);
+    Route::get('/customer', 'Customer\CustomerLoginController@index');
+    Route::get('/customer/cart', 'Customer\CustomerCartController@index');
+    Route::get('/customer/cart/{cartId}', 'Customer\CustomerCartController@show');
+    Route::post('/customer/cart', 'Customer\CustomerCartController@store');
+    Route::put('/customer/cart', 'Customer\CustomerCartController@update');
+    Route::delete('/customer/cart', 'Customer\CustomerCartController@destroy');
+    Route::delete('/customer/logout', 'Customer\CustomerLoginController@destroy');
 });
 //
 
 // Route seller
-Route::post('/seller/login', 'SellerLoginController@store');
-Route::post('/seller/register', 'SellerRegisterController@store');
-Route::get('/seller/product', 'SellerProductController@index');
-Route::get('/seller/{shopId}/product', 'SellerProductController@showByShop');
-Route::get('/seller/product/{productId}', 'SellerProductController@showById');
-Route::get('/seller/profile', 'SellerRegisterController@index');
-Route::get('/seller/{id}/profile', 'SellerRegisterController@show');
+Route::post('/seller/login', 'Seller\SellerLoginController@store');
+Route::post('/seller/register', 'Integrated\SellerRegisterController@store');
+Route::get('/seller/product', 'Seller\SellerProductController@index');
+Route::get('/seller/{shopId}/product', 'Seller\SellerProductController@showByShop');
+Route::get('/seller/product/{productId}', 'Seller\SellerProductController@showById');
+Route::get('/seller/profile', 'Seller\SellerRegisterController@index');
+Route::get('/seller/{id}/profile', 'Seller\SellerRegisterController@show');
 
 Route::group(['middleware' => ['checkScopes:seller']], function () {
-    Route::get('/seller/transaction/{id}', 'SellerCustomerTransactionController@show');
-    Route::get('/seller/transaction', 'SellerCustomerTransactionController@index');
-    Route::post('/seller/purchase', 'SellerSupplierTransactionController@store')->middleware(['cartValidate:seller']);
-    Route::get('/seller/cart', 'SellerCartController@index');
-    Route::get('/seller/cart/{cartId}', 'SellerCartController@show');
-    Route::post('/seller/cart', 'SellerCartController@store');
-    Route::put('/seller/cart', 'SellerCartController@update');
-    Route::delete('/seller/cart', 'SellerCartController@destroy');
-    Route::get('/seller', 'sellerLoginController@index');
-    Route::delete('/seller/logout', 'SellerLoginController@destroy');
-    Route::post('/seller/product', 'SellerProductController@store');
-    Route::put('/seller/product', 'SellerProductController@update');
-    Route::delete('/seller/product', 'SellerProductController@destroy');
+    Route::get('/seller/transaction/{id}', 'Seller\SellerCustomerTransactionController@show');
+    Route::get('/seller/transaction', 'Seller\SellerCustomerTransactionController@index');
+    Route::post('/seller/purchase', 'Integrated\SellerTransactionController@store')->middleware(['cartValidate:seller']);
+    Route::get('/seller/cart', 'Seller\SellerCartController@index');
+    Route::get('/seller/cart/{cartId}', 'Seller\SellerCartController@show');
+    Route::post('/seller/cart', 'Seller\SellerCartController@store');
+    Route::put('/seller/cart', 'Seller\SellerCartController@update');
+    Route::delete('/seller/cart', 'Seller\SellerCartController@destroy');
+    Route::get('/seller', 'Seller\sellerLoginController@index');
+    Route::delete('/seller/logout', 'Seller\SellerLoginController@destroy');
+    Route::post('/seller/product', 'Seller\SellerProductController@store');
+    Route::put('/seller/product', 'Seller\SellerProductController@update');
+    Route::delete('/seller/product', 'Seller\SellerProductController@destroy');
 });
 //
 
 // Route Supplier
-Route::post('/supplier/login', 'SupplierLoginController@store');
-Route::post('/supplier/register', 'SupplierRegisterController@store');
-Route::get('/supplier/product', 'SupplierProductController@index');
-Route::get('/supplier/{shopId}/product', 'SupplierProductController@showByShop');
-Route::get('/supplier/product/{productId}', 'SupplierProductController@showById');
+Route::post('/supplier/login', 'Supplier\SupplierLoginController@store');
+Route::post('/supplier/register', 'Integrated\SupplierRegisterController@store');
+Route::get('/supplier/product', 'Supplier\SupplierProductController@index');
+Route::get('/supplier/{shopId}/product', 'Supplier\SupplierProductController@showByShop');
+Route::get('/supplier/product/{productId}', 'Supplier\SupplierProductController@showById');
 
 Route::group(['middleware' => ['checkScopes:supplier']], function () {
-    Route::get('/supplier', 'SupplierLoginController@index');
-    Route::delete('/supplier/logout', 'SupplierLoginController@destroy');
-    Route::post('/supplier/product', 'SupplierProductController@store');
-    Route::put('/supplier/product', 'SupplierProductController@update');
-    Route::delete('/supplier/product', 'SupplierProductController@destroy');
+    Route::get('/supplier', 'Supplier\SupplierLoginController@index');
+    Route::delete('/supplier/logout', 'Supplier\SupplierLoginController@destroy');
+    Route::post('/supplier/product', 'Supplier\SupplierProductController@store');
+    Route::put('/supplier/product', 'Supplier\SupplierProductController@update');
+    Route::delete('/supplier/product', 'Supplier\SupplierProductController@destroy');
 });
 //
 Route::get('/test', 'TesterController@checkShop');

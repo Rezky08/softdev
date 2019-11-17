@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Http\Controllers\Controller;
 
 use App\Model\CustomerDetail as customer_details;
 use App\Model\CustomerLogin as customer_logins;

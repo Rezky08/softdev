@@ -2,8 +2,8 @@
 
 namespace App\Http\Middleware;
 
-use App\Http\Controllers\CustomerCartController;
-use App\Http\Controllers\SellerCartController;
+use App\Http\Controllers\Customer\CustomerCartController;
+use App\Http\Controllers\Seller\SellerCartController;
 use App\Model\CustomerCart as customer_carts;
 use App\Model\SellerProduct as seller_products;
 use Closure;

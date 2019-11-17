@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Seller;
+
+use App\Http\Controllers\Controller;
 
 use App\Model\SellerShop as seller_shops;
 use Illuminate\Http\Request;

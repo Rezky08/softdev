@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Coin;
+
+use App\Http\Controllers\Controller;
 
 use App\Model\CoinDetail as coin_details;
 use App\Model\CoinTransaction as coin_transactions;
 use App\Model\CustomerDetail as customer_details;
-use App\Model\SellerDetail as seller_details;
 use App\Model\SellerShop as seller_shops;
-use App\Model\SellerTransaction as seller_transactions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 

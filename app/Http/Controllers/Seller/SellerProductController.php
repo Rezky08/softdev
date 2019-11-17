@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Seller;
 
-use App\Model\SellerLogin as seller_logins;
+use App\Http\Controllers\Controller;
+
 use App\Model\SellerProduct as seller_products;
 use App\Model\SellerShop as seller_shops;
 use Illuminate\Http\Request;
@@ -22,7 +23,7 @@ class SellerProductController extends Controller
         $sellerProductData  = $sellerProductData->map(function ($item) {
             $showProductData = [
                 'id' => $item->id,
-                'shop_id' => $item->seller_id,
+                'shop_id' => $item->seller_shop_id,
                 'product_name' => $item->seller_product_name,
                 'product_price' => $item->seller_product_price,
                 'product_stock' => $item->seller_product_stock,
@@ -124,7 +125,6 @@ class SellerProductController extends Controller
             return $item->product;
         });
         $sellerProductData = $sellerProductData->flatten();
-
         $sellerProductData = $sellerProductData->map(function ($item) {
             $showProductData = [
                 'id' => $item->id,
@@ -199,7 +199,7 @@ class SellerProductController extends Controller
             'product_name' => ['required'],
             'product_price' => ['required', 'numeric'],
             'product_stock' => ['required', 'numeric'],
-            'product_image' => ['required', 'image', 'mimes:png,jpg,bmp,jpeg', 'max:102400']
+            'product_image' => ['image', 'mimes:png,jpg,bmp,jpeg', 'max:102400']
         ]);
         if ($validation->fails()) {
             $response = [
@@ -231,15 +231,17 @@ class SellerProductController extends Controller
             'updated_at' => date_format(now(), 'Y-m-d H:i:s')
         ];
         $productImage = $request->file('product_image');
-        $productImagePath = Storage::url($productImage->store('public/image/sellers/' . $sellerShopData->seller_shop_name));
-        $productDetail['seller_product_image'] = $productImagePath;
+        if ($productImage != null) {
+            $productImagePath = Storage::url($productImage->store('public/image/sellers/' . $sellerShopData->seller_shop_name));
+            $productDetail['seller_product_image'] = $productImagePath;
+        }
 
         // update Product
         $status = seller_products::where($whereCond)->update($productDetail);
         $productDetail = seller_products::where($whereCond)->first();
         $showProductData = [
             'id' => $productDetail->id,
-            'shop_id' => $productDetail->seller_id,
+            'shop_id' => $productDetail->seller_shop_id,
             'product_name' => $productDetail->seller_product_name,
             'product_price' => $productDetail->seller_product_price,
             'product_stock' => $productDetail->seller_product_stock,
@@ -346,6 +348,20 @@ class SellerProductController extends Controller
     {
         $productId = collect($productId);
         $productId = $productId->flatten();
+
+        // check type of input
+        $productTypeCheck = $productId->first();
+        $productTypeCheck = collect($productTypeCheck);
+        $productTypeCheck = $productTypeCheck->toArray();
+        $productTypeCheck = collect($productTypeCheck)->has(['product_qty']);
+        $productRequest = null;
+        if ($productTypeCheck) {
+            $productRequest = $productId;
+            $productId = $productId->map(function ($item) {
+                return $item->product_id;
+            });
+        }
+
         $status = $this->availabeCheck($productId);
         if ($status->getStatusCode() != 200) {
             return $status;
@@ -362,11 +378,22 @@ class SellerProductController extends Controller
             ];
             return $item;
         });
-        $status = $product->map(function ($item) {
-            if ($item->product_stock <= 0) {
-                return $item;
-            }
-        });
+
+        if ($productRequest != null) {
+            $status = $product->map(function ($item) use ($productRequest) {
+                $product = $productRequest->where('product_id', $item->id)->first();
+                if ($item->product_stock - $product->product_qty < 0) {
+                    return $item;
+                }
+            });
+        } else {
+            $status = $product->map(function ($item) {
+                if ($item->product_stock <= 0) {
+                    return $item;
+                }
+            });
+        }
+
         $status = $status->filter();
         if (!$status->isEmpty()) {
             $response = [

@@ -1,16 +1,14 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Customer;
 
-use App\Model\SellerCart as seller_carts;
-use App\Model\SellerDetail as seller_details;
-use App\Model\SellerLogin as seller_logins;
-use App\Model\SupplierProduct as supplier_products;
-use App\Model\SupplierShop as supplier_shops;
+use App\Http\Controllers\Seller\SellerProductController as SellerProduct;
+use App\Http\Controllers\Controller;
+use App\Model\CustomerCart as customer_carts;
 use Illuminate\Http\Request;
 use Validator;
 
-class SellerCartController extends Controller
+class CustomerCartController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -19,45 +17,45 @@ class SellerCartController extends Controller
      */
     public function index(Request $request)
     {
-        $sellerData = $request->sellerData;
-        $sellerCart = seller_carts::where(['seller_id' => $sellerData->id, 'seller_status' => 0]);
-        if (!$sellerCart->exists()) {
+        $customerData = $request->customerData;
+        $customerCart = customer_carts::where(['customer_id' => $customerData->id, 'customer_status' => 0]);
+        if (!$customerCart->exists()) {
             $response = [
                 'status' => 400,
                 'message' => 'Are you want to buy something?'
             ];
             return response()->json($response, 400);
         }
-        $sellerCart = $sellerCart->get();
-        $sellerProductIds = $sellerCart->map(function ($item) {
-            return [$item->id => $item->seller_supplier_product_id];
+        $customerCart = $customerCart->get();
+        $customerProductIds = $customerCart->map(function ($item) {
+            return [$item->id => $item->customer_seller_product_id];
         });
-        $supplierProduct = new SupplierProductController;
-        $status = $supplierProduct->showById($sellerProductIds);
+        $sellerProduct = new SellerProduct;
+        $status = $sellerProduct->showById($customerProductIds);
         if ($status->getStatusCode() != 200) {
             return $status;
         }
         $productDetails = json_decode($status->getContent())->data;
         $productDetails = collect($productDetails);
-        $sellerCart = $sellerCart->map(function ($item) use ($productDetails) {
-            $product = $productDetails->where('id', $item->seller_supplier_product_id);
+        $customerCart = $customerCart->map(function ($item) use ($productDetails) {
+            $product = $productDetails->where('id', $item->customer_seller_product_id);
             $product = $product->first();
-            $sellerCartData = [
+            $customerCartData = [
                 'id' => $item->id,
-                'seller_id' => $item->seller_id,
-                'supplier_id' => $item->seller_supplier_id,
-                'product_id' => $item->seller_supplier_product_id,
+                'customer_id' => $item->customer_id,
+                'shop_id' => $item->customer_seller_shop_id,
+                'product_id' => $item->customer_seller_product_id,
                 'product_image' => $product->product_image,
                 'product_name' => $product->product_name,
                 'product_price' => $product->product_price,
-                'product_qty' => $item->seller_product_qty,
+                'product_qty' => $item->customer_product_qty,
             ];
-            return $sellerCartData;
+            return $customerCartData;
         });
 
         $response = [
             'status' => 200,
-            'data' => $sellerCart
+            'data' => $customerCart
         ];
         return response()->json($response, 200);
     }
@@ -71,8 +69,8 @@ class SellerCartController extends Controller
     public function store(Request $request)
     {
         // check Stock
-        $supplierProduct = new SupplierProductController;
-        $status = $supplierProduct->checkStock($request->product_id);
+        $sellerProduct = new SellerProduct;
+        $status = $sellerProduct->checkStock($request->product_id);
         if ($status->getStatusCode() != 200) {
             return $status;
         }
@@ -84,11 +82,14 @@ class SellerCartController extends Controller
         // check product is exists
         $status = $this->showByProduct($request, $request->product_id);
         if ($status->getStatusCode() == 200) {
-            $sellerCart = json_decode($status->getContent())->data;
-            $sellerCart = collect($sellerCart)->first();
+            $customerCart = json_decode($status->getContent())->data;
+            $customerCart = collect($customerCart)->first();
 
-            // check if qty>stock
-            if ($sellerCart->product_qty + 1 > $productDetails->product_stock) {
+            /* 
+                THIS STAGE MOVE BEFORE PURCHASE
+                
+                // check if qty>stock
+                if ($customerCart->product_qty + 1 > $productDetails->product_stock) {
                 $response = [
                     'status' => 400,
                     'message' => 'sorry, ' . $productDetails->product_name . " only " . $productDetails->product_stock . " left"
@@ -96,12 +97,13 @@ class SellerCartController extends Controller
                 return response()->json($response, 400);
             }
             //
+            */
 
             // update qty
             $updateCart = [
-                'seller_product_qty' => $sellerCart->product_qty + 1
+                'customer_product_qty' => $customerCart->product_qty + 1
             ];
-            $status = seller_carts::where('id', $sellerCart->id)->update($updateCart);
+            $status = customer_carts::where('id', $customerCart->id)->update($updateCart);
             if (!$status) {
                 $response = [
                     'status' => 500,
@@ -109,18 +111,18 @@ class SellerCartController extends Controller
                 ];
                 return response()->json($response, 500);
             }
-            $sellerCart->product_qty += 1;
+            $customerCart->product_qty += 1;
             $response = [
                 'status' => 200,
-                'data' => $sellerCart
+                'data' => $customerCart
             ];
             return response()->json($response, 200);
         }
         //
 
-        $sellerData = $request->sellerData;
+        $customerData = $request->customerData;
         // get product data
-        $status = $supplierProduct->showById($request->product_id);
+        $status = $sellerProduct->showById($request->product_id);
         if ($status->getStatusCode() != 200) {
             return $status;
         }
@@ -130,15 +132,15 @@ class SellerCartController extends Controller
         //
 
         $productAddtoCart = [
-            'seller_id' => $sellerData->id,
-            'seller_supplier_id' => $productDetails->supplier_id,
-            'seller_supplier_product_id' => $request->product_id,
-            'seller_product_qty' => $request->qty,
-            'seller_status' => 0,
+            'customer_id' => $customerData->id,
+            'customer_seller_shop_id' => $productDetails->seller_shop_id,
+            'customer_seller_product_id' => $request->product_id,
+            'customer_product_qty' => $request->qty,
+            'customer_status' => 0,
             'created_at' => date_format(now(), 'Y-m-d H:i:s'),
             'updated_at' => date_format(now(), 'Y-m-d H:i:s')
         ];
-        $status = seller_carts::insert($productAddtoCart);
+        $status = customer_carts::insert($productAddtoCart);
         if (!$status) {
             $response = [
                 'status' => 405,
@@ -156,17 +158,17 @@ class SellerCartController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Model\SellerCart  $SellerCart
+     * @param  \App\Model\CustomerCart  $CustomerCart
      * @return \Illuminate\Http\Response
      */
     public function show(Request $request, ...$cartId)
     {
-        $sellerData = $request->sellerData;
+        $customerData = $request->customerData;
         $cartId = collect($cartId);
         $cartId = $cartId->flatten();
-        $whereCond = ['seller_id' => $sellerData->id];
-        $sellerCarts = seller_carts::where($whereCond)->whereIn('id', $cartId)->get();
-        $cartIdCheck = $sellerCarts->map(function ($item) {
+        $whereCond = ['customer_id' => $customerData->id];
+        $customerCarts = customer_carts::where($whereCond)->whereIn('id', $cartId)->get();
+        $cartIdCheck = $customerCarts->map(function ($item) {
             return $item->id;
         });
         $status = $cartId->diff($cartIdCheck);
@@ -178,34 +180,34 @@ class SellerCartController extends Controller
             ];
             return response()->json($response, 400);
         }
-        $sellerProductIds = $sellerCarts->map(function ($item) {
-            return [$item->id => $item->seller_supplier_product_id];
+        $customerProductIds = $customerCarts->map(function ($item) {
+            return [$item->id => $item->customer_seller_product_id];
         });
-        $supplierProduct = new SupplierProductController;
-        $status = $supplierProduct->showById($sellerProductIds);
+        $sellerProduct = new SellerProduct;
+        $status = $sellerProduct->showById($customerProductIds);
         if ($status->getStatusCode() != 200) {
             return $status;
         }
         $productDetails = json_decode($status->getContent())->data;
         $productDetails = collect($productDetails);
-        $sellerCarts = $sellerCarts->map(function ($item) use ($productDetails) {
-            $product = $productDetails->where('id', $item->seller_supplier_product_id);
+        $customerCarts = $customerCarts->map(function ($item) use ($productDetails) {
+            $product = $productDetails->where('id', $item->customer_seller_product_id);
             $product = $product->first();
-            $sellerCartData = [
+            $customerCartData = [
                 'id' => $item->id,
-                'supplier_id' => $item->seller_supplier_id,
-                'product_id' => $item->seller_supplier_product_id,
+                'shop_id' => $item->customer_seller_shop_id,
+                'product_id' => $item->customer_seller_product_id,
                 'product_image' => $product->product_image,
                 'product_name' => $product->product_name,
                 'product_price' => $product->product_price,
-                'product_qty' => $item->seller_product_qty,
+                'product_qty' => $item->customer_product_qty,
             ];
-            return $sellerCartData;
+            return $customerCartData;
         });
 
         $response = [
             'status' => 200,
-            'data' => $sellerCarts
+            'data' => $customerCarts
         ];
         return response()->json($response, 200);
     }
@@ -214,18 +216,18 @@ class SellerCartController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Model\SellerCart  $SellerCart
+     * @param  \App\Model\CustomerCart  $CustomerCart
      * @return \Illuminate\Http\Response
      */
     public function showByProduct(Request $request, ...$productId)
     {
-        $sellerData = $request->sellerData;
+        $customerData = $request->customerData;
         $productId = collect($productId);
         $productId = $productId->flatten();
-        $whereCond = ['seller_id' => $sellerData->id, 'seller_status' => 0];
-        $sellerCarts = seller_carts::where($whereCond)->whereIn('seller_supplier_product_id', $productId)->get();
-        $productIdCheck = $sellerCarts->map(function ($item) {
-            return $item->seller_supplier_product_id;
+        $whereCond = ['customer_id' => $customerData->id, 'customer_status' => 0];
+        $customerCarts = customer_carts::where($whereCond)->whereIn('customer_seller_product_id', $productId)->get();
+        $productIdCheck = $customerCarts->map(function ($item) {
+            return $item->customer_seller_product_id;
         });
         $status = $productId->diff($productIdCheck);
         if (!$status->isEmpty()) {
@@ -236,34 +238,34 @@ class SellerCartController extends Controller
             ];
             return response()->json($response, 400);
         }
-        $sellerProductIds = $sellerCarts->map(function ($item) {
-            return [$item->id => $item->seller_supplier_product_id];
+        $customerProductIds = $customerCarts->map(function ($item) {
+            return [$item->id => $item->customer_seller_product_id];
         });
-        $supplierProduct = new SupplierProductController;
-        $status = $supplierProduct->showById($sellerProductIds);
+        $sellerProduct = new SellerProduct;
+        $status = $sellerProduct->showById($customerProductIds);
         if ($status->getStatusCode() != 200) {
             return $status;
         }
         $productDetails = json_decode($status->getContent())->data;
         $productDetails = collect($productDetails);
-        $sellerCarts = $sellerCarts->map(function ($item) use ($productDetails) {
-            $product = $productDetails->where('id', $item->seller_supplier_product_id);
+        $customerCarts = $customerCarts->map(function ($item) use ($productDetails) {
+            $product = $productDetails->where('id', $item->customer_seller_product_id);
             $product = $product->first();
-            $sellerCartData = [
+            $customerCartData = [
                 'id' => $item->id,
-                'supplier_id' => $item->seller_supplier_id,
-                'product_id' => $item->seller_supplier_product_id,
+                'shop_id' => $item->customer_seller_shop_id,
+                'product_id' => $item->customer_seller_product_id,
                 'product_image' => $product->product_image,
                 'product_name' => $product->product_name,
                 'product_price' => $product->product_price,
-                'product_qty' => $item->seller_product_qty,
+                'product_qty' => $item->customer_product_qty,
             ];
-            return $sellerCartData;
+            return $customerCartData;
         });
 
         $response = [
             'status' => 200,
-            'data' => $sellerCarts
+            'data' => $customerCarts
         ];
         return response()->json($response, 200);
     }
@@ -272,7 +274,7 @@ class SellerCartController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Model\SellerCart  $SellerCart
+     * @param  \App\Model\CustomerCart  $CustomerCart
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request)
@@ -288,7 +290,7 @@ class SellerCartController extends Controller
             ];
             return response()->json($response, 400);
         }
-        $sellerData = $request->sellerData;
+        $customerData = $request->customerData;
         $status = $this->show($request, $request->id);
         if ($status->getStatusCode() != 200) {
             return $status;
@@ -296,17 +298,17 @@ class SellerCartController extends Controller
         $whereCond = [
             'id' => $request->id,
         ];
-        $sellerCart = json_decode($status->getContent())->data;
-        $sellerCart = collect($sellerCart);
-        $sellerCart = $sellerCart->first();
+        $customerCart = json_decode($status->getContent())->data;
+        $customerCart = collect($customerCart);
+        $customerCart = $customerCart->first();
         if ($request->qty <= 0) {
             // cancel product
             $status = $this->destroy($request);
             return $status;
         } else {
-            $cartUpdate = seller_carts::where($whereCond);
+            $cartUpdate = customer_carts::where($whereCond);
             $cartUpdate = $cartUpdate->update([
-                'seller_product_qty' => $request->qty
+                'customer_product_qty' => $request->qty
             ]);
         }
         $status = $this->show($request, $request->id);
@@ -316,7 +318,7 @@ class SellerCartController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Model\SellerCart  $SellerCart
+     * @param  \App\Model\CustomerCart  $CustomerCart
      * @return \Illuminate\Http\Response
      */
     public function destroy(Request $request)
@@ -331,10 +333,10 @@ class SellerCartController extends Controller
             ];
             return response()->json($response, 400);
         }
-        $sellerData = $request->sellerData;
+        $customerData = $request->customerData;
         $whereCond = [
             'id' => $request->id,
-            'seller_id' => $sellerData->id,
+            'customer_id' => $customerData->id,
         ];
         $status = $this->show($request, $request->id);
         if ($status->getStatusCode() != 200) {
@@ -345,7 +347,7 @@ class SellerCartController extends Controller
         $cartData = $cartData->first();
 
         // cancel product
-        $cartDelete = seller_carts::where('id', $request->id)->delete();
+        $cartDelete = customer_carts::where('id', $request->id)->delete();
         if (!$cartDelete) {
             $response = [
                 'status' => 500,
@@ -379,13 +381,17 @@ class SellerCartController extends Controller
 
         // get product id
         $productIds = $cartData->map(function ($item) {
-            return $item->product_id;
+            $item = (object) [
+                'product_id' => $item->product_id,
+                'product_qty' => $item->product_qty
+            ];
+            return $item;
         });
         //
 
         // get product data
-        $supplierProduct = new SupplierProductController;
-        $status = $supplierProduct->checkStock($productIds);
+        $sellerProduct = new SellerProduct;
+        $status = $sellerProduct->checkStock($productIds);
         return $status;
         //
     }

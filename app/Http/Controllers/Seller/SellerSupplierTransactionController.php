@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Seller;
+
+use App\Http\Controllers\Controller;
 
 use App\Model\SellerCart as seller_carts;
 use App\Model\SellerSupplierTransaction as seller_supplier_transaction;

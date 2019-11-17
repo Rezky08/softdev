@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Seller;
 
-use App\Model\CustomerLoginLog as customer_login_logs;
+use App\Http\Controllers\Controller;
+
+use App\Model\SellerLoginLog as seller_login_logs;
 use Illuminate\Http\Request;
 
-class CustomerLoginLogController extends Controller
+class SellerLoginLogController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -26,7 +28,7 @@ class CustomerLoginLogController extends Controller
     public function store(Request $request)
     {
         $loginInfo = $request->login_info;
-        $status = customer_login_logs::insert($loginInfo);
+        $status = seller_login_logs::insert($loginInfo);
         if (!$status) {
             $response = [
                 'status' => 500,

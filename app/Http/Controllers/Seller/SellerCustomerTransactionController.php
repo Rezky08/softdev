@@ -1,14 +1,19 @@
 <?php
-/**
- * This file handle supplier seller transaction, only transaction not other action
- */
-namespace App\Http\Controllers;
 
-use App\Model\SupplierSellerDetailTransaction as supplier_seller_detail_transaction;
-use App\Model\SupplierSellerTransaction as supplier_seller_transaction;
+namespace App\Http\Controllers\Seller;
+
+use App\Http\Controllers\Customer\CustomerRegisterController as CustomerRegister;
+use App\Http\Controllers\Seller\SellerShopController as SellerShop;
+use App\Http\Controllers\Coin\CoinBalanceController as CoinBalance;
+use App\Http\Controllers\Coin\CoinTransactionController as CoinTransaction;
+use App\Http\Controllers\Controller;
+
+
+use App\Model\SellerCustomerDetailTransaction as seller_customer_detail_transaction;
+use App\Model\SellerCustomerTransaction as seller_customer_transaction;
 use Illuminate\Http\Request;
 
-class SupplierSellerTransactionController extends Controller
+class SellerCustomerTransactionController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,7 +22,11 @@ class SupplierSellerTransactionController extends Controller
      */
     public function index(Request $request)
     {
-
+        $sellerData = $request->sellerData;
+        $sellerShop = $sellerData->shop;
+        $shopCustomerTransaction = $sellerShop->transaction;
+        $sellerSupplierTransaction = $sellerData->transaction;
+        return dd($shopCustomerTransaction, $sellerSupplierTransaction);
     }
 
     /**
@@ -28,53 +37,53 @@ class SupplierSellerTransactionController extends Controller
      */
     public function store(Request $request)
     {
-        $sellerData = $request->sellerData;
-        $supplierTransactions = $request->supplier_seller_transaction;
-        $supplierDetailTransactions = $supplierTransactions->groupBy('supplier_id');
-        $supplierTransactions = $supplierDetailTransactions->map(function ($item) {
+        $customerData = $request->customerData;
+        $sellerTransactions = $request->seller_customer_transaction;
+        $sellerDetailTransactions = $sellerTransactions->groupBy('shop_id');
+        $sellerTransactions = $sellerDetailTransactions->map(function ($item) {
             $item = collect($item);
             $transaction = [
-                'seller_id' => $item[0]->seller_id,
-                'supplier_id' => $item[0]->supplier_id,
-                'supplier_total_price' => $item->sum('product_sub_total'),
+                'customer_id' => $item[0]->customer_id,
+                'seller_shop_id' => $item[0]->shop_id,
+                'seller_total_price' => $item->sum('product_sub_total'),
                 'created_at' => date_format(now(), 'Y-m-d H:i:s'),
                 'updated_at' => date_format(now(), 'Y-m-d H:i:s')
             ];
             return $transaction;
         });
-        $seller = new SellerRegisterController;
-        $supplier = new SupplierRegisterController;
+        $customer = new CustomerRegister;
+        $shop = new SellerShop;
+
 
         // balance validation
-        $totalPrice = $supplierTransactions->sum('supplier_total_price');
-        $coinBalance = new CoinBalanceController;
-        $status = $coinBalance->validateBalance($sellerData->seller_username, $totalPrice);
+        $totalPrice = $sellerTransactions->sum('seller_total_price');
+        $coinBalance = new CoinBalance;
+        $status = $coinBalance->validateBalance($customerData->customer_username, $totalPrice);
         if ($status->getStatusCode() != 200) {
             return $status;
         }
 
         // insert transactions
-        $transactionId = $supplierTransactions->map(function ($item) {
-            return supplier_seller_transaction::insertGetId($item);
+        $transactionId = $sellerTransactions->map(function ($item) {
+            return seller_customer_transaction::insertGetId($item);
         });
-        //
 
-        // send to supplierDetailTransactionController
-        $request->request->add(['supplier_seller_transaction_ids' => $transactionId, 'supplier_seller_detail_transaction' => $supplierDetailTransactions]);
+        // send to sellerDetailTransactionController
+        $request->request->add(['seller_customer_transaction_ids' => $transactionId, 'seller_customer_detail_transaction' => $sellerDetailTransactions]);
 
-        $supplierDetailTransactions = new  SupplierSellerDetailTransactionController;
-        $status = $supplierDetailTransactions->store($request);
+        $sellerDetailTransactions = new  SellerCustomerDetailTransactionController;
+        $status = $sellerDetailTransactions->store($request);
 
         if ($status->getStatusCode() != 200) {
             return $status;
         }
-        //
+
 
         //coin transaction preparation
-        $coinTransactionsPrep = $supplierTransactions->map(function ($item) use ($seller, $supplier) {
-            // get username seller
+        $coinTransactionsPrep = $sellerTransactions->map(function ($item) use ($customer, $shop) {
+            // get username customer
             $item = (object) $item;
-            $status = $seller->show($item->seller_id);
+            $status = $customer->show($item->customer_id);
             if ($status->getStatusCode() != 200) {
                 return $status;
             }
@@ -84,19 +93,19 @@ class SupplierSellerTransactionController extends Controller
             $prep['username_source'] = $status->username;
             //
 
-            // get username supplier
+            // get username seller
             $item = (object) $item;
-            $status = $supplier->show($item->supplier_id);
+            $status = $shop->show($item->seller_shop_id);
             if ($status->getStatusCode() != 200) {
                 return $status;
             }
             $status = json_decode($status->getContent())->data;
             $status = collect($status);
             $status = $status->first();
-            $prep['username_destination'] = $status->username;
+            $prep['username_destination'] = $status->seller->username;
             //
 
-            $prep['transaction_balance'] = $item->supplier_total_price;
+            $prep['transaction_balance'] = $item->seller_total_price;
             $prep = (object) $prep;
             return $prep;
         });
@@ -104,7 +113,7 @@ class SupplierSellerTransactionController extends Controller
         //
 
         // insert transaction to coin transaction
-        $coinTransactions = new CoinTransactionController;
+        $coinTransactions = new CoinTransaction;
         $request->request->add(['coin_transactions' => $coinTransactionsPrep]);
         $status = $coinTransactions->store($request);
         if ($status->getStatusCode() != 200) {
@@ -124,36 +133,36 @@ class SupplierSellerTransactionController extends Controller
     public function show(...$id)
     {
         $ids = collect($id)->flatten();
-        $supplierTransactions = supplier_seller_transaction::whereIn('id', $ids)->get();
+        $sellerTransactions = seller_customer_transaction::whereIn('id', $ids)->get();
 
         // // short variable name
-        // $supplierTransactions = $supplierTransactions->map(function ($item) {
+        // $sellerTransactions = $sellerTransactions->map(function ($item) {
         //     $display = [
         //         'id' => $item->id,
-        //         'supplier_id' => $item->supplier_id,
-        //         'seller_id' => $item->seller_id,
-        //         'total_price' => $item->supplier_total_price,
+        //         'shop_id' => $item->seller_shop_id,
+        //         'customer_id' => $item->customer_id,
+        //         'total_price' => $item->seller_total_price,
         //         'created_at' => $item->created_at->toDateTimeString()
         //     ];
         //     return (object) $display;
         // });
         // //
 
-        $supplierTransactionIdChecks = $supplierTransactions->map(function ($item) {
+        $sellerTransactionIdChecks = $sellerTransactions->map(function ($item) {
             return $item->id;
         });
-        $supplierTransactionIdChecks = $ids->diff($supplierTransactionIdChecks);
-        if (!$supplierTransactionIdChecks->isEmpty()) {
+        $sellerTransactionIdChecks = $ids->diff($sellerTransactionIdChecks);
+        if (!$sellerTransactionIdChecks->isEmpty()) {
             $response = [
                 'status' => 400,
                 'message' => 'Transaction not found',
-                'data' => ['transaction_id' => $supplierTransactionIdChecks]
+                'data' => ['transaction_id' => $sellerTransactionIdChecks]
             ];
             return response()->json($response, 400);
         }
         $response = [
             'status' => 200,
-            'data' => $supplierTransactions
+            'data' => $sellerTransactions
         ];
         return response()->json($response, 200);
     }

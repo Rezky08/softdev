@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Customer;
+
+use App\Http\Controllers\Controller;
 
 use App\Model\CustomerCart as customer_carts;
 use App\Model\CustomerSellerTransaction as customer_seller_transaction;
-use App\Model\CustomerSellerDetailTransaction as customer_seller_detail_transaction;
 use Illuminate\Http\Request;
 
 class CustomerSellerTransactionController extends Controller
@@ -39,15 +40,6 @@ class CustomerSellerTransactionController extends Controller
             return $item->product_sub_total;
         });
 
-        // send to seller customer transaction controller
-        $sellerCustomerTransactions = $customerCart;
-        $request->request->add(['seller_customer_transaction' => $sellerCustomerTransactions]);
-        $sellerTransactions = new SellerCustomerTransactionController;
-        $status = $sellerTransactions->store($request);
-        if ($status->getStatusCode() != 200) {
-            return $status;
-        }
-
         $transactions = [
             'customer_id' => $customerData->id,
             'customer_total_price' => $subTotal->sum(),
@@ -65,7 +57,6 @@ class CustomerSellerTransactionController extends Controller
             $item->customer_seller_transaction_id = $transactionId;
             return $item;
         });
-
 
 
         // send to customer detail transaction controller

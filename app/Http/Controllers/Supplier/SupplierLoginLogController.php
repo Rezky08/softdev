@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Supplier;
 
-use App\Model\SellerSupplierDetailTransaction as seller_supplier_detail_transaction;
+use App\Http\Controllers\Controller;
+
+use App\Model\SupplierLoginLog as supplier_login_logs;
 use Illuminate\Http\Request;
 
-class SellerSupplierDetailTransactionController extends Controller
+class SupplierLoginLogController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -25,31 +27,18 @@ class SellerSupplierDetailTransactionController extends Controller
      */
     public function store(Request $request)
     {
-        $transactionDetails = $request->transaction_details;
-        $transactionDetails = $transactionDetails->map(function ($item) {
-            $item = [
-                'seller_supplier_id' => $item->supplier_id,
-                'seller_supplier_product_id' => $item->product_id,
-                'seller_product_name' => $item->product_name,
-                'seller_product_price' => $item->product_price,
-                'seller_supplier_transaction_id' => $item->seller_supplier_transaction_id,
-                'seller_product_qty' => $item->product_qty,
-                'created_at' => date_format(now(), 'Y-m-d H:i:s'),
-                'updated_at' => date_format(now(), 'Y-m-d H:i:s')
-            ];
-            return $item;
-        });
-        $status = seller_supplier_detail_transaction::insert($transactionDetails->toArray());
+        $loginInfo = $request->login_info;
+        $status = supplier_login_logs::insert($loginInfo);
         if (!$status) {
             $response = [
                 'status' => 500,
-                'message' => 'sorry, system overload'
+                'message' => 'Internal Server Error'
             ];
             return response()->json($response, 500);
         }
         $response = [
             'status' => 200,
-            'message' => 'item has been purchased'
+            'message' => 'Log has been created'
         ];
         return response()->json($response, 200);
     }

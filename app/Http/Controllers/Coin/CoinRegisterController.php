@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Coin;
 
-use App\CoinRegister;
+use App\Http\Controllers\Controller;
+
 use App\Model\CoinDetail as coin_details;
 use App\Model\CoinLogin as coin_logins;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Validator;
 
 class CoinRegisterController extends Controller
@@ -64,7 +64,10 @@ class CoinRegisterController extends Controller
         $validation = Validator::make($request->all(), [
             'username' => ['required', 'unique:dbmarketcoins.coin_logins,coin_username'],
             'password' => ['required', 'min:8', 'max:12', 'regex:/^(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*[\d]).{8,12}$/'],
-            'email' => ['required', 'email', 'unique:dbmarketcoins.coin_details,coin_email']
+            'email' => ['required', 'email', 'unique:dbmarketcoins.coin_details,coin_email'],
+            'customer_dob' => ['date'],
+            'customer_sex' => ['boolean'],
+            'customer_phone' => ['numeric'],
         ]);
         if ($validation->fails()) {
             $response = [

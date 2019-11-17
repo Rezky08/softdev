@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Customer;
 
-use App\Model\SellerLoginLog as seller_login_logs;
+use App\Http\Controllers\Controller;
+
+use App\Model\CustomerSellerDetailTransaction as customer_seller_detail_transaction;
 use Illuminate\Http\Request;
 
-class SellerLoginLogController extends Controller
+class CustomerSellerDetailTransactionController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -25,18 +27,31 @@ class SellerLoginLogController extends Controller
      */
     public function store(Request $request)
     {
-        $loginInfo = $request->login_info;
-        $status = seller_login_logs::insert($loginInfo);
+        $transactionDetails = $request->transaction_details;
+        $transactionDetails = $transactionDetails->map(function ($item) {
+            $item = [
+                'customer_seller_shop_id' => $item->shop_id,
+                'customer_seller_product_id' => $item->product_id,
+                'customer_product_name' => $item->product_name,
+                'customer_product_price' => $item->product_price,
+                'customer_seller_transaction_id' => $item->customer_seller_transaction_id,
+                'customer_product_qty' => $item->product_qty,
+                'created_at' => date_format(now(), 'Y-m-d H:i:s'),
+                'updated_at' => date_format(now(), 'Y-m-d H:i:s')
+            ];
+            return $item;
+        });
+        $status = customer_seller_detail_transaction::insert($transactionDetails->toArray());
         if (!$status) {
             $response = [
                 'status' => 500,
-                'message' => 'Internal Server Error'
+                'message' => 'sorry, system overload'
             ];
             return response()->json($response, 500);
         }
         $response = [
             'status' => 200,
-            'message' => 'Log has been created'
+            'message' => 'item has been purchased'
         ];
         return response()->json($response, 200);
     }
