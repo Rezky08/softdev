@@ -62,6 +62,8 @@ class SellerProductController extends Controller
             ];
             return response()->json($response);
         }
+
+        // mengambil data dari seller
         $sellerData = $request->sellerData;
         $sellerShopId = $sellerData->shop;
         $productDetail = [
@@ -149,7 +151,7 @@ class SellerProductController extends Controller
     {
         $sellerProductId = collect($id)->flatten();
         $sellerProduct = seller_products::whereIn('id', $sellerProductId)->get();
-        // check shop exists
+        // check product exists
         $sellerProductIdCheck = $sellerProduct->map(function ($item) {
             return $item->id;
         });
@@ -157,7 +159,7 @@ class SellerProductController extends Controller
         if (!$status->isEmpty()) {
             $response = [
                 'status' => 400,
-                'message' => 'sorry, cannot find your shop',
+                'message' => 'sorry, cannot find your product',
                 'data' => $status->all()
             ];
             return response()->json($response, 400);

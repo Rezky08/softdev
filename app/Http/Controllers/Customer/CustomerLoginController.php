@@ -105,7 +105,6 @@ class CustomerLoginController extends Controller
         $password_input = $request->password;
         $customerLogin  = customer_details::where('customer_details.customer_username', $username_input)->leftJoin('customer_logins', 'customer_details.customer_username', '=', 'customer_logins.customer_username');
         if (!$customerLogin->exists()) {
-            // Redirect to login page again
             $response = [
                 'status' => 403,
                 'message' => 'You have entered an invalid username or password'
@@ -148,6 +147,7 @@ class CustomerLoginController extends Controller
         $customerLoginLog = new CustomerLoginLogController;
         $status = $customerLoginLog->store($request);
         //
+
         if ($status->getStatusCode() != 200) {
             return $status;
         }

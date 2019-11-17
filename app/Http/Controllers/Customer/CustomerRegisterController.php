@@ -65,9 +65,10 @@ class CustomerRegisterController extends Controller
             'password' => ['required', 'min:8', 'max:12', 'regex:/^(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*[\d]).{8,12}$/'],
             'email' => ['required', 'email', 'unique:dbmarketsellers.seller_details,seller_email', 'unique:dbmarketcustomers.customer_details,customer_email'],
             'customer_dob' => ['date'],
-            'customer_sex' => ['boolean'],
+            'customer_sex' => ['boolean'], // 0 Female, 1 Male
             'customer_phone' => ['numeric'],
         ]);
+
         if ($validation->fails()) {
             $response = [
                 'status' => 401,

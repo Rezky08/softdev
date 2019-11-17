@@ -68,7 +68,7 @@ class CoinTransactionController extends Controller
             return $item;
         });
 
-        // get coin data data
+        // get coin data 
         $coin = new CoinRegisterController;
         $status = $coin->showByUsername($coinUsername);
         if ($status->getStatusCode() != 200) {
@@ -94,7 +94,7 @@ class CoinTransactionController extends Controller
             $prep['coin_id_source'] = $status->id;
             //
 
-            // get coin source
+            // get coin destination
             $status = $coinDetails->where('username', $item->username_destination);
             if ($status->isEmpty()) {
                 $response = [
@@ -118,7 +118,7 @@ class CoinTransactionController extends Controller
                 'coin_id_source' => $item->coin_id_source,
                 'coin_id_destination' => $item->coin_id_destination,
                 'coin_transaction_code' => 1,
-                'coin_transaction_type' => 0,
+                'coin_transaction_type' => 0, //credit
                 'coin_balance' => $item->coin_balance,
                 'created_at' => date_format(now(), 'Y-m-d H:i:s'),
                 'updated_at' => date_format(now(), 'Y-m-d H:i:s'),
@@ -130,7 +130,7 @@ class CoinTransactionController extends Controller
                 'coin_id_source' => $item->coin_id_destination,
                 'coin_id_destination' => $item->coin_id_source,
                 'coin_transaction_code' => 1,
-                'coin_transaction_type' => 1,
+                'coin_transaction_type' => 1, // debit
                 'coin_balance' => $item->coin_balance,
                 'created_at' => $item->created_at,
                 'updated_at' => $item->updated_at,

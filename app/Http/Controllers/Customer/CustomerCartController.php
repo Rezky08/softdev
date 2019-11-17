@@ -143,10 +143,10 @@ class CustomerCartController extends Controller
         $status = customer_carts::insert($productAddtoCart);
         if (!$status) {
             $response = [
-                'status' => 405,
+                'status' => 500,
                 'message' => 'Failed add ' . $productDetails->product_name . 'to cart'
             ];
-            return response()->json($response, 405);
+            return response()->json($response, 500);
         }
         $response = [
             'status' => 200,

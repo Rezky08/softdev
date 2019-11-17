@@ -30,10 +30,11 @@ class CustomerTransactionController extends Controller
         /* 
             make subtotal of product will be purchase and check the balance
         */
-        $subtotal = $customerCart->map(function ($item) {
-            return $item->product_price * $item->product_qty;
+        $customerCart = $customerCart->map(function ($item) {
+            $item->product_sub_total = $item->product_price * $item->product_qty;
+            return $item;
         });
-        $total = $subtotal->sum();
+        $total = $customerCart->sum('product_sub_total');
         $coinBalance = new CoinBalance;
         $status = $coinBalance->validateBalance($customerData->customer_username, $total);
         if ($status->getStatusCode() != 200) {
@@ -60,6 +61,7 @@ class CustomerTransactionController extends Controller
             return $status;
         }
         //if transaction not added to system, then return error message
+
 
         $response = [
             'status' => 200,

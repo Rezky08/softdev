@@ -54,7 +54,6 @@ class SellerCustomerTransactionController extends Controller
         $customer = new CustomerRegister;
         $shop = new SellerShop;
 
-
         // balance validation
         $totalPrice = $sellerTransactions->sum('seller_total_price');
         $coinBalance = new CoinBalance;
@@ -77,7 +76,6 @@ class SellerCustomerTransactionController extends Controller
         if ($status->getStatusCode() != 200) {
             return $status;
         }
-
 
         //coin transaction preparation
         $coinTransactionsPrep = $sellerTransactions->map(function ($item) use ($customer, $shop) {
