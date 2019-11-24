@@ -6,7 +6,7 @@ use App\Model\CustomerCart as customer_carts;
 use App\Model\SellerProduct as seller_products;
 use Closure;
 
-class CartValidate
+class CartValidateSeller
 {
     /**
      * Handle an incoming request.
