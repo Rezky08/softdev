@@ -73,6 +73,7 @@ Route::post('/supplier/register', 'Integrated\SupplierRegisterController@store')
 Route::get('/supplier/product', 'Supplier\SupplierProductController@index');
 Route::get('/supplier/{shopId}/product', 'Supplier\SupplierProductController@showByShop');
 Route::get('/supplier/product/{productId}', 'Supplier\SupplierProductController@showById');
+Route::get('/supplier/{id}/profile', 'Supplier\SupplierRegisterController@show');
 
 Route::group(['middleware' => ['checkScopes:supplier']], function () {
     Route::get('/supplier', 'Supplier\SupplierLoginController@index');
@@ -82,6 +83,8 @@ Route::group(['middleware' => ['checkScopes:supplier']], function () {
     Route::delete('/supplier/product', 'Supplier\SupplierProductController@destroy');
 });
 //
+
+Route::post('/coin/topup', 'Coin\CoinBalanceController@coinTopUp');
 Route::get('/test', 'TesterController@checkShop');
 Route::get('/test/supplier', 'TesterController@supplierCheck');
 Route::post('/test/sendbalance', 'CoinTransactionController@store');

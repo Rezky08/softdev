@@ -12,7 +12,7 @@ class CustomerTransactionController extends Controller
 {
     public function store(Request $request)
     {
-        /* 
+        /*
         check if request has key 'customerData','customerCartData' or not
         if not, then return error message 400 bad request
          */
@@ -27,7 +27,7 @@ class CustomerTransactionController extends Controller
         $customerCart  = $request->customerCartData;
         $customerData = $request->customerData;
 
-        /* 
+        /*
             make subtotal of product will be purchase and check the balance
         */
         $customerCart = $customerCart->map(function ($item) {
@@ -41,7 +41,7 @@ class CustomerTransactionController extends Controller
             return $status;
         }
 
-        /* 
+        /*
             store transaction to seller transaction
          */
         $request->request->add(['seller_customer_transaction' => $customerCart]);
@@ -50,9 +50,9 @@ class CustomerTransactionController extends Controller
         if ($status->getStatusCode() != 200) {
             return $status;
         }
-        //if transaction not added to system, then return error message 
+        //if transaction not added to system, then return error message
 
-        /* 
+        /*
             store transaction to customer transaction
          */
         $customerSellerTransaction = new CustomerSellerTransaction;

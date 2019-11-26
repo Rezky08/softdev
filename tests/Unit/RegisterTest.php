@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
-class LoginTest extends TestCase
+class RegisterTest extends TestCase
 {
     /**
      * A basic unit test example.
@@ -15,22 +15,21 @@ class LoginTest extends TestCase
      * @return void
      */
     /** @test */
-    public function customerLogin()
+    public function customerRegister()
     {
         /*
             input :
                 username : ['required','unique']
                 password : ['required','contain Uppercase,lowercase,special char,min8,max12']
-            get 1 user from database
+                sex : ['required','0 female, 1 male']
+                email : ['required','unique','must email']
          */
-        $URL = 'http://127.0.0.1:8000/api/customer/3/profile';
-        $response = $this->get($URL);
-        $user = $response->decodeResponseJson();
-        $user = $user['data'][0];
-        $URL = 'http://127.0.0.1:8000/api/customer/login';
+        $URL = 'http://127.0.0.1:8000/api/customer/register';
         $input =[
-            'username' => $user['username'],
-            'password' => 'CsTest77#'
+            'username' => 'customerTest'.Str::random(5),
+            'password' => 'CsTest77#',
+            'sex' => random_int(0,1),
+            'email'=> 'customerTest'.Str::random(5).'@ugm.ac.id'
         ];
         $response = $this->post($URL,$input);
         $response->assertStatus(200);
@@ -42,22 +41,21 @@ class LoginTest extends TestCase
      * @return void
      */
     /** @test */
-    public function sellerLogin()
+    public function sellerRegister()
     {
         /*
             input :
                 username : ['required','unique']
                 password : ['required','contain Uppercase,lowercase,special char,min8,max12']
-            get 1 user from database
+                sex : ['required','0 female, 1 male']
+                email : ['required','unique','must email']
          */
-        $URL = 'http://127.0.0.1:8000/api/seller/3/profile';
-        $response = $this->get($URL);
-        $user = $response->decodeResponseJson();
-        $user = $user['data'][0];
-        $URL = 'http://127.0.0.1:8000/api/seller/login';
+        $URL = 'http://127.0.0.1:8000/api/seller/register';
         $input =[
-            'username' => $user['username'],
-            'password' => 'SlTest77#'
+            'username' => 'sellerTest'.Str::random(5),
+            'password' => 'SlTest77#',
+            'sex' => random_int(0,1),
+            'email'=> 'sellerTest'.Str::random(5).'@ugm.ac.id'
         ];
         $response = $this->post($URL,$input);
         $response->assertStatus(200);
@@ -69,22 +67,21 @@ class LoginTest extends TestCase
      * @return void
      */
     /** @test */
-    public function supplierLogin()
+    public function supplierRegister()
     {
         /*
             input :
                 username : ['required','unique']
                 password : ['required','contain Uppercase,lowercase,special char,min8,max12']
-            get 1 user from database
+                sex : ['required','0 female, 1 male']
+                email : ['required','unique','must email']
          */
-        $URL = 'http://127.0.0.1:8000/api/supplier/3/profile';
-        $response = $this->get($URL);
-        $user = $response->decodeResponseJson();
-        $user = $user['data'][0];
-        $URL = 'http://127.0.0.1:8000/api/supplier/login';
+        $URL = 'http://127.0.0.1:8000/api/supplier/register';
         $input =[
-            'username' => $user['username'],
-            'password' => 'SpTest77#'
+            'username' => 'supplierTest'.Str::random(5),
+            'password' => 'SpTest77#',
+            'sex' => random_int(0,1),
+            'email'=> 'supplierTest'.Str::random(5).'@ugm.ac.id'
         ];
         $response = $this->post($URL,$input);
         $response->assertStatus(200);

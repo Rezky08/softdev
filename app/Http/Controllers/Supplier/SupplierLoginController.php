@@ -32,6 +32,17 @@ class SupplierLoginController extends Controller
             ];
             return response()->json($response, 401);
         }
+        $supplierData = [
+            'id' => $supplierData->id,
+            'username' => $supplierData->supplier_username,
+            'fullname' => $supplierData->supplier_fullname,
+            'dob' => $supplierData->supplier_dob,
+            'address' => $supplierData->supplier_address,
+            'sex' => $supplierData->supplier_sex == 0 ? 'female' : 'male',
+            'email' => $supplierData->supplier_email,
+            'phone' => $supplierData->supplier_phone,
+            'join_date' => date_format($supplierData->created_at, 'Y-m-d H:i:s')
+        ];
         $response = [
             'status' => 200,
             'data' => $supplierData

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Coin;
 
+use App\Helpers\Currency as currency;
 use App\Http\Controllers\Controller;
 
 use App\Model\CoinDetail as coin_details;
@@ -68,7 +69,7 @@ class CoinTransactionController extends Controller
             return $item;
         });
 
-        // get coin data 
+        // get coin data
         $coin = new CoinRegisterController;
         $status = $coin->showByUsername($coinUsername);
         if ($status->getStatusCode() != 200) {
@@ -115,8 +116,8 @@ class CoinTransactionController extends Controller
 
         $credit = $coinTransactions->map(function ($item, $key) {
             $item = (object) [
-                'coin_id_source' => $item->coin_id_source,
-                'coin_id_destination' => $item->coin_id_destination,
+                'coin_id_source' => $item->coin_id_destination,
+                'coin_id_destination' => $item->coin_id_source,
                 'coin_transaction_code' => 1,
                 'coin_transaction_type' => 0, //credit
                 'coin_balance' => $item->coin_balance,
@@ -154,10 +155,10 @@ class CoinTransactionController extends Controller
 
         $coinBalance = new CoinBalanceController;
         $debit->map(function ($item) use ($coinBalance) {
-            $status = $coinBalance->balanceCredit($item->coin_id_source, $item->coin_balance);
+            $status = $coinBalance->balanceDebit($item->coin_id_source, $item->coin_balance);
         });
         $credit->map(function ($item) use ($coinBalance) {
-            $status = $coinBalance->balanceDebit($item->coin_id_source, $item->coin_balance);
+            $status = $coinBalance->balanceCredit($item->coin_id_source, $item->coin_balance);
         });
 
         $response = [
@@ -383,6 +384,29 @@ class CoinTransactionController extends Controller
         ];
         return response()->json($response, 200);
     }
+
+    public function storeTopUpTransaction(Request $request)
+    {
+        $validation = Validator::make($request->all(),[
+            'topup_transaction' => ['required'],
+            'coin_detail' => ['required']
+        ]);
+        if ($validation->fails()) {
+            $response = [
+                'status' => 400,
+                'message' => $validation->errors()
+            ];
+            return response()->json($response,400);
+        }
+        $status = coin_transactions::insert($request->topup_transaction);
+        $currency = new currency;
+        $response = [
+            'status' => 200,
+            'message' => 'Topup of IDR '. $currency->intToIdr($request->topup_transaction['coin_balance']).' to '.$request->coin_detail->username.' successfully'
+        ];
+        return response()->json($response,200);
+    }
+
 
 
 
