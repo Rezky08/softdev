@@ -46,13 +46,56 @@ class CoinBalanceController extends Controller
         return response()->json($response, 200);
     }
 
+
+    public function show(Request $request)
+    {
+
+        if ($request->has('username')) {
+            return $this->showByUsername($request->username);
+        }
+        if ($request->has('id')) {
+            return $this->showById($request->id);
+        }
+        $response = [
+            'status' => 400,
+            'message' => 'field id or username required.'
+        ];
+        return response()->json($response, 400);
+    }
+
     /**
      * Display the specified resource.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(...$id)
+    public function showByUsername(...$username)
+    {
+        // get coin details
+        $coin = new CoinRegisterController;
+        $status = $coin->showByUsername($username);
+        if ($status->getStatusCode() != 200) {
+            return $status;
+        }
+        $status = $status->getContent();
+        $status = json_decode($status);
+        $status = $status->data;
+        $status = collect($status);
+        $id = $status->map(function ($item) {
+            return $item->id;
+        });
+        $id = $id->flatten()->toArray();
+        return $this->showById($id);
+    }
+
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function showById(...$id)
     {
         $coinID = collect($id);
         $coinID = $coinID->flatten();
@@ -168,9 +211,9 @@ class CoinBalanceController extends Controller
 
     public function coinTopUp(Request $request)
     {
-        $validation = Validator::make($request->all(),[
-            'username_destination' => ['required','exists:dbmarketcoins.coin_details,coin_username'],
-            'topup_balance' => ['required','numeric']
+        $validation = Validator::make($request->all(), [
+            'username_destination' => ['required', 'exists:dbmarketcoins.coin_details,coin_username'],
+            'topup_balance' => ['required', 'numeric']
         ]);
         if ($validation->fails()) {
             $response = [
@@ -181,7 +224,7 @@ class CoinBalanceController extends Controller
         }
         $coin = new CoinRegisterController;
         $status = $coin->showByUsername($request->username_destination);
-        if ($status->getStatusCode()!=200) {
+        if ($status->getStatusCode() != 200) {
             return $status;
         }
         $status = $status->getContent();
@@ -190,13 +233,13 @@ class CoinBalanceController extends Controller
         $status = collect($status);
         $coinDetail = $status->first();
 
-        $status = $this->show($coinDetail->id);
-        if ($status->getStatusCode()!=200) {
+        $status = $this->showById($coinDetail->id);
+        if ($status->getStatusCode() != 200) {
             return $status;
         }
 
-        $status = $this->balanceCredit($coinDetail->id,$request->topup_balance);
-        if ($status->getStatusCode() !=200) {
+        $status = $this->balanceCredit($coinDetail->id, $request->topup_balance);
+        if ($status->getStatusCode() != 200) {
             return $status;
         }
 
@@ -210,7 +253,7 @@ class CoinBalanceController extends Controller
             'updated_at' => date_format(now(), 'Y-m-d H:i:s'),
         ];
 
-        $request->request->add(['topup_transaction'=>$transactions,'coin_detail'=>$coinDetail]);
+        $request->request->add(['topup_transaction' => $transactions, 'coin_detail' => $coinDetail]);
         $coinTransaction = new CoinTransactionController;
         $status = $coinTransaction->storeTopUpTransaction($request);
 
