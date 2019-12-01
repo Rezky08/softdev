@@ -98,6 +98,18 @@ class SellerProductController extends Controller
         return response()->json($response, 200);
     }
 
+    public function show(Request $request)
+    {
+        if ($request->has('id')) {
+            $id = $request->id;
+            $status = $this->showById($id);
+        } else {
+            $status = $this->index();
+        }
+        return $status;
+    }
+
+
     /**
      * Display the specified resource.
      *

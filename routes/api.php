@@ -44,9 +44,8 @@ Route::group(['middleware' => ['checkScopes:customer']], function () {
 // Route seller
 Route::post('/seller/login', 'Seller\SellerLoginController@store');
 Route::post('/seller/register', 'Integrated\SellerRegisterController@store');
-Route::get('/seller/product', 'Seller\SellerProductController@index');
+Route::get('/seller/product', 'Seller\SellerProductController@show');
 Route::get('/seller/{shopId}/product', 'Seller\SellerProductController@showByShop');
-Route::get('/seller/product/{productId}', 'Seller\SellerProductController@showById');
 Route::get('/seller/profile', 'Seller\SellerRegisterController@index');
 Route::get('/seller/{id}/profile', 'Seller\SellerRegisterController@show');
 
