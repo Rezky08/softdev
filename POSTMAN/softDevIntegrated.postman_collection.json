@@ -1,0 +1,610 @@
+{
+	"info": {
+		"_postman_id": "c47e5d38-89b7-4570-a76f-85e30c2f8d7d",
+		"name": "softDevIntegrated",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Customer Register",
+			"request": {
+				"auth": {
+					"type": "oauth1",
+					"oauth1": [
+						{
+							"key": "addParamsToHeader",
+							"value": true,
+							"type": "boolean"
+						},
+						{
+							"key": "addEmptyParamsToSign",
+							"value": false,
+							"type": "boolean"
+						},
+						{
+							"key": "tokenSecret",
+							"value": "pNKbGTzjMSrxfpLEIFU9XoWwrT4bHyrq99qxp0kByv2Mo",
+							"type": "string"
+						},
+						{
+							"key": "token",
+							"value": "834235722-9vRLtwBXgO30uTvIu9YBTCCAkvv8EUjmYd1P59Ep",
+							"type": "string"
+						},
+						{
+							"key": "consumerSecret",
+							"value": "F4VIjyl8YoxOoeuQXR1aWPJHqVesIFdgiC4lEVM1PoCxByOaFD",
+							"type": "string"
+						},
+						{
+							"key": "consumerKey",
+							"value": "5C1Zpu5VuwKknBJAJhxTI5kFj",
+							"type": "string"
+						},
+						{
+							"key": "signatureMethod",
+							"value": "HMAC-SHA1",
+							"type": "string"
+						},
+						{
+							"key": "version",
+							"value": "1.0",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "ConsumerKey",
+						"value": "5C1Zpu5VuwKknBJAJhxTI5kFj",
+						"type": "text"
+					},
+					{
+						"key": "ConsumerSecret",
+						"value": "F4VIjyl8YoxOoeuQXR1aWPJHqVesIFdgiC4lEVM1PoCxByOaFD",
+						"type": "text"
+					},
+					{
+						"key": "AccessToken",
+						"value": "9vRLtwBXgO30uTvIu9YBTCCAkvv8EUjmYd1P59Ep",
+						"type": "text"
+					},
+					{
+						"key": "AccessTokenSecret",
+						"value": "pNKbGTzjMSrxfpLEIFU9XoWwrT4bHyrq99qxp0kByv2Mo",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "fullname",
+							"value": "rezkysetiawan",
+							"type": "text"
+						},
+						{
+							"key": "DOB",
+							"value": "1999-01-01",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "rezky2211949021",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "Test123#",
+							"type": "text"
+						},
+						{
+							"key": "sex",
+							"value": "0",
+							"type": "text"
+						},
+						{
+							"key": "email",
+							"value": "rezky.setiawan49021@gmail.com",
+							"type": "text"
+						},
+						{
+							"key": "phone",
+							"value": "089629238997",
+							"type": "text"
+						},
+						{
+							"key": "address",
+							"value": "jakarta",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8005/api/customer/register?",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8005",
+					"path": [
+						"api",
+						"customer",
+						"register"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": "",
+							"disabled": true
+						}
+					]
+				},
+				"description": "User register"
+			},
+			"response": []
+		},
+		{
+			"name": "Supplier Register",
+			"request": {
+				"auth": {
+					"type": "oauth1",
+					"oauth1": [
+						{
+							"key": "addParamsToHeader",
+							"value": true,
+							"type": "boolean"
+						},
+						{
+							"key": "addEmptyParamsToSign",
+							"value": false,
+							"type": "boolean"
+						},
+						{
+							"key": "tokenSecret",
+							"value": "pNKbGTzjMSrxfpLEIFU9XoWwrT4bHyrq99qxp0kByv2Mo",
+							"type": "string"
+						},
+						{
+							"key": "token",
+							"value": "834235722-9vRLtwBXgO30uTvIu9YBTCCAkvv8EUjmYd1P59Ep",
+							"type": "string"
+						},
+						{
+							"key": "consumerSecret",
+							"value": "F4VIjyl8YoxOoeuQXR1aWPJHqVesIFdgiC4lEVM1PoCxByOaFD",
+							"type": "string"
+						},
+						{
+							"key": "consumerKey",
+							"value": "5C1Zpu5VuwKknBJAJhxTI5kFj",
+							"type": "string"
+						},
+						{
+							"key": "signatureMethod",
+							"value": "HMAC-SHA1",
+							"type": "string"
+						},
+						{
+							"key": "version",
+							"value": "1.0",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "ConsumerKey",
+						"type": "text",
+						"value": "5C1Zpu5VuwKknBJAJhxTI5kFj"
+					},
+					{
+						"key": "ConsumerSecret",
+						"type": "text",
+						"value": "F4VIjyl8YoxOoeuQXR1aWPJHqVesIFdgiC4lEVM1PoCxByOaFD"
+					},
+					{
+						"key": "AccessToken",
+						"type": "text",
+						"value": "9vRLtwBXgO30uTvIu9YBTCCAkvv8EUjmYd1P59Ep"
+					},
+					{
+						"key": "AccessTokenSecret",
+						"type": "text",
+						"value": "pNKbGTzjMSrxfpLEIFU9XoWwrT4bHyrq99qxp0kByv2Mo"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "fullname",
+							"value": "rezkysetiawan",
+							"type": "text"
+						},
+						{
+							"key": "DOB",
+							"value": "1999-01-01",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "rezky2211955",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "Test123#",
+							"type": "text"
+						},
+						{
+							"key": "sex",
+							"value": "0",
+							"type": "text"
+						},
+						{
+							"key": "email",
+							"value": "rezky.setiawan8440@gmail.com",
+							"type": "text"
+						},
+						{
+							"key": "phone",
+							"value": "089629238997",
+							"type": "text"
+						},
+						{
+							"key": "address",
+							"value": "jakarta",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8005/api/supplier/register?",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8005",
+					"path": [
+						"api",
+						"supplier",
+						"register"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": "",
+							"disabled": true
+						}
+					]
+				},
+				"description": "User register"
+			},
+			"response": []
+		},
+		{
+			"name": "Seller Register",
+			"request": {
+				"auth": {
+					"type": "oauth1",
+					"oauth1": [
+						{
+							"key": "addParamsToHeader",
+							"value": true,
+							"type": "boolean"
+						},
+						{
+							"key": "addEmptyParamsToSign",
+							"value": false,
+							"type": "boolean"
+						},
+						{
+							"key": "tokenSecret",
+							"value": "pNKbGTzjMSrxfpLEIFU9XoWwrT4bHyrq99qxp0kByv2Mo",
+							"type": "string"
+						},
+						{
+							"key": "token",
+							"value": "834235722-9vRLtwBXgO30uTvIu9YBTCCAkvv8EUjmYd1P59Ep",
+							"type": "string"
+						},
+						{
+							"key": "consumerSecret",
+							"value": "F4VIjyl8YoxOoeuQXR1aWPJHqVesIFdgiC4lEVM1PoCxByOaFD",
+							"type": "string"
+						},
+						{
+							"key": "consumerKey",
+							"value": "5C1Zpu5VuwKknBJAJhxTI5kFj",
+							"type": "string"
+						},
+						{
+							"key": "signatureMethod",
+							"value": "HMAC-SHA1",
+							"type": "string"
+						},
+						{
+							"key": "version",
+							"value": "1.0",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "ConsumerKey",
+						"type": "text",
+						"value": "5C1Zpu5VuwKknBJAJhxTI5kFj"
+					},
+					{
+						"key": "ConsumerSecret",
+						"type": "text",
+						"value": "F4VIjyl8YoxOoeuQXR1aWPJHqVesIFdgiC4lEVM1PoCxByOaFD"
+					},
+					{
+						"key": "AccessToken",
+						"type": "text",
+						"value": "9vRLtwBXgO30uTvIu9YBTCCAkvv8EUjmYd1P59Ep"
+					},
+					{
+						"key": "AccessTokenSecret",
+						"type": "text",
+						"value": "pNKbGTzjMSrxfpLEIFU9XoWwrT4bHyrq99qxp0kByv2Mo"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "fullname",
+							"value": "rezkysetiawan",
+							"type": "text"
+						},
+						{
+							"key": "DOB",
+							"value": "1999-01-01",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "rezky221196122121",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "Test123#",
+							"type": "text"
+						},
+						{
+							"key": "sex",
+							"value": "0",
+							"type": "text"
+						},
+						{
+							"key": "email",
+							"value": "rezky.setiawan80122112@gmail.com",
+							"type": "text"
+						},
+						{
+							"key": "phone",
+							"value": "089629238997",
+							"type": "text"
+						},
+						{
+							"key": "address",
+							"value": "jakarta",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8005/api/seller/register?",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8005",
+					"path": [
+						"api",
+						"seller",
+						"register"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": "",
+							"disabled": true
+						}
+					]
+				},
+				"description": "User register"
+			},
+			"response": []
+		},
+		{
+			"name": "customer Purchase",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjY0MDdiZDMxOTZjNmRmMzU4OTA3ZjM2ODI5MDZiODcxMjM0ODY3Njk0ZWYxODI4YjMxZTNmNmQ4ZDhjNDA2MzFiMTkyNDFhNjdlNDE1Y2QxIn0.eyJhdWQiOiIxIiwianRpIjoiNjQwN2JkMzE5NmM2ZGYzNTg5MDdmMzY4MjkwNmI4NzEyMzQ4Njc2OTRlZjE4MjhiMzFlM2Y2ZDhkOGM0MDYzMWIxOTI0MWE2N2U0MTVjZDEiLCJpYXQiOjE1NzUyMDEyMzcsIm5iZiI6MTU3NTIwMTIzNywiZXhwIjoxNTc1Mjg3NjM3LCJzdWIiOiIxIiwic2NvcGVzIjpbImN1c3RvbWVyIl19.TlKilWEQL14ShZac9pyNCqOxi0v045iLF-nlcYKtmnlluvvMyuG_N5kAFBxOGJIeYOUHwGqHh9aRFIbS6kAFhvQ5beg_IlbD4IevEu-szdtxQd2JS_npkXQk3v5afobPL_XYRTgrn7VA7snYyIpJfB2IlLA_gEGOJoW5i3O5GphoojPkrh_U3dmfuuuH8e5XkmrD_JDCpxvu_6FccsKLqFM-fXfWHazm-QBbCN2uj8PY2pOgxCAQjT2dTEWK6bhA-SHc-PaAN8Cl1G8mylcINMsyLqQiCWECdFboVZNLnDTXm3cnuETwsaIt3RB_hju_uAN6N6fHq3oX4LL09isyhs_Zu0Aq8dZ851qht7oH1O1Bf91Zs-192-6L_V6O8eyZc97CboDrru64lEk4BXrigTXeOIX0v-m3UXXk1bFjQQCxSeu_RWzUWdnNnO0WXE1pbrr13nATN6rEtZZEXQ8dsTp2eyMltGzaNMuxHfycVCzsX0V9i2fJJaKxKodRA1-9oJ0CjzlPmqReDO5sHmqh-lG_-ny2ZIF5q7ZmSZBquyW-0U_T_wPFg0bVjIFpN_lYs20U84-bJPHRU2wa5c5CePOW2GPEt2Erp1OH-YxOH5YSWfPRNhQJijDKZc8k1NkS0B48joFbPScU35FABcVaX4_4ACOHjqbonEADhpT4wDo",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "cartId[]",
+							"value": "16",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "cartId[]",
+							"value": "21",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "cartId[]",
+							"value": "22",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "cartId[]",
+							"value": "23",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "cartId[]",
+							"value": "25",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8005/api/customer/purchase",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8005",
+					"path": [
+						"api",
+						"customer",
+						"purchase"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "seller Purchase",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjVmY2E4NTFiZjk4MmNiNjViZWY4YTY1NjVjM2ZiNjg1MmNjMjIzMmYxYWZmODIzZTFmNTI3YjQzYWUxYTU2YWFjZWE5ZTFhNTcyYTI0MTdlIn0.eyJhdWQiOiIxIiwianRpIjoiNWZjYTg1MWJmOTgyY2I2NWJlZjhhNjU2NWMzZmI2ODUyY2MyMjMyZjFhZmY4MjNlMWY1MjdiNDNhZTFhNTZhYWNlYTllMWE1NzJhMjQxN2UiLCJpYXQiOjE1NzUxMjkyMDMsIm5iZiI6MTU3NTEyOTIwMywiZXhwIjoxNTc1MjE1NjAyLCJzdWIiOiI2Iiwic2NvcGVzIjpbImN1c3RvbWVyIl19.cY8O0lxPQklMsmIN9hJUP_K_h4XUkH9HeCBAD3ZR4X85F-BV0_qVwP6tQcRgDmrptyUscJrjvtC8wAU7Bpep8ewmAirh2yF1UI-PKCBDSQilJj5OOojAgYB49IHnTRNxZjTuU6O5i9ReM8fkUjuzyLo1jPXYskulXqbLR9Gm1TV8epXa9Y-SUgWZ1PJKAxH1ywvzToemU_XamZ5hDjIH5bdojeP0rgJW0XqHONHdNYrlDhjAEJoxoIb7qiLSnaAYtMYd-t35AB6tWcstWRqsFowO-12UNhRDdt8CtUX1x-51EzFWIhfnxeJBnZbfzXQJFYiB5Y8JoVCHfPGrXi9sDMCvOq75sLnvAdx43FeIfQjMDN8gdDPsHPJWNvi49hiXN-77RqvKLUwJXyADlaNULtj0sLw34ZOQkv7CxBXxs6qk1vyKNzQci_0NPMyCzELiCPgGeypDACsydktM4RYMbpLmPPieg58EBeutfkwdHpNNyxr-ivFMC4Nyki3-DsUCS4xX3uO0ljh4PyKQwId2em-4vWrWAEBlyeSS3BKdQkChkb1IdsT2E40I4C04rbJTLHKlf2UBgJRJ5H8a0uKmHUhPorvANIsLBQvThaFmn3KqZoyt3qFpIyoB4dlpe2m2LAev7Pm2w97GwoKiFPoZNWy8rer4reH_dQl2HFvQ-1Y",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "cartId[]",
+							"value": "16",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "cartId[]",
+							"value": "21",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "cartId[]",
+							"value": "22",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "cartId[]",
+							"value": "23",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "cartId[]",
+							"value": "25",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8005/api/seller/purchase",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8005",
+					"path": [
+						"api",
+						"seller",
+						"purchase"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

@@ -49,6 +49,25 @@ class CoinBalanceController extends Controller
 
     public function show(Request $request)
     {
+        if (!$request->has('id') && !$request->has('username')) {
+            $response = [
+                'status' => 400,
+                'message' => 'field id or username required.'
+            ];
+            return response()->json($response, 400);
+        }
+
+        $validation = Validator::make($request->all(), [
+            'id' => ['numeric'],
+            'username' => ['string']
+        ]);
+        if ($validation->fails()) {
+            $response = [
+                'status' => 400,
+                'message' => $validation->errors()
+            ];
+            return response()->json($response, 400);
+        }
 
         if ($request->has('username')) {
             return $this->showByUsername($request->username);
@@ -56,11 +75,6 @@ class CoinBalanceController extends Controller
         if ($request->has('id')) {
             return $this->showById($request->id);
         }
-        $response = [
-            'status' => 400,
-            'message' => 'field id or username required.'
-        ];
-        return response()->json($response, 400);
     }
 
     /**

@@ -1,0 +1,358 @@
+{
+	"info": {
+		"_postman_id": "9df464a5-3c7b-488d-8608-b6a00d4e165e",
+		"name": "softDevCoin",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Coin Register",
+			"request": {
+				"auth": {
+					"type": "oauth1",
+					"oauth1": [
+						{
+							"key": "addParamsToHeader",
+							"value": true,
+							"type": "boolean"
+						},
+						{
+							"key": "addEmptyParamsToSign",
+							"value": false,
+							"type": "boolean"
+						},
+						{
+							"key": "tokenSecret",
+							"value": "pNKbGTzjMSrxfpLEIFU9XoWwrT4bHyrq99qxp0kByv2Mo",
+							"type": "string"
+						},
+						{
+							"key": "token",
+							"value": "834235722-9vRLtwBXgO30uTvIu9YBTCCAkvv8EUjmYd1P59Ep",
+							"type": "string"
+						},
+						{
+							"key": "consumerSecret",
+							"value": "F4VIjyl8YoxOoeuQXR1aWPJHqVesIFdgiC4lEVM1PoCxByOaFD",
+							"type": "string"
+						},
+						{
+							"key": "consumerKey",
+							"value": "5C1Zpu5VuwKknBJAJhxTI5kFj",
+							"type": "string"
+						},
+						{
+							"key": "signatureMethod",
+							"value": "HMAC-SHA1",
+							"type": "string"
+						},
+						{
+							"key": "version",
+							"value": "1.0",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "ConsumerKey",
+						"type": "text",
+						"value": "5C1Zpu5VuwKknBJAJhxTI5kFj"
+					},
+					{
+						"key": "ConsumerSecret",
+						"type": "text",
+						"value": "F4VIjyl8YoxOoeuQXR1aWPJHqVesIFdgiC4lEVM1PoCxByOaFD"
+					},
+					{
+						"key": "AccessToken",
+						"type": "text",
+						"value": "9vRLtwBXgO30uTvIu9YBTCCAkvv8EUjmYd1P59Ep"
+					},
+					{
+						"key": "AccessTokenSecret",
+						"type": "text",
+						"value": "pNKbGTzjMSrxfpLEIFU9XoWwrT4bHyrq99qxp0kByv2Mo"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "fullname",
+							"value": "rezkysetiawan",
+							"type": "text"
+						},
+						{
+							"key": "DOB",
+							"value": "1999-01-01",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "rezky22119483",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "Test123#",
+							"type": "text"
+						},
+						{
+							"key": "sex",
+							"value": "0",
+							"type": "text"
+						},
+						{
+							"key": "email",
+							"value": "rezky.setiawan483@gmail.com",
+							"type": "text"
+						},
+						{
+							"key": "phone",
+							"value": "089629238997",
+							"type": "text"
+						},
+						{
+							"key": "address",
+							"value": "jakarta",
+							"type": "text"
+						},
+						{
+							"key": "account_type",
+							"value": "1",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8004/api/coin/register?",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8004",
+					"path": [
+						"api",
+						"coin",
+						"register"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": "",
+							"disabled": true
+						}
+					]
+				},
+				"description": "User register"
+			},
+			"response": []
+		},
+		{
+			"name": "coin balance",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjVmY2E4NTFiZjk4MmNiNjViZWY4YTY1NjVjM2ZiNjg1MmNjMjIzMmYxYWZmODIzZTFmNTI3YjQzYWUxYTU2YWFjZWE5ZTFhNTcyYTI0MTdlIn0.eyJhdWQiOiIxIiwianRpIjoiNWZjYTg1MWJmOTgyY2I2NWJlZjhhNjU2NWMzZmI2ODUyY2MyMjMyZjFhZmY4MjNlMWY1MjdiNDNhZTFhNTZhYWNlYTllMWE1NzJhMjQxN2UiLCJpYXQiOjE1NzUxMjkyMDMsIm5iZiI6MTU3NTEyOTIwMywiZXhwIjoxNTc1MjE1NjAyLCJzdWIiOiI2Iiwic2NvcGVzIjpbImN1c3RvbWVyIl19.cY8O0lxPQklMsmIN9hJUP_K_h4XUkH9HeCBAD3ZR4X85F-BV0_qVwP6tQcRgDmrptyUscJrjvtC8wAU7Bpep8ewmAirh2yF1UI-PKCBDSQilJj5OOojAgYB49IHnTRNxZjTuU6O5i9ReM8fkUjuzyLo1jPXYskulXqbLR9Gm1TV8epXa9Y-SUgWZ1PJKAxH1ywvzToemU_XamZ5hDjIH5bdojeP0rgJW0XqHONHdNYrlDhjAEJoxoIb7qiLSnaAYtMYd-t35AB6tWcstWRqsFowO-12UNhRDdt8CtUX1x-51EzFWIhfnxeJBnZbfzXQJFYiB5Y8JoVCHfPGrXi9sDMCvOq75sLnvAdx43FeIfQjMDN8gdDPsHPJWNvi49hiXN-77RqvKLUwJXyADlaNULtj0sLw34ZOQkv7CxBXxs6qk1vyKNzQci_0NPMyCzELiCPgGeypDACsydktM4RYMbpLmPPieg58EBeutfkwdHpNNyxr-ivFMC4Nyki3-DsUCS4xX3uO0ljh4PyKQwId2em-4vWrWAEBlyeSS3BKdQkChkb1IdsT2E40I4C04rbJTLHKlf2UBgJRJ5H8a0uKmHUhPorvANIsLBQvThaFmn3KqZoyt3qFpIyoB4dlpe2m2LAev7Pm2w97GwoKiFPoZNWy8rer4reH_dQl2HFvQ-1Y",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "token",
+						"type": "text",
+						"value": "aHhy7AIAvzPBdQdpB0YbaRH6N9Zw0rbhWCjenCOLhMZKSjq9tvenCidF8Y05",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "product_id",
+							"value": "7",
+							"type": "text"
+						},
+						{
+							"key": "qty",
+							"value": "1",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8004/api/coin/balance?username=rezky221198",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8004",
+					"path": [
+						"api",
+						"coin",
+						"balance"
+					],
+					"query": [
+						{
+							"key": "username",
+							"value": "rezky221198"
+						},
+						{
+							"key": "token",
+							"value": "hlonDs2nLNjXoACagn2107GFXoytoXt3r463U6t4TEkhs9JGLwgCI50DdE9E",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "coin topup",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImQxYmM3OGIwODM1M2VkNmY5MWU5YWRmZGNmYTQ2YTc1NDg4NDI0ZWI5NTc3NzY2MTUyOTBiNDU5NThlY2JmNzFmZGFmNjllZTAxOTZiOTFkIn0.eyJhdWQiOiIxIiwianRpIjoiZDFiYzc4YjA4MzUzZWQ2ZjkxZTlhZGZkY2ZhNDZhNzU0ODg0MjRlYjk1Nzc3NjYxNTI5MGI0NTk1OGVjYmY3MWZkYWY2OWVlMDE5NmI5MWQiLCJpYXQiOjE1NzIxODExNDQsIm5iZiI6MTU3MjE4MTE0NCwiZXhwIjoxNTcyMjY3NTQzLCJzdWIiOiIxIiwic2NvcGVzIjpbInNlbGxlciJdfQ.aEp4x9GKuG6946EHEDannHR-fg6v3nE7s2WBDSbG01vcAOFQjm45NDy3W7AYSxHyaEKANNJXYFukV01RR1FZqEiD6sH7Ql6BIy7_575-J_P_PxGiJm4CVhGaX4u9YIBeDcY72Bne3LaJSgoAty09zZoXYtg9aAjG6ix8M7T46KyAyywwFHrrPSKSa__lZX0p1uPdSVrA16sxCRdo2-8QrMajboncmzHp--uSEDnUdt0CryPlUxmHDdybwPDwhjs7Q4Hzx4G5XsPHebSX3yBnPDOEmIFMgtreLbOiuVrmMp9zd-cVjlW1Ad05w8E1xlFVtYH_XJ6BfHkKF9vJndY_bF4OdV9Dg8skxlI02Hnlm4IE9xqy9UX8aPJ38hLemPPrCsFGdWidaVJj2VrLqkzFxTEp3qYY1G-zi9RQ_XUzwwOF0m4s7ufepykw4g01FqpyKCXlgXgiAngCNTyiQcFA6StkdEo8LtB2cCqAv5Y2dk8h6a0bmcqmbk8994kuE-6CP7xL0mH3pySFgQrpDXSlqCQMWvEowlgXY5S-8vd4m8md5SxMGOXGSyb7R57CNEAzGSHFd7Yyyy3T4WcVixQfvM2Hhu4yj9Q-GK_prQlSEc2SCYu51oVtZW6TEXHSNpK1JkTzGLqX0vZzVPSDuWLqS6Uwnz9zBvk9LNbcwzAvsoQ",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "ConsumerKey",
+						"value": "5C1Zpu5VuwKknBJAJhxTI5kFj",
+						"type": "text"
+					},
+					{
+						"key": "ConsumerSecret",
+						"value": "F4VIjyl8YoxOoeuQXR1aWPJHqVesIFdgiC4lEVM1PoCxByOaFD",
+						"type": "text"
+					},
+					{
+						"key": "AccessToken",
+						"value": "9vRLtwBXgO30uTvIu9YBTCCAkvv8EUjmYd1P59Ep",
+						"type": "text"
+					},
+					{
+						"key": "AccessTokenSecret",
+						"value": "pNKbGTzjMSrxfpLEIFU9XoWwrT4bHyrq99qxp0kByv2Mo",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "productName",
+							"value": "Encu",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "productPrice",
+							"value": "99999",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "productStock",
+							"value": "10",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "productImage",
+							"type": "file",
+							"src": [],
+							"disabled": true
+						},
+						{
+							"key": "username_destination",
+							"value": "rezky221196",
+							"type": "text"
+						},
+						{
+							"key": "topup_balance",
+							"value": "9999999999",
+							"type": "text"
+						},
+						{
+							"key": "id",
+							"value": "1",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/coin/topup/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"coin",
+						"topup",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
