@@ -83,7 +83,10 @@ Route::group(['middleware' => ['checkScopes:supplier']], function () {
 });
 //
 
+// Route Coin
 Route::post('/coin/topup', 'Coin\CoinBalanceController@coinTopUp');
+Route::get('/coin/balance', 'Coin\CoinBalanceController@show');
+
 Route::get('/test', 'TesterController@checkShop');
 Route::get('/test/supplier', 'TesterController@supplierCheck');
 Route::post('/test/sendbalance', 'CoinTransactionController@store');
